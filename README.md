@@ -2,6 +2,8 @@
 
 Plataforma B2B da ImportFácil: loja para clientes empresariais, orçamentos, ordens de importação, financeiro e Painel da equipe.
 
+**▶ Abrir o protótipo: https://importfacil.github.io/REP-TESTE/**
+
 ## O que tem neste repositório
 
 | Pasta | Conteúdo | Situação |
@@ -16,7 +18,7 @@ Comece por [`docs/fase-1.md`](docs/fase-1.md).
 
 ## Protótipo
 
-Abra `index.html` no navegador. Para publicar no GitHub Pages: *Settings → Pages*, branch `main`, pasta `/ (root)`.
+Está publicado em **https://importfacil.github.io/REP-TESTE/** (GitHub Pages, atualizado a cada commit no `main`). Também abre direto do arquivo `index.html` no navegador.
 
 O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×), pedidos, orçamentos e ordens de importação (encomenda ou conta e ordem), cadastro para crédito, Financeiro e o Painel da equipe (crédito, pedidos, recebíveis e condições). Login, boletos, Pix, NF-e, consulta de crédito e CEP são simulados.
 
