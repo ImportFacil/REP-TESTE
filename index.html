@@ -864,6 +864,17 @@
   .eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   @media (max-width:420px){.eqgrid{grid-template-columns:1fr}}
 </style>
+<link rel="manifest" href="prototipo.webmanifest">
+<link rel="apple-touch-icon" href="prototipo-icone-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ImportFácil">
+<script>
+  // App instalável (PWA): registra o service worker só em HTTPS (GitHub Pages, AWS).
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('prototipo-sw.js').catch(() => {}));
+  }
+</script>
 </head>
 <body>
 <div id="phone">
