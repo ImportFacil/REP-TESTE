@@ -62,7 +62,8 @@ resource "aws_s3_bucket_policy" "site" {
   depends_on = [aws_s3_bucket_public_access_block.site]
 }
 
-# Rotas do site sem extensão (ex.: /pedidos/123) entregam o index.html; arquivos (.js, .css, .png) seguem normais.
+# O site é exportado como páginas estáticas (pasta/index.html): /pedidos e /pedidos/ entregam /pedidos/index.html.
+# Arquivos (.js, .css, .png, .json) seguem normais.
 resource "aws_cloudfront_function" "rotas_site" {
   name    = "${local.nome}-rotas-site"
   runtime = "cloudfront-js-2.0"
@@ -70,8 +71,9 @@ resource "aws_cloudfront_function" "rotas_site" {
   code    = <<-JS
     function handler(event) {
       var req = event.request;
-      var ultimo = req.uri.split('/').pop();
-      if (ultimo.indexOf('.') === -1) req.uri = '/index.html';
+      var uri = req.uri;
+      if (uri.endsWith('/')) req.uri = uri + 'index.html';
+      else if (uri.split('/').pop().indexOf('.') === -1) req.uri = uri + '/index.html';
       return req;
     }
   JS

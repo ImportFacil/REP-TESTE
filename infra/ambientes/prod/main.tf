@@ -59,6 +59,11 @@ variable "dominio_origem_api" {
   default = ""
 }
 
+variable "sentry_dsn" {
+  type    = string
+  default = ""
+}
+
 variable "zona_route53_id" {
   type    = string
   default = ""
@@ -76,6 +81,7 @@ module "plataforma" {
   dominio_site       = var.dominio_site
   dominio_origem_api = var.dominio_origem_api
   zona_route53_id    = var.zona_route53_id
+  sentry_dsn         = var.sentry_dsn
 
   # Produção, configuração de INÍCIO (antes de clientes reais). Quando houver clientes, ajuste:
   #   banco_classe = "db.t4g.medium", banco_multi_az = true, banco_performance_insights = true,
@@ -93,6 +99,7 @@ module "plataforma" {
   api_memoria                = 1024
   api_quantidade_min         = 1
   api_quantidade_max         = 4
+  gateway_pagamento          = "desligado"
   retencao_logs_dias         = 90
   cognito_protecao_exclusao  = true
 }

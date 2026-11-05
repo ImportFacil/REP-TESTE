@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "api_execucao_segredos" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      { Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = [aws_secretsmanager_secret.banco.arn] },
+      { Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = [aws_secretsmanager_secret.banco.arn, aws_secretsmanager_secret.simulador.arn] },
       { Effect = "Allow", Action = ["kms:Decrypt"], Resource = [aws_kms_key.principal.arn] },
     ]
   })
@@ -120,7 +120,15 @@ locals {
     FILA_EVENTOS_URL           = aws_sqs_queue.eventos.url
     BUCKET_ARQUIVOS            = aws_s3_bucket.arquivos.bucket
     REDIS_HOST                 = try(aws_elasticache_replication_group.principal[0].primary_endpoint_address, "")
+    GATEWAY                    = var.gateway_pagamento
+    SENTRY_DSN                 = var.sentry_dsn
   }
+
+  segredos_api = [
+    { name = "DB_USUARIO", valueFrom = "${aws_secretsmanager_secret.banco.arn}:usuario::" },
+    { name = "DB_SENHA", valueFrom = "${aws_secretsmanager_secret.banco.arn}:senha::" },
+    { name = "WEBHOOK_SEGREDO_SIMULADOR", valueFrom = aws_secretsmanager_secret.simulador.arn },
+  ]
 }
 
 resource "aws_ecs_task_definition" "api" {
@@ -142,10 +150,7 @@ resource "aws_ecs_task_definition" "api" {
     essential    = true
     portMappings = [{ containerPort = 3000, protocol = "tcp" }]
     environment  = [for k, v in local.ambiente_api : { name = k, value = v }]
-    secrets = [
-      { name = "DB_USUARIO", valueFrom = "${aws_secretsmanager_secret.banco.arn}:usuario::" },
-      { name = "DB_SENHA", valueFrom = "${aws_secretsmanager_secret.banco.arn}:senha::" },
-    ]
+    secrets      = local.segredos_api
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -158,7 +163,7 @@ resource "aws_ecs_task_definition" "api" {
     user                   = "node"
   }])
 
-  depends_on = [aws_secretsmanager_secret_version.banco]
+  depends_on = [aws_secretsmanager_secret_version.banco, aws_secretsmanager_secret_version.simulador]
 }
 
 # ---------- balanceador ----------

@@ -35,6 +35,7 @@ A troca para duas zonas e a mudança de classe do banco são feitas pela AWS com
 | Borda (HTTPS, cache do site, bloqueio de ataques) | CloudFront + WAF (+ Route 53 e certificados, se houver domínio) | `site.tf` |
 | Site e painel | S3 privado, servido só pelo CloudFront | `site.tf` |
 | API | ECS Fargate atrás de um balanceador que só aceita o CloudFront | `api.tf` |
+| Worker (fila de eventos e rotinas) | ECS Fargate, mesma imagem da API | `worker.tf` |
 | Fila (fase 2: webhooks, NF-e, avisos) | SQS com fila de erros | `fila.tf` |
 | Banco de dados | RDS PostgreSQL 16, criptografado, só TLS | `banco.tf` |
 | Cache | ElastiCache Redis, criptografado | `cache.tf` |
@@ -46,7 +47,9 @@ A troca para duas zonas e a mudança de classe do banco são feitas pela AWS com
 
 O endereço do site é `https://<domínio>` e a API fica em `https://<domínio>/api`. Sem domínio próprio, o CloudFront dá um endereço `https://xxxx.cloudfront.net`.
 
-> **Ainda não criados (fase 2):** os workers que consomem a fila e o agendador (EventBridge Scheduler) da régua de cobrança e da conciliação. Eles entram junto com o código que vão rodar.
+O site (Next.js) fica na raiz e o protótipo antigo em `/prototipo/`. As rotinas (Pix vencido, régua de cobrança, orçamentos vencidos) rodam dentro do worker, com trava no banco, sem precisar de um agendador separado.
+
+**Gateway de pagamento:** `simulador` em dev e homologação e `desligado` em produção (variável `gateway_pagamento`). Quando houver as chaves do Asaas, a integração entra e produção passa a usá-la.
 
 ## Antes de começar
 
@@ -77,7 +80,7 @@ Em **Settings → Secrets and variables → Actions → Variables** do repositó
 | `AWS_PAPEL_BUILD` | saída `papel_build` |
 | `ECR_REPOSITORIO` | saída `repositorio_imagens` |
 
-Em **Settings → Environments**, crie três environments: `dev`, `homolog` e `producao`. Em cada um, crie a variável `AWS_PAPEL_DEPLOY` com o papel correspondente da saída `papeis_deploy`. No `producao`, marque **Required reviewers** e escolha quem aprova as entregas.
+Em **Settings → Environments**, crie três environments: `dev`, `homolog` e `producao`. Em cada um, crie a variável `AWS_PAPEL_DEPLOY` com o papel correspondente da saída `papeis_deploy` (e, se usar o Sentry, `SENTRY_DSN_SITE`). No `producao`, marque **Required reviewers** e escolha quem aprova as entregas.
 
 ### 3. Publicar a primeira imagem
 

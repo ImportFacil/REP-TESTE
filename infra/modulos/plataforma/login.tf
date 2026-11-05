@@ -6,8 +6,12 @@ locals {
     clientes = { mfa = "OPTIONAL", rotulo = "Clientes" }
     equipe   = { mfa = "ON", rotulo = "Equipe ImportFácil" } # verificação em 2 etapas obrigatória
   }
+  # O site volta do login em /auth/retorno/ e, ao sair, vai para a página inicial.
   urls_retorno = distinct(compact([
-    local.url_site,
+    "${local.url_site}/auth/retorno/",
+    var.ambiente == "dev" ? "http://localhost:3001/auth/retorno/" : "",
+  ]))
+  urls_saida = distinct(compact([
     "${local.url_site}/",
     var.ambiente == "dev" ? "http://localhost:3001/" : "",
   ]))
@@ -87,7 +91,7 @@ resource "aws_cognito_user_pool_client" "site" {
   allowed_oauth_scopes                 = ["openid", "email", "profile"]
   supported_identity_providers         = ["COGNITO"]
   callback_urls                        = local.urls_retorno
-  logout_urls                          = local.urls_retorno
+  logout_urls                          = local.urls_saida
   prevent_user_existence_errors        = "ENABLED"
   enable_token_revocation              = true
 

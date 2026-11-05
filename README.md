@@ -9,12 +9,13 @@ Plataforma B2B da ImportFácil: loja para clientes empresariais, orçamentos, or
 | Pasta | Conteúdo | Situação |
 | --- | --- | --- |
 | `index.html` | Protótipo navegável de todas as telas (dados ficam no navegador) | Pronto; é publicado como site de cada ambiente |
-| `backend/` | API em NestJS + PostgreSQL | **Fase 1 pronta:** login, empresas, usuários, catálogo e preços por tipo de cliente, auditoria |
+| `frontend/` | Site em Next.js ligado à API (loja, Painel da equipe, app instalável) | **Pronto** |
+| `backend/` | API em NestJS + PostgreSQL, e o worker | **Fases 1 e 2 prontas:** login, empresas, catálogo e preços, crédito, pedidos, pagamentos (simulados até o Asaas), orçamentos, ordens de importação, régua de cobrança, auditoria |
 | `infra/` | Infraestrutura AWS em Terraform (São Paulo) | **Fase 1 pronta:** dev, homologação e produção |
 | `.github/workflows/` | Testes, publicação da imagem e deploy | Pronto; o deploy liga quando a AWS for configurada |
 | `docs/` | Situação da fase 1 e próximos passos | — |
 
-Comece por [`docs/fase-1.md`](docs/fase-1.md).
+Comece por [`docs/fase-2.md`](docs/fase-2.md) (situação atual) e [`docs/fase-1.md`](docs/fase-1.md).
 
 ## Protótipo
 
@@ -24,7 +25,7 @@ O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×),
 
 ## Fases de entrega
 
-1. **Base** (este repositório): infraestrutura nos três ambientes, login de clientes e equipe, empresas e usuários, catálogo e preços por tipo de cliente.
-2. **Venda e pagamento:** carrinho, pedido, Pix, boleto e cartão pelo gateway, webhooks, Financeiro do cliente, cadastro e aprovação de crédito.
+1. **Base** ✅ infraestrutura nos três ambientes, login de clientes e equipe, empresas e usuários, catálogo e preços por tipo de cliente.
+2. **Venda e pagamento** ✅ (com gateway simulado até as chaves do Asaas): carrinho, pedido, Pix, boleto e cartão, webhooks, Financeiro do cliente, cadastro e aprovação de crédito.
 3. **Fiscal e operação:** NF-e pelo ERP, régua de cobrança, conciliação diária, orçamentos e ordens de importação.
 4. **Importação a fundo:** custos com câmbio, conta e ordem com numerário, documentos do processo, Siscomex e relatórios.

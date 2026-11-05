@@ -6,6 +6,7 @@ import { lerConfig } from './config';
 import { FILA, FilaSqs, type Fila } from './pagamentos/fila';
 import { WebhookService } from './pagamentos/webhook.service';
 import { RotinasService } from './rotinas/rotinas.service';
+import { iniciarSentry, registrarErro } from './observabilidade';
 
 /**
  * Worker: processa a fila de eventos (avisos de pagamento) e roda as rotinas
@@ -14,6 +15,7 @@ import { RotinasService } from './rotinas/rotinas.service';
  */
 async function iniciar(): Promise<void> {
   const config = lerConfig();
+  iniciarSentry(config, 'worker');
   const app = await NestFactory.createApplicationContext(AppModule.com(config), { bufferLogs: true });
   app.useLogger(app.get(Logger));
   app.enableShutdownHooks();
@@ -29,6 +31,7 @@ async function iniciar(): Promise<void> {
       await rotinas.executarPendentes();
     } catch (e) {
       log.error(`Falha nas rotinas: ${(e as Error).message}`);
+      registrarErro(e, { onde: 'rotinas' });
     }
   };
   await ciclo();
@@ -36,7 +39,7 @@ async function iniciar(): Promise<void> {
 
   if (fila instanceof FilaSqs) {
     log.log('Worker consumindo a fila de eventos.');
-    await fila.consumir((m) => webhooks.processar(m), () => parar);
+    await fila.consumir((m) => webhooks.processar(m).catch((e) => { registrarErro(e, { mensagem: m }); throw e; }), () => parar);
   } else {
     log.log('Fila em memória: os eventos são processados pela própria API; o worker só roda as rotinas.');
     while (!parar) await new Promise((r) => setTimeout(r, 1000));

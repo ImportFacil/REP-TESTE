@@ -41,6 +41,8 @@ jobs:
             echo "SERVICO=$(ler ecs/servico)"
             echo "FAMILIA=$(ler ecs/familia)"
             echo "CONTEINER=$(ler ecs/conteiner)"
+            echo "SERVICO_WORKER=$(ler ecs/servico-worker)"
+            echo "FAMILIA_WORKER=$(ler ecs/familia-worker)"
             echo "SUBREDES=$(ler ecs/subredes)"
             echo "GRUPO_SEG=$(ler ecs/grupo-seguranca)"
             echo "IP_PUBLICO=$(ler ecs/ip-publico)"
@@ -48,18 +50,30 @@ jobs:
             echo "BUCKET_SITE=$(ler site/bucket)"
             echo "DISTRIBUICAO=$(ler site/distribuicao)"
             echo "URL_SITE=$(ler site/url)"
+            echo "COG_CLI_POOL=$(ler login/clientes/pool)"
+            echo "COG_CLI_CLIENT=$(ler login/clientes/client)"
+            echo "COG_CLI_DOMINIO=$(ler login/clientes/dominio)"
+            echo "COG_EQ_POOL=$(ler login/equipe/pool)"
+            echo "COG_EQ_CLIENT=$(ler login/equipe/client)"
+            echo "COG_EQ_DOMINIO=$(ler login/equipe/dominio)"
           } >> "$GITHUB_ENV"
 
-      - name: Registrar definição de tarefa com a imagem ${{ inputs.tag }}
+      - name: Registrar definições de tarefa (API e worker) com a imagem ${{ inputs.tag }}
         run: |
-          atual=$(aws ecs describe-task-definition --task-definition "$FAMILIA" --query taskDefinition)
-          imagem_base=$(echo "$atual" | jq -r --arg c "$CONTEINER" '.containerDefinitions[] | select(.name==$c) | .image' | sed 's/:[^:]*$//')
-          nova=$(echo "$atual" | jq --arg c "$CONTEINER" --arg img "$imagem_base:${{ inputs.tag }}" '
-            .containerDefinitions |= map(if .name == $c then .image = $img else . end)
-            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
-          arn=$(aws ecs register-task-definition --cli-input-json "$nova" --query taskDefinition.taskDefinitionArn --output text)
-          echo "TAREFA=$arn" >> "$GITHUB_ENV"
-          echo "Nova definição: $arn"
+          registrar() {
+            local familia="$1" conteiner="$2" atual imagem_base nova
+            atual=$(aws ecs describe-task-definition --task-definition "$familia" --query taskDefinition)
+            imagem_base=$(echo "$atual" | jq -r --arg c "$conteiner" '.containerDefinitions[] | select(.name==$c) | .image' | sed 's/:[^:]*$//')
+            nova=$(echo "$atual" | jq --arg c "$conteiner" --arg img "$imagem_base:${{ inputs.tag }}" '
+              .containerDefinitions |= map(if .name == $c then .image = $img else . end)
+              | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
+            aws ecs register-task-definition --cli-input-json "$nova" --query taskDefinition.taskDefinitionArn --output text
+          }
+          TAREFA=$(registrar "$FAMILIA" "$CONTEINER")
+          TAREFA_WORKER=$(registrar "$FAMILIA_WORKER" worker)
+          echo "TAREFA=$TAREFA" >> "$GITHUB_ENV"
+          echo "TAREFA_WORKER=$TAREFA_WORKER" >> "$GITHUB_ENV"
+          echo "API: $TAREFA"; echo "Worker: $TAREFA_WORKER"
 
       - name: Migrar banco e dados de referência
         run: |
@@ -82,19 +96,46 @@ jobs:
           rodar migracao node dist/banco/migrar.js
           rodar semear node dist/banco/semear.js
 
-      - name: Trocar a versão da API
+      - name: Trocar a versão da API e do worker
         run: |
           aws ecs update-service --cluster "$CLUSTER" --service "$SERVICO" --task-definition "$TAREFA" >/dev/null
-          aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICO"
+          aws ecs update-service --cluster "$CLUSTER" --service "$SERVICO_WORKER" --task-definition "$TAREFA_WORKER" >/dev/null
+          aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICO" "$SERVICO_WORKER"
           em_uso=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICO" --query 'services[0].taskDefinition' --output text)
           if [ "$em_uso" != "$TAREFA" ]; then
             echo "::error::A nova versão não ficou saudável e o ECS voltou para a anterior ($em_uso)."
             exit 1
           fi
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Montar o site (Next.js) e o protótipo em /prototipo
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          mkdir -p out/prototipo
+          cp ../index.html out/prototipo/index.html
+          # Configuração lida pelo site ao abrir (login pelo Cognito deste ambiente).
+          jq -n --arg amb "${{ inputs.ambiente }}" --arg r "$AWS_REGION" --arg sentry "${{ vars.SENTRY_DSN_SITE }}" \
+            --arg cp "$COG_CLI_POOL" --arg cc "$COG_CLI_CLIENT" --arg cd "$COG_CLI_DOMINIO" \
+            --arg ep "$COG_EQ_POOL" --arg ec "$COG_EQ_CLIENT" --arg ed "$COG_EQ_DOMINIO" '{
+              ambiente: $amb, api: "/api", auth: "cognito",
+              clientes: { regiao: $r, pool: $cp, client: $cc, dominio: $cd },
+              equipe: { regiao: $r, pool: $ep, client: $ec, dominio: $ed }
+            } + (if $sentry != "" then { sentryDsn: $sentry } else {} end)' > out/config.json
+
       - name: Publicar o site
         run: |
-          aws s3 cp index.html "s3://$BUCKET_SITE/index.html" --cache-control "no-cache" --content-type "text/html; charset=utf-8"
+          # Arquivos com hash no nome ficam em cache por 1 ano; páginas e config.json, sem cache.
+          aws s3 sync frontend/out "s3://$BUCKET_SITE/" --delete --exclude "*.html" --exclude "config.json" --exclude "manifest.webmanifest" --exclude "sw.js" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync frontend/out "s3://$BUCKET_SITE/" --exclude "*" --include "*.html" --include "config.json" --include "manifest.webmanifest" --include "sw.js" \
+            --cache-control "no-cache"
           aws cloudfront create-invalidation --distribution-id "$DISTRIBUICAO" --paths "/*" >/dev/null
 
       - name: Conferir a saúde da API

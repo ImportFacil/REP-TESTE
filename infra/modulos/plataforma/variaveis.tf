@@ -142,6 +142,32 @@ variable "api_quantidade_max" {
   default = 2
 }
 
+variable "gateway_pagamento" {
+  description = "simulador (dev e homologação) ou desligado (produção, até as chaves do Asaas)."
+  type        = string
+  default     = "desligado"
+  validation {
+    condition     = contains(["simulador", "desligado"], var.gateway_pagamento)
+    error_message = "Use simulador ou desligado."
+  }
+}
+
+variable "sentry_dsn" {
+  description = "Opcional: DSN do projeto no Sentry para os erros da API e do worker."
+  type        = string
+  default     = ""
+}
+
+variable "worker_cpu" {
+  type    = number
+  default = 256
+}
+
+variable "worker_memoria" {
+  type    = number
+  default = 512
+}
+
 # ---------- domínio (opcional) ----------
 
 variable "dominio_site" {

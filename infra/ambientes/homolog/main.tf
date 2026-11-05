@@ -59,6 +59,11 @@ variable "dominio_origem_api" {
   default = ""
 }
 
+variable "sentry_dsn" {
+  type    = string
+  default = ""
+}
+
 variable "zona_route53_id" {
   type    = string
   default = ""
@@ -76,6 +81,7 @@ module "plataforma" {
   dominio_site       = var.dominio_site
   dominio_origem_api = var.dominio_origem_api
   zona_route53_id    = var.zona_route53_id
+  sentry_dsn         = var.sentry_dsn
 
   # Homologação econômica: sem NAT, banco micro, uma tarefa pequena.
   usar_nat                   = false
@@ -89,6 +95,7 @@ module "plataforma" {
   api_memoria        = 512
   api_quantidade_min = 1
   api_quantidade_max = 2
+  gateway_pagamento  = "simulador"
   retencao_logs_dias = 30
 }
 

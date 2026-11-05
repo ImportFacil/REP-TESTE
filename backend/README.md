@@ -2,13 +2,17 @@
 
 NestJS (TypeScript) + PostgreSQL, com consultas pelo [Kysely](https://kysely.dev) e migrações versionadas.
 
-## Módulos da fase 1
+## Módulos
 
 | Módulo | O que faz | Rotas |
 | --- | --- | --- |
 | Contas e acesso | Empresas (CNPJ numérico ou alfanumérico), usuários e papéis | `GET /eu`, `/empresa/*`, `/equipe/empresas/*`, `/equipe/usuarios/*` |
 | Catálogo e preços | Categorias por tipo de cliente, produtos, desconto e pedido mínimo por tipo, cotação | `/catalogo/*`, `/equipe/tabelas-preco/*`, `/equipe/produtos/*` |
 | Auditoria | Quem fez o quê e quando, com antes e depois, em cadastros, usuários e preços | `GET /equipe/auditoria` |
+| Crédito | Cadastro, documentos, faixas A/B/C, limite, conta e ordem para cliente grande | `/credito/*`, `/equipe/credito/*` |
+| Pedidos | Condições de pagamento, pedido com preço congelado, faturamento, andamento | `/pedidos/*`, `/equipe/pedidos/*` |
+| Pagamentos | Cobranças, parcelas, webhook do gateway, Financeiro, recebíveis, condições versionadas | `/financeiro`, `/pagamentos/*`, `/equipe/recebiveis` |
+| Importação | Orçamentos, ordens, numerário, prestação de contas | `/orcamentos/*`, `/ordens/*`, `/equipe/orcamentos/*`, `/equipe/ordens/*` |
 | Saúde | Usado pelo balanceador e pelos alarmes | `GET /saude` |
 
 A documentação interativa das rotas fica em `/docs` (desligada em produção).
@@ -34,6 +38,7 @@ npm run build
 npm run migrar
 npm run semear -- --demonstracao      # tipos de cliente, catálogo do protótipo e 5 empresas de exemplo
 npm start                              # http://localhost:3000/docs
+npm run worker                         # fila e rotinas (Pix vencido, régua de cobrança…)
 ```
 
 Para chamar a API como um cliente ou como a equipe, gere um token de desenvolvimento:
@@ -47,7 +52,7 @@ npm run token-dev -- admin@importfacil.dev equipe
 
 ```bash
 npm test            # regras de preço, CNPJ e configuração
-npm run test:api    # 28 cenários de ponta a ponta contra um PostgreSQL de verdade (TESTE_DATABASE_URL)
+npm run test:api    # 56 cenários de ponta a ponta contra um PostgreSQL de verdade (TESTE_DATABASE_URL)
 npm run lint && npm run typecheck
 ```
 
