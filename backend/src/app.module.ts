@@ -9,6 +9,12 @@ import { BancoModule } from './banco/banco.module';
 import { CatalogoModule } from './catalogo/catalogo.module';
 import { CONFIG, type Config } from './config';
 import { ContasModule } from './contas/contas.module';
+import { CreditoModule } from './credito/credito.module';
+import { DevTokenController } from './auth/dev-token.controller';
+import { ImportacaoModule } from './importacao/importacao.module';
+import { PagamentosModule } from './pagamentos/pagamentos.module';
+import { PedidosModule } from './pedidos/pedidos.module';
+import { RotinasModule } from './rotinas/rotinas.module';
 import { SaudeController } from './saude/saude.controller';
 
 @Module({})
@@ -38,8 +44,13 @@ export class AppModule {
         AuditoriaModule,
         ContasModule,
         CatalogoModule,
+        PagamentosModule,
+        CreditoModule,
+        PedidosModule,
+        ImportacaoModule,
+        RotinasModule,
       ],
-      controllers: [SaudeController],
+      controllers: [SaudeController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };
   }

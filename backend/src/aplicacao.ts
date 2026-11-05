@@ -8,7 +8,7 @@ import type { Config } from './config';
 
 /** Monta a aplicação (usado pelo main.ts e pelos testes de ponta a ponta). */
 export async function criarAplicacao(config: Config): Promise<INestApplication> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule.com(config), { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule.com(config), { bufferLogs: true, rawBody: true });
   app.useLogger(app.get(Logger));
   // Atrás do CloudFront e do balanceador, o IP real de quem acessa vem em X-Forwarded-For.
   app.set('trust proxy', config.saltosProxy);

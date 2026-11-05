@@ -7,6 +7,8 @@ import type { Database } from './tipos';
 // bigint (int8) e numeric viram number: os valores em centavos ficam muito abaixo de 2^53.
 types.setTypeParser(20, (v) => Number(v));
 types.setTypeParser(1700, (v) => Number(v));
+// date sem fuso: fica como texto AAAA-MM-DD (vencimentos não podem mudar de dia por causa do fuso).
+types.setTypeParser(1082, (v) => v);
 
 export function criarConexao(banco: Config['banco']): Kysely<Database> {
   const ssl = banco.ssl

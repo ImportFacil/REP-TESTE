@@ -31,6 +31,15 @@ export interface Config {
   saltosProxy: number;
   limiteRequisicoesPorMinuto: number;
   documentacaoApi: boolean;
+  pagamentos: {
+    /** "simulador" (dev e homologação) ou "desligado". O Asaas entra quando houver as chaves. */
+    gateway: 'simulador' | 'desligado';
+    segredoWebhookSimulador: string;
+  };
+  /** Fila de eventos: SQS na AWS; em memória (processa na hora) no ambiente local e nos testes. */
+  filaEventosUrl?: string;
+  arquivos: { modo: 's3' | 'local'; bucket?: string; pasta: string };
+  sentryDsn?: string;
 }
 
 const AMBIENTES: Ambiente[] = ['local', 'teste', 'dev', 'homolog', 'prod'];
@@ -102,7 +111,20 @@ export function lerConfig(env: NodeJS.ProcessEnv = process.env): Config {
     saltosProxy: Number(env.SALTOS_PROXY ?? 1),
     limiteRequisicoesPorMinuto: Number(env.LIMITE_REQ_MINUTO ?? 120),
     documentacaoApi: (env.DOCS_API ?? (ambiente === 'prod' ? 'false' : 'true')) === 'true',
+    pagamentos: lerPagamentos(env, ambiente),
+    filaEventosUrl: env.FILA_EVENTOS_URL || undefined,
+    arquivos: env.BUCKET_ARQUIVOS
+      ? { modo: 's3', bucket: env.BUCKET_ARQUIVOS, pasta: '' }
+      : { modo: 'local', pasta: env.PASTA_ARQUIVOS ?? '/tmp/importfacil-arquivos' },
+    sentryDsn: env.SENTRY_DSN || undefined,
   };
+}
+
+function lerPagamentos(env: NodeJS.ProcessEnv, ambiente: Ambiente): Config['pagamentos'] {
+  const gateway = (env.GATEWAY ?? (ambiente === 'prod' ? 'desligado' : 'simulador')) as Config['pagamentos']['gateway'];
+  if (gateway !== 'simulador' && gateway !== 'desligado') throw new Error(`GATEWAY inválido: ${gateway}`);
+  if (gateway === 'simulador' && ambiente === 'prod') throw new Error('O gateway simulado não pode rodar em produção.');
+  return { gateway, segredoWebhookSimulador: env.WEBHOOK_SEGREDO_SIMULADOR ?? 'segredo-do-simulador' };
 }
 
 export const CONFIG = Symbol('CONFIG');

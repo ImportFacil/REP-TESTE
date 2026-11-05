@@ -55,6 +55,7 @@ export interface EmpresasTabela {
   tipo_cliente: string;
   endereco: Json<Endereco> | null;
   situacao: Generated<SituacaoEmpresa>;
+  conta_e_ordem_liberada: Generated<boolean>;
   criado_em: Generated<Momento>;
   atualizado_em: Generated<Momento>;
 }
@@ -116,6 +117,262 @@ export interface AuditoriaTabela {
   criado_em: Generated<Momento>;
 }
 
+// ---------------- fase 2 ----------------
+
+export type FormaPagamento = 'pix' | 'boleto' | 'cartao';
+export type SituacaoPedido = 'novo' | 'em_separacao' | 'enviado' | 'entregue' | 'cancelado';
+export type SituacaoPagamentoPedido =
+  | 'aguardando_pagamento' | 'pix_expirado' | 'aguardando_faturamento' | 'em_aberto' | 'pago' | 'estornado' | 'cancelado';
+export type SituacaoCadastro = 'rascunho' | 'em_analise' | 'pendente_documentos' | 'aprovado' | 'reprovado';
+export type Faixa = 'A' | 'B' | 'C';
+export type Modalidade = 'encomenda' | 'conta_e_ordem';
+export type EtapaNumerario = 'cambio' | 'tributos' | 'despesas_finais';
+
+export interface PoliticasPagamentoTabela {
+  id: Generated<number>;
+  pix_desconto_bp: number;
+  pix_validade_horas: number;
+  boleto_max_parcelas: number;
+  cartao_max_parcelas: number;
+  cartao_sem_juros_ate: number;
+  cartao_juros_am_bp: number;
+  multa_atraso_bp: number;
+  juros_atraso_am_bp: number;
+  atraso_bloqueio_dias: number;
+  cliente_grande_mensal_centavos: number;
+  criado_por: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface CadastrosCreditoTabela {
+  empresa_id: string;
+  situacao: Generated<SituacaoCadastro>;
+  faturamento_mensal_centavos: number | null;
+  compras_mensais_previstas_centavos: number | null;
+  limite_solicitado_centavos: number | null;
+  anos_cnpj: number | null;
+  dados: Generated<Json<Record<string, unknown>>>;
+  faixa: Faixa | null;
+  limite_aprovado_centavos: Generated<number>;
+  parecer: string | null;
+  analista_id: string | null;
+  enviado_em: Momento | null;
+  decidido_em: Momento | null;
+  proxima_revisao_em: ColumnType<string | null, string | null | undefined, string | null>;
+  atualizado_em: Generated<Momento>;
+}
+
+export interface LimitesCreditoTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  faixa: Faixa;
+  valor_centavos: number;
+  aprovado_por: string;
+  motivo: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface DocumentosTabela {
+  id: Generated<string>;
+  empresa_id: string;
+  dono: 'cadastro' | 'ordem';
+  dono_id: string;
+  tipo: string;
+  nome_arquivo: string;
+  tipo_conteudo: string;
+  tamanho_bytes: number;
+  chave: string;
+  sha256: string;
+  enviado_por: string;
+  substituido: Generated<boolean>;
+  criado_em: Generated<Momento>;
+}
+
+export interface PedidosTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  comprador_id: string;
+  tipo_cliente: string;
+  forma_pagamento: FormaPagamento;
+  parcelas: number;
+  subtotal_centavos: number;
+  desconto_centavos: Generated<number>;
+  juros_centavos: Generated<number>;
+  total_centavos: number;
+  situacao: Generated<SituacaoPedido>;
+  situacao_pagamento: SituacaoPagamentoPedido;
+  politica_id: number;
+  endereco_entrega: Json<Endereco> | null;
+  observacao: string | null;
+  faturado_em: Momento | null;
+  criado_em: Generated<Momento>;
+  atualizado_em: Generated<Momento>;
+}
+
+export interface PedidoItensTabela {
+  id: Generated<number>;
+  pedido_id: number;
+  produto_id: number;
+  codigo: string;
+  nome: string;
+  unidade: string;
+  quantidade: number;
+  preco_tabela_centavos: number;
+  preco_unitario_centavos: number;
+  total_centavos: number;
+}
+
+export interface PedidoEventosTabela {
+  id: Generated<number>;
+  pedido_id: number;
+  tipo: string;
+  descricao: string;
+  usuario_id: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface OrcamentosTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  solicitante_id: string;
+  modalidade: Modalidade;
+  situacao: Generated<'solicitado' | 'enviado' | 'aceito' | 'recusado' | 'expirado' | 'cancelado'>;
+  observacao: string | null;
+  frete_centavos: number | null;
+  taxa_servico_bp: number | null;
+  total_centavos: number | null;
+  condicao: string | null;
+  prazo_entrega_dias: number | null;
+  valido_ate: ColumnType<string | null, string | null | undefined, string | null>;
+  respondido_por: string | null;
+  respondido_em: Momento | null;
+  decidido_em: Momento | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface OrcamentoItensTabela {
+  id: Generated<number>;
+  orcamento_id: number;
+  produto_id: number | null;
+  descricao: string;
+  unidade: Generated<string>;
+  quantidade: number;
+  preco_unitario_centavos: number | null;
+}
+
+export interface OrdensImportacaoTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  orcamento_id: number;
+  modalidade: Modalidade;
+  etapa: string;
+  concluida: Generated<boolean>;
+  cancelada: Generated<boolean>;
+  criado_em: Generated<Momento>;
+  atualizado_em: Generated<Momento>;
+}
+
+export interface OrdemEventosTabela {
+  id: Generated<number>;
+  ordem_id: number;
+  etapa: string;
+  descricao: string;
+  usuario_id: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface NumerariosTabela {
+  id: Generated<number>;
+  ordem_id: number;
+  etapa: EtapaNumerario;
+  valor_previsto_centavos: number;
+  valor_pago_centavos: Generated<number>;
+  situacao: Generated<'aguardando' | 'pago' | 'cancelado'>;
+  criado_por: string;
+  criado_em: Generated<Momento>;
+  pago_em: Momento | null;
+}
+
+export interface OrdemGastosTabela {
+  id: Generated<number>;
+  ordem_id: number;
+  etapa: EtapaNumerario;
+  descricao: string;
+  valor_centavos: number;
+  registrado_por: string;
+  criado_em: Generated<Momento>;
+}
+
+export interface CobrancasTabela {
+  id: Generated<number>;
+  pedido_id: number | null;
+  numerario_id: number | null;
+  meio: FormaPagamento;
+  valor_centavos: number;
+  gateway: string;
+  id_gateway: string | null;
+  situacao: Generated<'pendente' | 'paga' | 'expirada' | 'cancelada' | 'estornada'>;
+  expira_em: Momento | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface ParcelasTabela {
+  id: Generated<number>;
+  cobranca_id: number;
+  numero: number;
+  valor_centavos: number;
+  vencimento: ColumnType<string, string, string>;
+  situacao: Generated<'aberta' | 'vencida' | 'paga' | 'cancelada'>;
+  id_gateway: string | null;
+  linha_digitavel: string | null;
+  pix_copia_cola: string | null;
+  valor_pago_centavos: number | null;
+  pago_em: Momento | null;
+}
+
+export interface PagamentosTabela {
+  id: Generated<number>;
+  parcela_id: number;
+  valor_centavos: number;
+  pago_em: Momento;
+  meio: string;
+  id_evento_gateway: string;
+  criado_em: Generated<Momento>;
+}
+
+export interface EventosWebhookTabela {
+  id: Generated<number>;
+  origem: string;
+  id_evento: string;
+  tipo: string;
+  conteudo: Json<unknown>;
+  assinatura_valida: boolean;
+  recebido_em: Generated<Momento>;
+  processado_em: Momento | null;
+  erro: string | null;
+}
+
+export interface NotificacoesTabela {
+  id: Generated<number>;
+  empresa_id: string | null;
+  destinatario: string;
+  canal: 'email' | 'whatsapp';
+  modelo: string;
+  chave: string;
+  dados: Json<Record<string, unknown>>;
+  situacao: Generated<'pendente' | 'enviada' | 'falhou'>;
+  criado_em: Generated<Momento>;
+  enviado_em: Momento | null;
+}
+
+export interface RotinasExecucoesTabela {
+  nome: string;
+  referencia: string;
+  iniciado_em: Generated<Momento>;
+  concluido_em: Momento | null;
+  resultado: Json<unknown> | null;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -123,7 +380,32 @@ export interface Database {
   categorias: CategoriasTabela;
   produtos: ProdutosTabela;
   auditoria: AuditoriaTabela;
+  politicas_pagamento: PoliticasPagamentoTabela;
+  cadastros_credito: CadastrosCreditoTabela;
+  limites_credito: LimitesCreditoTabela;
+  documentos: DocumentosTabela;
+  pedidos: PedidosTabela;
+  pedido_itens: PedidoItensTabela;
+  pedido_eventos: PedidoEventosTabela;
+  orcamentos: OrcamentosTabela;
+  orcamento_itens: OrcamentoItensTabela;
+  ordens_importacao: OrdensImportacaoTabela;
+  ordem_eventos: OrdemEventosTabela;
+  numerarios: NumerariosTabela;
+  ordem_gastos: OrdemGastosTabela;
+  cobrancas: CobrancasTabela;
+  parcelas: ParcelasTabela;
+  pagamentos: PagamentosTabela;
+  eventos_webhook: EventosWebhookTabela;
+  notificacoes: NotificacoesTabela;
+  rotinas_execucoes: RotinasExecucoesTabela;
 }
+
+export type Politica = Selectable<PoliticasPagamentoTabela>;
+export type CadastroCredito = Selectable<CadastrosCreditoTabela>;
+export type Pedido = Selectable<PedidosTabela>;
+export type Cobranca = Selectable<CobrancasTabela>;
+export type Parcela = Selectable<ParcelasTabela>;
 
 export type TabelaPreco = Selectable<TabelasPrecoTabela>;
 export type Empresa = Selectable<EmpresasTabela>;

@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "3.1162.0",
+    "@aws-sdk/client-s3": "3.1162.0",
+    "@aws-sdk/client-sqs": "3.1162.0",
     "@nestjs/common": "11.2.8",
     "@nestjs/core": "11.2.8",
     "@nestjs/platform-express": "11.2.8",
@@ -28,6 +30,7 @@
     "@eslint/js": "9.39.5",
     "@nestjs/testing": "11.2.8",
     "@types/jest": "29.5.14",
+    "@types/multer": "2.3.0",
     "@types/node": "22.20.5",
     "@types/pg": "8.23.1",
     "@types/supertest": "7.2.1",
@@ -52,6 +55,7 @@
     "migrar": "node dist/banco/migrar.js",
     "semear": "node dist/banco/semear.js",
     "criar-admin": "node dist/scripts/criar-admin.js",
-    "token-dev": "node dist/scripts/token-dev.js"
+    "token-dev": "node dist/scripts/token-dev.js",
+    "worker": "node dist/worker.js"
   }
 }

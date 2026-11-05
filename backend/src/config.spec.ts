@@ -31,4 +31,11 @@ describe('lerConfig', () => {
     expect(c.documentacaoApi).toBe(false);
     expect(c.auth.modo).toBe('cognito');
   });
+
+  it('nunca usa o gateway simulado em produção', () => {
+    const cognito = { COGNITO_CLIENTES_POOL_ID: 'p1', COGNITO_CLIENTES_CLIENT_ID: 'c1', COGNITO_EQUIPE_POOL_ID: 'p2', COGNITO_EQUIPE_CLIENT_ID: 'c2' };
+    expect(lerConfig({ ...base, ...cognito, AMBIENTE: 'prod' }).pagamentos.gateway).toBe('desligado');
+    expect(() => lerConfig({ ...base, ...cognito, AMBIENTE: 'prod', GATEWAY: 'simulador' })).toThrow(/produção/);
+    expect(lerConfig({ ...base }).pagamentos.gateway).toBe('simulador');
+  });
 });
