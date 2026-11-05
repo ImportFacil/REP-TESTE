@@ -1,0 +1,106 @@
+# Deploy de uma versão já publicada no ECR em um ambiente:
+# 1. registra a nova definição de tarefa com a imagem nova;
+# 2. aplica as migrações do banco e os dados de referência (tarefas avulsas);
+# 3. troca a versão da API (o ECS volta sozinho para a anterior se a nova falhar);
+# 4. publica o site e confere a saúde da API.
+name: _deploy
+
+on:
+  workflow_call:
+    inputs:
+      ambiente: { type: string, required: true }
+      environment: { type: string, required: true }
+      tag: { type: string, required: true }
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy em ${{ inputs.ambiente }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      AWS_REGION: sa-east-1
+      PREFIXO: /importfacil/${{ inputs.ambiente }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PAPEL_DEPLOY }}
+          aws-region: sa-east-1
+
+      - name: Ler parâmetros do ambiente
+        run: |
+          ler() { aws ssm get-parameter --name "$PREFIXO/$1" --query Parameter.Value --output text; }
+          {
+            echo "CLUSTER=$(ler ecs/cluster)"
+            echo "SERVICO=$(ler ecs/servico)"
+            echo "FAMILIA=$(ler ecs/familia)"
+            echo "CONTEINER=$(ler ecs/conteiner)"
+            echo "SUBREDES=$(ler ecs/subredes)"
+            echo "GRUPO_SEG=$(ler ecs/grupo-seguranca)"
+            echo "LOG_GROUP=$(ler ecs/log-group)"
+            echo "BUCKET_SITE=$(ler site/bucket)"
+            echo "DISTRIBUICAO=$(ler site/distribuicao)"
+            echo "URL_SITE=$(ler site/url)"
+          } >> "$GITHUB_ENV"
+
+      - name: Registrar definição de tarefa com a imagem ${{ inputs.tag }}
+        run: |
+          atual=$(aws ecs describe-task-definition --task-definition "$FAMILIA" --query taskDefinition)
+          imagem_base=$(echo "$atual" | jq -r --arg c "$CONTEINER" '.containerDefinitions[] | select(.name==$c) | .image' | sed 's/:[^:]*$//')
+          nova=$(echo "$atual" | jq --arg c "$CONTEINER" --arg img "$imagem_base:${{ inputs.tag }}" '
+            .containerDefinitions |= map(if .name == $c then .image = $img else . end)
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
+          arn=$(aws ecs register-task-definition --cli-input-json "$nova" --query taskDefinition.taskDefinitionArn --output text)
+          echo "TAREFA=$arn" >> "$GITHUB_ENV"
+          echo "Nova definição: $arn"
+
+      - name: Migrar banco e dados de referência
+        run: |
+          rodar() {
+            local nome="$1"; shift
+            local cmd; cmd=$(jq -cn --args '$ARGS.positional' "$@")
+            local tarefa
+            tarefa=$(aws ecs run-task --cluster "$CLUSTER" --task-definition "$TAREFA" --launch-type FARGATE \
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBREDES],securityGroups=[$GRUPO_SEG],assignPublicIp=DISABLED}" \
+              --overrides "{\"containerOverrides\":[{\"name\":\"$CONTEINER\",\"command\":$cmd}]}" \
+              --started-by "github-$nome" --query 'tasks[0].taskArn' --output text)
+            echo "$nome: $tarefa"
+            aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$tarefa"
+            local codigo
+            codigo=$(aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$tarefa" --query 'tasks[0].containers[0].exitCode' --output text)
+            local id="${tarefa##*/}"
+            aws logs get-log-events --log-group-name "$LOG_GROUP" --log-stream-name "api/$CONTEINER/$id" --query 'events[].message' --output text || true
+            if [ "$codigo" != "0" ]; then echo "::error::$nome falhou (código $codigo)"; exit 1; fi
+          }
+          rodar migracao node dist/banco/migrar.js
+          rodar semear node dist/banco/semear.js
+
+      - name: Trocar a versão da API
+        run: |
+          aws ecs update-service --cluster "$CLUSTER" --service "$SERVICO" --task-definition "$TAREFA" >/dev/null
+          aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICO"
+          em_uso=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICO" --query 'services[0].taskDefinition' --output text)
+          if [ "$em_uso" != "$TAREFA" ]; then
+            echo "::error::A nova versão não ficou saudável e o ECS voltou para a anterior ($em_uso)."
+            exit 1
+          fi
+
+      - name: Publicar o site
+        run: |
+          aws s3 cp index.html "s3://$BUCKET_SITE/index.html" --cache-control "no-cache" --content-type "text/html; charset=utf-8"
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUICAO" --paths "/*" >/dev/null
+
+      - name: Conferir a saúde da API
+        run: |
+          for i in $(seq 1 12); do
+            if curl -fsS "$URL_SITE/api/saude"; then echo; exit 0; fi
+            sleep 10
+          done
+          echo "::error::A API não respondeu em $URL_SITE/api/saude"
+          exit 1

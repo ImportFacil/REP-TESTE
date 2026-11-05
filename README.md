@@ -1,44 +1,28 @@
-# ImportFácil — Protótipo da Loja B2B
+# ImportFácil
 
-Protótipo navegável da plataforma ImportFácil: loja B2B para clientes empresariais, orçamentos, ordens de importação, financeiro e Painel da equipe.
+Plataforma B2B da ImportFácil: loja para clientes empresariais, orçamentos, ordens de importação, financeiro e Painel da equipe.
 
-É uma página única (`index.html`), sem dependências nem instalação. Todos os dados ficam no navegador (`localStorage`). O objetivo é validar telas e regras de negócio e servir de especificação para o desenvolvimento do sistema real.
+## O que tem neste repositório
 
-## Como abrir
+| Pasta | Conteúdo | Situação |
+| --- | --- | --- |
+| `index.html` | Protótipo navegável de todas as telas (dados ficam no navegador) | Pronto; é publicado como site de cada ambiente |
+| `backend/` | API em NestJS + PostgreSQL | **Fase 1 pronta:** login, empresas, usuários, catálogo e preços por tipo de cliente, auditoria |
+| `infra/` | Infraestrutura AWS em Terraform (São Paulo) | **Fase 1 pronta:** dev, homologação e produção |
+| `.github/workflows/` | Testes, publicação da imagem e deploy | Pronto; o deploy liga quando a AWS for configurada |
+| `docs/` | Situação da fase 1 e próximos passos | — |
 
-- **No computador:** baixe o repositório e abra `index.html` no navegador.
-- **Online (GitHub Pages):** em *Settings → Pages*, escolha a branch `main` e a pasta `/ (root)`. A página fica em `https://importfacil.github.io/Prot-tipo-IF/`.
+Comece por [`docs/fase-1.md`](docs/fase-1.md).
 
-## O que o protótipo cobre
+## Protótipo
 
-**Loja do cliente**
-- Início, categorias, produto, busca e favoritos
-- Preços e pedido mínimo por tipo de cliente (cooperativa, distribuidora, revendedor, construtora, hospital privado)
-- Carrinho e fechamento de pedido
-- Pagamento: Pix à vista com desconto, boleto parcelado 30/60/90/120 dias, cartão de crédito em até 12×
-- Bloqueio do boleto quando o cadastro não foi aprovado, há parcela em atraso ou o pedido passa do limite de crédito
-- Pedidos, recompra e nota fiscal
-- Orçamentos e ordens de importação, com modalidade encomenda ou conta e ordem
-- Cadastro da empresa e documentos para análise de crédito
-- Financeiro: parcelas em aberto, linha digitável e Pix (a baixa vem do "banco")
+Abra `index.html` no navegador. Para publicar no GitHub Pages: *Settings → Pages*, branch `main`, pasta `/ (root)`.
 
-**Painel da equipe**
-- Crédito: analisar cadastro, definir limite, aprovar, pedir documentos ou reprovar
-- Pedidos: avançar status de pedidos e ordens de importação
-- Recebíveis: boletos a receber, atrasos, vendas no cartão e régua de cobrança
-- Condições: desconto do Pix, parcelas do boleto e do cartão, multa e juros
+O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×), pedidos, orçamentos e ordens de importação (encomenda ou conta e ordem), cadastro para crédito, Financeiro e o Painel da equipe (crédito, pedidos, recebíveis e condições). Login, boletos, Pix, NF-e, consulta de crédito e CEP são simulados.
 
-## O que é simulado
+## Fases de entrega
 
-Depende do backend: login real, emissão de boletos e Pix pelo gateway, confirmação de pagamento por webhook, consulta de crédito em bureau, emissão de NF-e e busca de CEP. No protótipo, botões "Simular" fazem esse papel.
-
-## Arquitetura do sistema real
-
-A arquitetura proposta (AWS São Paulo, API em NestJS, PostgreSQL, gateway de pagamento, ERP para NF-e, política de crédito e fases de entrega) está no documento **Arquitetura ImportFácil**.
-
-## Próximos passos
-
-1. Fase 1 — Base: infraestrutura, login, empresas, catálogo e preços por tipo de cliente
-2. Fase 2 — Venda e pagamento: pedido, Pix, boleto, cartão, webhooks e crédito
-3. Fase 3 — Fiscal e operação: NF-e, régua de cobrança, conciliação, orçamentos e ordens
-4. Fase 4 — Importação a fundo: custos com câmbio, conta e ordem com numerário, Siscomex
+1. **Base** (este repositório): infraestrutura nos três ambientes, login de clientes e equipe, empresas e usuários, catálogo e preços por tipo de cliente.
+2. **Venda e pagamento:** carrinho, pedido, Pix, boleto e cartão pelo gateway, webhooks, Financeiro do cliente, cadastro e aprovação de crédito.
+3. **Fiscal e operação:** NF-e pelo ERP, régua de cobrança, conciliação diária, orçamentos e ordens de importação.
+4. **Importação a fundo:** custos com câmbio, conta e ordem com numerário, documentos do processo, Siscomex e relatórios.

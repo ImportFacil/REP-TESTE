@@ -1,0 +1,7 @@
+imagem_api         = "123456789012.dkr.ecr.sa-east-1.amazonaws.com/importfacil/api"
+imagem_tag_inicial = "COMMIT-DO-PRIMEIRO-BUILD"
+email_alertas      = "ti@importfacil.com.br"
+# Com domínio próprio (opcional):
+# dominio_site       = "homolog.importfacil.com.br"
+# dominio_origem_api = "origem-api.homolog.importfacil.com.br"
+# zona_route53_id    = "Z0123456789ABCDEFGHIJ"

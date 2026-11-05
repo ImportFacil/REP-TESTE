@@ -1,0 +1,3 @@
+imagem_api         = "123456789012.dkr.ecr.sa-east-1.amazonaws.com/importfacil/api"
+imagem_tag_inicial = "COMMIT-DO-PRIMEIRO-BUILD"
+email_alertas      = "ti@importfacil.com.br"
