@@ -53,10 +53,10 @@ resource "aws_db_instance" "principal" {
   final_snapshot_identifier = local.prod ? "${local.nome}-final" : null
 
   auto_minor_version_upgrade = true
-  # Performance Insights não existe nas classes menores (micro/small); liga só em produção.
-  performance_insights_enabled          = local.prod
-  performance_insights_kms_key_id       = local.prod ? aws_kms_key.principal.arn : null
-  performance_insights_retention_period = local.prod ? 7 : null
+  # Performance Insights não existe nas classes micro e small.
+  performance_insights_enabled          = var.banco_performance_insights
+  performance_insights_kms_key_id       = var.banco_performance_insights ? aws_kms_key.principal.arn : null
+  performance_insights_retention_period = var.banco_performance_insights ? 7 : null
   enabled_cloudwatch_logs_exports       = ["postgresql"]
 
   lifecycle {

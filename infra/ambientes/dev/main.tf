@@ -78,7 +78,8 @@ module "plataforma" {
   zona_route53_id    = var.zona_route53_id
 
   # Ambiente dos desenvolvedores: o menor e mais barato possível.
-  nat_por_zona               = false
+  # Opcional: no começo, os desenvolvedores podem usar o ambiente local (Docker) e não criar este.
+  usar_nat                   = false
   banco_classe               = "db.t4g.micro"
   banco_multi_az             = false
   banco_retencao_backup_dias = 1

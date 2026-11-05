@@ -77,19 +77,19 @@ module "plataforma" {
   dominio_origem_api = var.dominio_origem_api
   zona_route53_id    = var.zona_route53_id
 
-  # Homologação: parecido com produção, mas em uma zona só para custar menos.
-  nat_por_zona               = false
-  banco_classe               = "db.t4g.small"
+  # Homologação econômica: sem NAT, banco micro, uma tarefa pequena.
+  usar_nat                   = false
+  banco_classe               = "db.t4g.micro"
   banco_multi_az             = false
   banco_retencao_backup_dias = 7
   banco_protecao_exclusao    = false
-  cache_habilitado           = true
-  cache_tipo_no              = "cache.t4g.micro"
-  api_cpu                    = 512
-  api_memoria                = 1024
-  api_quantidade_min         = 1
-  api_quantidade_max         = 2
-  retencao_logs_dias         = 30
+  # O Redis só passa a ser usado pelo código na fase 2.
+  cache_habilitado   = false
+  api_cpu            = 256
+  api_memoria        = 512
+  api_quantidade_min = 1
+  api_quantidade_max = 2
+  retencao_logs_dias = 30
 }
 
 output "plataforma" {

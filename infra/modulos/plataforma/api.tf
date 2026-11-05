@@ -98,6 +98,8 @@ resource "aws_iam_role_policy" "api_tarefa" {
 # com a imagem nova (por isso o serviço ignora mudanças em task_definition).
 
 locals {
+  subredes_api = var.usar_nat ? aws_subnet.aplicacao[*].id : aws_subnet.publica[*].id
+
   ambiente_api = {
     AMBIENTE                   = var.ambiente
     PORTA                      = "3000"
@@ -241,9 +243,9 @@ resource "aws_ecs_service" "api" {
   enable_execute_command            = false
 
   network_configuration {
-    subnets          = aws_subnet.aplicacao[*].id
+    subnets          = local.subredes_api
     security_groups  = [aws_security_group.api.id]
-    assign_public_ip = false
+    assign_public_ip = !var.usar_nat
   }
 
   load_balancer {

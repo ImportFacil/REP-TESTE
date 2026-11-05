@@ -43,6 +43,7 @@ jobs:
             echo "CONTEINER=$(ler ecs/conteiner)"
             echo "SUBREDES=$(ler ecs/subredes)"
             echo "GRUPO_SEG=$(ler ecs/grupo-seguranca)"
+            echo "IP_PUBLICO=$(ler ecs/ip-publico)"
             echo "LOG_GROUP=$(ler ecs/log-group)"
             echo "BUCKET_SITE=$(ler site/bucket)"
             echo "DISTRIBUICAO=$(ler site/distribuicao)"
@@ -67,7 +68,7 @@ jobs:
             local cmd; cmd=$(jq -cn --args '$ARGS.positional' "$@")
             local tarefa
             tarefa=$(aws ecs run-task --cluster "$CLUSTER" --task-definition "$TAREFA" --launch-type FARGATE \
-              --network-configuration "awsvpcConfiguration={subnets=[$SUBREDES],securityGroups=[$GRUPO_SEG],assignPublicIp=DISABLED}" \
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBREDES],securityGroups=[$GRUPO_SEG],assignPublicIp=$IP_PUBLICO}" \
               --overrides "{\"containerOverrides\":[{\"name\":\"$CONTEINER\",\"command\":$cmd}]}" \
               --started-by "github-$nome" --query 'tasks[0].taskArn' --output text)
             echo "$nome: $tarefa"

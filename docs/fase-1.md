@@ -9,8 +9,8 @@ Comparação entre o documento **Arquitetura ImportFácil** e o que está neste 
 | AWS São Paulo, três ambientes separados | `infra/ambientes/{dev,homolog,prod}` | Sintaxe e formato conferidos; o CI roda `terraform validate` |
 | Borda: HTTPS, cache e firewall (CloudFront + WAF), domínio opcional | `infra/modulos/plataforma/site.tf` | idem |
 | API em contêineres atrás de balanceador, com volta automática se a versão nova falhar | `api.tf` | idem |
-| Banco PostgreSQL em duas zonas, backup de 35 dias, só TLS, criptografado | `banco.tf` | idem |
-| Cache Redis, fila com fila de erros, arquivos com versões | `cache.tf`, `fila.tf`, `arquivos.tf` | idem |
+| Banco PostgreSQL com backup de 35 dias, só TLS, criptografado (duas zonas: pronto para ligar quando houver clientes) | `banco.tf` | idem |
+| Cache Redis (desligado até a fase 2), fila com fila de erros, arquivos com versões | `cache.tf`, `fila.tf`, `arquivos.tf` | idem |
 | Login com 2 grupos (clientes e equipe), 2 etapas obrigatórias para a equipe | `login.tf` + `backend/src/auth` | 28 testes de API |
 | Segredos no Secrets Manager, chaves no KMS, nada no código | `seguranca.tf` | — |
 | Alertas: API fora do ar ou lenta, erros, banco no limite, fila de erros | `monitoramento.tf` | — |
@@ -28,7 +28,7 @@ Também entrou o **CNPJ alfanumérico**, que a Receita Federal emite desde julho
 
 | Item | Para quê | Quem |
 | --- | --- | --- |
-| Conta AWS com cartão | Criar os ambientes (`infra/README.md`, passo 1) | Diretoria / TI |
+| Conta AWS com cartão (início estimado em US$ 340 por mês, sem impostos) | Criar os ambientes (`infra/README.md`, passo 1) | Diretoria / TI |
 | Variáveis e environments no GitHub | Ligar o deploy automático (passo 2) | Quem administra o repositório |
 | Domínio no Route 53 | Endereço próprio e HTTPS até a API em produção | TI |
 | Amazon SES com o domínio | Convites e recuperação de senha sem o limite de 50 e-mails por dia | TI |

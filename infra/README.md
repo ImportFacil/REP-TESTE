@@ -1,12 +1,32 @@
 # Infraestrutura AWS (Terraform)
 
-Tudo na região **São Paulo (sa-east-1)**, em uma conta AWS, com três ambientes separados (cada um com a sua rede, banco, chaves e login):
+Tudo na região **São Paulo (sa-east-1)**, em uma conta AWS, com três ambientes separados (cada um com a sua rede, banco, chaves e login).
 
-| Ambiente | Para quê | Banco | API | Cache |
-| --- | --- | --- | --- | --- |
-| `dev` | Trabalho dos desenvolvedores | 1 zona, backup de 1 dia | 1 tarefa pequena | desligado |
-| `homolog` | Testes da equipe antes de cada entrega | 1 zona, backup de 7 dias | 1 a 2 tarefas | 1 nó |
-| `prod` | Clientes reais | 2 zonas, backup de 35 dias, proteção contra exclusão | 2 a 6 tarefas | 2 nós com failover |
+A configuração atual é a **de início**, enxuta até haver clientes reais:
+
+| Ambiente | Para quê | Rede | Banco | API | Cache |
+| --- | --- | --- | --- | --- | --- |
+| `dev` (opcional) | Trabalho dos desenvolvedores | sem NAT | micro, backup de 1 dia | 1 tarefa pequena | desligado |
+| `homolog` | Testes da equipe antes de cada entrega | sem NAT | micro, backup de 7 dias | 1 a 2 tarefas pequenas | desligado |
+| `prod` | Clientes reais | 1 NAT | small, 1 zona, backup de 35 dias, proteção contra exclusão | 1 a 4 tarefas | desligado |
+
+Custo estimado (preços de tabela em São Paulo, pouco tráfego, sem impostos): **cerca de US$ 110 por mês em homologação e US$ 230 em produção**, e uns US$ 100 a mais se o `dev` for criado. O Redis está desligado porque o código só passa a usá-lo na fase 2.
+
+**Sem NAT** (dev e homologação), a API roda nas sub-redes públicas com IP próprio, o que economiza cerca de US$ 70 por mês por ambiente. O grupo de segurança continua recusando qualquer conexão que não venha do balanceador, e o banco segue sem acesso à internet.
+
+### Quando chegarem os clientes reais
+
+Em `infra/ambientes/prod/main.tf`, mude e rode `terraform apply`:
+
+| De | Para | Por quê |
+| --- | --- | --- |
+| `banco_classe = "db.t4g.small"` | `"db.t4g.medium"` (e `banco_performance_insights = true`) | mais fôlego e painel de desempenho |
+| `banco_multi_az = false` | `true` | se uma zona cair, o banco continua no ar |
+| `nat_por_zona = false` | `true` | a saída para a internet não depende de uma zona só |
+| `api_quantidade_min = 1` | `2` | uma tarefa em cada zona |
+| `cache_habilitado = false` | `true` e `cache_replicas = 1` | na fase 2, quando o código usar o Redis |
+
+A troca para duas zonas e a mudança de classe do banco são feitas pela AWS com alguns minutos de instabilidade. Faça fora do horário comercial. O backup de 35 dias já vale desde o primeiro dia.
 
 ## O que é criado em cada ambiente
 
@@ -88,7 +108,7 @@ AMB=homolog
 P=/importfacil/$AMB
 ler() { aws ssm get-parameter --name "$P/$1" --query Parameter.Value --output text; }
 aws ecs run-task --cluster "$(ler ecs/cluster)" --task-definition "$(ler ecs/familia)" --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[$(ler ecs/subredes)],securityGroups=[$(ler ecs/grupo-seguranca)],assignPublicIp=DISABLED}" \
+  --network-configuration "awsvpcConfiguration={subnets=[$(ler ecs/subredes)],securityGroups=[$(ler ecs/grupo-seguranca)],assignPublicIp=$(ler ecs/ip-publico)}" \
   --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/scripts/criar-admin.js","--email","voce@importfacil.com.br","--nome","Seu Nome"]}]}'
 ```
 
@@ -104,5 +124,5 @@ A pessoa recebe por e-mail a senha temporária. No primeiro login, troca a senha
 ## Pontos de atenção
 
 - **E-mails do Cognito:** por padrão, o Cognito envia no máximo 50 e-mails por dia (convites e recuperação de senha). Antes de abrir para clientes, configure o Amazon SES com o domínio da ImportFácil.
-- **Custos:** os maiores são o NAT (um por zona em produção), o banco em duas zonas e o balanceador. Dev e homologação usam a menor configuração possível. Destrua o `dev` quando não estiver em uso.
+- **Custos:** os maiores são o NAT, o balanceador e o banco. Dev e homologação não têm NAT e usam a menor configuração possível. O `dev` pode ser destruído quando não estiver em uso (`terraform destroy`), e criado de novo depois.
 - **Contas separadas:** hoje os três ambientes ficam na mesma conta AWS, separados por rede, chaves e permissões. Quando a operação crescer, vale mover produção para uma conta própria (AWS Organizations).

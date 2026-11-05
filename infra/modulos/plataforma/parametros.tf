@@ -6,7 +6,8 @@ locals {
     "ecs/servico"            = aws_ecs_service.api.name
     "ecs/familia"            = aws_ecs_task_definition.api.family
     "ecs/conteiner"          = "api"
-    "ecs/subredes"           = join(",", aws_subnet.aplicacao[*].id)
+    "ecs/subredes"           = join(",", local.subredes_api)
+    "ecs/ip-publico"         = var.usar_nat ? "DISABLED" : "ENABLED"
     "ecs/grupo-seguranca"    = aws_security_group.api.id
     "ecs/log-group"          = aws_cloudwatch_log_group.api.name
     "site/bucket"            = aws_s3_bucket.site.bucket

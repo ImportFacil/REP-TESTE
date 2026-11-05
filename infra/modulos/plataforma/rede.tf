@@ -59,8 +59,9 @@ resource "aws_route_table_association" "publica" {
 }
 
 # NAT: a API sai para a internet (Cognito, e na fase 2 gateway de pagamento e ERP) sem receber conexões.
+# Sem NAT (usar_nat = false), a API usa as sub-redes públicas; banco e cache continuam sem acesso à internet.
 locals {
-  qtd_nat = var.nat_por_zona ? length(var.zonas) : 1
+  qtd_nat = var.usar_nat ? (var.nat_por_zona ? length(var.zonas) : 1) : 0
 }
 
 resource "aws_eip" "nat" {
@@ -80,9 +81,12 @@ resource "aws_nat_gateway" "principal" {
 resource "aws_route_table" "privada" {
   count  = length(var.zonas)
   vpc_id = aws_vpc.principal.id
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.principal[var.nat_por_zona ? count.index : 0].id
+  dynamic "route" {
+    for_each = var.usar_nat ? [1] : []
+    content {
+      cidr_block     = "0.0.0.0/0"
+      nat_gateway_id = aws_nat_gateway.principal[var.nat_por_zona ? count.index : 0].id
+    }
   }
   tags = { Name = "${local.nome}-privada-${var.zonas[count.index]}" }
 }

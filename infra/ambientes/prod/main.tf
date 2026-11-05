@@ -77,21 +77,22 @@ module "plataforma" {
   dominio_origem_api = var.dominio_origem_api
   zona_route53_id    = var.zona_route53_id
 
-  # Produção: duas zonas em tudo, 35 dias de backup e proteção contra exclusão.
-  nat_por_zona               = true
-  banco_classe               = "db.t4g.medium"
-  banco_multi_az             = true
-  banco_armazenamento_gb     = 50
-  banco_armazenamento_max_gb = 500
+  # Produção, configuração de INÍCIO (antes de clientes reais). Quando houver clientes, ajuste:
+  #   banco_classe = "db.t4g.medium", banco_multi_az = true, banco_performance_insights = true,
+  #   nat_por_zona = true, api_quantidade_min = 2, cache_habilitado = true (fase 2), cache_replicas = 1.
+  usar_nat                   = true
+  nat_por_zona               = false
+  banco_classe               = "db.t4g.small"
+  banco_multi_az             = false
+  banco_armazenamento_gb     = 20
+  banco_armazenamento_max_gb = 200
   banco_retencao_backup_dias = 35
   banco_protecao_exclusao    = true
-  cache_habilitado           = true
-  cache_tipo_no              = "cache.t4g.small"
-  cache_replicas             = 1
-  api_cpu                    = 1024
-  api_memoria                = 2048
-  api_quantidade_min         = 2
-  api_quantidade_max         = 6
+  cache_habilitado           = false
+  api_cpu                    = 512
+  api_memoria                = 1024
+  api_quantidade_min         = 1
+  api_quantidade_max         = 4
   retencao_logs_dias         = 90
   cognito_protecao_exclusao  = true
 }

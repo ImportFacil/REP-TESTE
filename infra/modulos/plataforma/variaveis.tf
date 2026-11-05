@@ -30,6 +30,16 @@ variable "zonas" {
   default     = ["sa-east-1a", "sa-east-1c"]
 }
 
+variable "usar_nat" {
+  description = <<-EOT
+    Com NAT (produção), a API fica em sub-redes privadas e sai para a internet pelo NAT.
+    Sem NAT (economia em dev e homologação), a API roda nas sub-redes públicas com IP próprio;
+    o grupo de segurança continua recusando qualquer conexão que não venha do balanceador.
+  EOT
+  type        = bool
+  default     = true
+}
+
 variable "nat_por_zona" {
   description = "Um NAT por zona (produção) ou um só (economia em dev e homologação)."
   type        = bool
@@ -68,6 +78,12 @@ variable "banco_retencao_backup_dias" {
   description = "Backups diários com restauração a qualquer minuto do período (até 35)."
   type        = number
   default     = 7
+}
+
+variable "banco_performance_insights" {
+  description = "Painel de desempenho do banco. Não existe nas classes micro e small."
+  type        = bool
+  default     = false
 }
 
 variable "banco_protecao_exclusao" {
