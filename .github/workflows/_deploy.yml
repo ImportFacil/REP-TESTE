@@ -124,7 +124,7 @@ jobs:
           npm ci --no-audit --no-fund
           npm run build
           mkdir -p out/prototipo
-          cp ../index.html ../prototipo.webmanifest ../prototipo-sw.js ../prototipo-icone-*.png out/prototipo/
+          cp ../index.html ../prototipo-*.webmanifest ../prototipo-sw.js ../prototipo-globo-*.png out/prototipo/
           # Configuração lida pelo site ao abrir (login pelo Cognito deste ambiente).
           jq -n --arg amb "${{ inputs.ambiente }}" --arg r "$AWS_REGION" --arg sentry "${{ vars.SENTRY_DSN_SITE }}" \
             --arg cp "$COG_CLI_POOL" --arg cc "$COG_CLI_CLIENT" --arg cd "$COG_CLI_DOMINIO" \

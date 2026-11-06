@@ -1,9 +1,9 @@
 /* Service worker da ImportFácil: deixa o site instalável e abre mais rápido.
    Nunca guarda respostas da API nem o config.json (dados sempre atuais). */
-const VERSAO = 'importfacil-v3';
+const VERSAO = 'importfacil-v4';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSAO).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icone-192.png'])).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSAO).then((c) => c.addAll(['/', '/manifest.webmanifest', '/globo-192.png'])).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

@@ -10,9 +10,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icone-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/globo-192.png', sizes: '192x192', type: 'image/png' },
     ],
-    apple: '/icone-apple.png',
+    apple: '/globo-apple.png',
   },
   appleWebApp: { capable: true, title: 'ImportFácil', statusBarStyle: 'default' },
 };
