@@ -863,41 +863,46 @@
   .radiocard.off .muted{color:var(--muted-foreground)}
   .eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   @media (max-width:420px){.eqgrid{grid-template-columns:1fr}}
-  /* Calculadora de importação (Painel da equipe) — réplica da planilha */
-  .calc-top{display:grid;gap:0 12px}
-  @media (min-width:760px){.calc-top{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}}
-  .calc-cambios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 8px}
-  @media (max-width:520px){.calc-cambios{grid-template-columns:1fr}}
-  .calc-wrap{overflow-x:auto;max-width:100%;border:1px solid var(--border);border-radius:var(--radius-md)}
-  .calc-wrap:focus-visible{outline:2px solid var(--ring)}
-  .calc-tab{border-collapse:collapse;font-size:.72rem;font-variant-numeric:tabular-nums;min-width:100%}
-  .calc-tab th{background:var(--muted);color:var(--ink-2);font-weight:600;text-align:center;vertical-align:bottom;padding:6px 8px;border-bottom:1px solid var(--border);min-width:96px;line-height:1.25}
-  .calc-tab th .calc-col{display:block;font-size:.62rem;color:var(--muted-foreground);font-weight:500}
-  .calc-tab td{padding:4px 8px;border-bottom:1px solid var(--hairline);white-space:nowrap;text-align:right}
-  .calc-tab td.calc-inp{padding:3px 4px}
-  .calc-in{width:100%;min-width:84px;padding:5px 7px;font-size:.74rem;color:#1d4ed8;font-weight:600;text-align:right;box-shadow:none}
-  .calc-in.calc-txt{text-align:left}
-  .calc-in.calc-desc{min-width:220px}
-  [data-theme="dark"] .calc-in{color:#7aa2ff}
-  .calc-tot td{font-weight:700;background:var(--muted)}
-  .calc-desp td:first-child{text-align:left;white-space:normal;min-width:180px}
-  .calc-desp td:last-child{text-align:left;white-space:normal;font-size:.66rem}
-  .calc-extras{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.72rem;color:var(--ink-2);margin-top:10px}
-  .calc-cols2{display:block}
-  @media (min-width:1024px){.calc-cols2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}}
+  /* Calculadora de importação (Painel da equipe) */
+  .calc-cols{display:block}
+  @media (min-width:1024px){.calc-cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}.calc-side{min-width:0}}
   .calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
   @media (min-width:640px){.calc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  .calc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .calc-span2{grid-column:span 2}
+  .calc-item{border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px;margin-bottom:10px}
+  .calc-item-top{display:flex;gap:6px;align-items:center}
+  .calc-det summary{cursor:pointer;font-size:.74rem;color:var(--muted-foreground);margin-top:10px}
+  .calc-item-res{font-size:.74rem;color:var(--ink-2);margin-top:8px;border-top:1px dashed var(--hairline);padding-top:6px}
+  .calc-item-res .pos,.calc-u .pos{color:var(--good)} .calc-item-res .neg,.calc-u .neg{color:var(--critical)}
+  .calc-u{padding:8px 0;border-bottom:1px solid var(--hairline)} .calc-u:last-child{border-bottom:none}
+  .calc-u .row{font-size:.8rem;margin-bottom:2px}
+  .calc-actions{display:grid;gap:8px;margin-bottom:12px}
   .calc-anexo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
-  .calc-ncm{display:flex;align-items:center;gap:2px}
-  .calc-ncm .btn{padding:4px 6px;min-height:0}
-  .calc-in.ncm-invalido{color:var(--critical);border-color:var(--critical)}
+  .calc-ncm{display:flex;align-items:center;gap:4px}
+  .calc-ncm .btn{flex:none;padding:6px 8px}
+  .calc-ncm-desc{font-size:.66rem;color:var(--muted-foreground);margin-top:3px;line-height:1.3}
+  .calc-ncm-desc.neg{color:var(--critical)}
+  input.ncm-invalido{color:var(--critical);border-color:var(--critical)}
   .ncm-lista{margin-top:8px;display:flex;flex-direction:column;gap:6px}
   .ncm-op{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:9px 10px;cursor:pointer;font-family:inherit;color:inherit}
   .ncm-op:hover,.ncm-op:focus-visible{border-color:var(--ring);background:var(--accent)}
   .ncm-cod{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;font-weight:700;white-space:nowrap;padding-top:1px}
   .ncm-txt{display:flex;flex-direction:column;gap:2px;font-size:.76rem;min-width:0}
   .ncm-txt span{color:var(--muted-foreground);font-size:.7rem}
+  .calc-ext{display:flex;flex-direction:column}
+  .calc-ext-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 120px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline)}
+  .calc-ext-row label{margin:0 0 2px}
+  .calc-ext-rot{display:flex;flex-direction:column;gap:3px;font-size:.78rem;min-width:0}
+  .calc-ext-rot .muted{font-size:.68rem}
+  .calc-ext-brl{font-size:.74rem;color:var(--ink-2);text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+  .calc-ext-nome{font-size:.78rem;font-weight:600;padding:6px 8px}
+  .calc-chk{display:flex;align-items:center;gap:6px;font-size:.68rem;font-weight:500;color:var(--ink-2);margin:0}
+  .calc-chk input{width:auto;box-shadow:none}
+  .calc-mini{width:58px;display:inline-block;padding:2px 6px;font-size:.7rem;margin:0 2px}
+  .calc-ext-tot{font-size:.76rem;margin-top:8px}
+  .calc-sub{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted-foreground);margin:8px 0 2px}
+  .calc-sub:first-child{margin-top:0}
+  @media (max-width:560px){.calc-ext-row{grid-template-columns:minmax(0,1fr) 110px}.calc-ext-brl{grid-column:1 / -1;justify-content:flex-start;text-align:left}}
 </style>
 <link rel="manifest" href="prototipo-globo.webmanifest">
 <link rel="apple-touch-icon" href="prototipo-globo-apple.png">
@@ -3862,292 +3867,324 @@ function eqSalvar(){
 }
 
 /* ---------- Calculadora de importação ----------
-   Réplica da planilha "FINAL IMPORT COSTS DRONES" (abas 20 DRY e 40 DRY): mesmas entradas
-   (campos azuis), mesmas colunas e as mesmas fórmulas, inclusive as constantes.
-   Recalcula a cada digitação e fica salva neste navegador. */
-const CALC_KEY = 'importfacil.calculadora.v2';
-const CALC_DRONES = [ // descrição, NCM, US$/unit, qtd 20, peso 20, qtd 40, peso 40
-  ['DJI Agras T100','8806.99.00',36000,2,170,5,425], ['DJI Agras T70P','8806.94.00',20000,3,180,6,360],
-  ['DJI Agras T55','8806.94.00',17000,3,165,6,330], ['DJI Agras T25P','8806.94.00',16500,8,500,20,1250],
-  ['DJI Agras T50','8806.94.00',11000,6,220,15,550], ['DJI Agras T25','8806.94.00',10500,6,220,15,550],
-  ['DJI Agras T20P','8806.94.00',14500,4,230,10,580], ['DJI Agras T40','8806.94.00',9500,6,210,15,525],
-  ['DJI Mavic 3M (Mavic 3 Multispectral)','8806.92.00',4500,10,20,18,36]];
-const CALC_DESP = [ // [chave, célula, rótulo]  valores em R$
-  ['capatazia','F30','Capatazia'],['siscomex','F31','Siscomex'],['sda','F32','S.D.A.'],['marinha','F33','Marinha Mercante'],
-  ['outros','F34','Other Charges (Damage Fee / Drop Off / Handling / ISPS / Gate Charge / Terminal Sec Charge)'],
-  ['desDI','F35','Desembaraço DI - CW TRIUNFO'],['dta','F36','Desembaraço DTA'],['transp','F37','Transporte Rodov.'],
-  ['estadia','F38','Estadia'],['arm1','F39','Armazenagem'],['difCamb','F40','Dif. cambial'],['demurrage','F41','Demurrage'],['arm2','F43','Armazenagem 2 - EADI / Confins']];
-const CALC_CONST = [ // [chave, onde aparece na planilha, rótulo, valor]
-  ['seguro','G29','Seguro: (FOB R$ + frete R$) ×',0.006],['finimp','BM','FINIMP: Kardex ×',0.11],['div','BO','Kardex ÷',0.82],
-  ['icmsOp','BP','ICMS op. própria: (Kardex ÷ 0,82) ×',0.18],['mva','BR','ST: base × (MVA)',1.4],['icmsSt','BR','ST: alíquota',0.18],
-  ['markup','BU','Preço de venda: custo médio ×',1.5859],['icmsV','BY','ICMS venda: PV ×',0.12],['piscofV','CA','PIS/COFINS venda: PV ×',0.0925],
-  ['armEst','G43','Estimativa de armazenagem: CIF R$ ×',0.005],['bz21','BZ21','Linha de total, coluna BZ: BU21 ×',0.0975]];
+   Baseada na planilha "FINAL IMPORT COSTS DRONES" (contêiner 20' e 40'), com as correções:
+   frete e seguro contados uma vez só, estadia no custo por item, capatazia no valor aduaneiro,
+   AFRMM como % do frete e Taxa Siscomex calculada pelo número de adições.
+   Os custos cobrados antes da chegada ao Brasil são informados em dólar.
+   Tudo recalcula a cada digitação e fica salvo neste navegador. */
+const CALC_KEY = 'importfacil.calculadora.v3';
+const CALC_DESP = [ // [campo, rótulo]  (R$, rateados pelo valor FOB de cada item)
+  ['outros','Taxas do armador e do terminal (ISPS, handling etc.)'],['desDI','Desembaraço da DI/DUIMP (despachante)'],['dta','Desembaraço da DTA'],
+  ['transp','Transporte rodoviário'],['estadia','Estadia'],['arm1','Armazenagem 1'],['arm2','Armazenagem 2 (EADI)'],['demurrage','Demurrage']];
+const CALC_DRONES = [ // descrição, NCM, FOB unit. US$, qtd 20', peso 20' (kg), qtd 40', peso 40', preço de mercado no Brasil (aeronave, Agridrones nov/2026)
+  ['DJI Agras T100','8806.99.00',36000,2,170,5,425,130000],
+  ['DJI Agras T70P','8806.94.00',20000,3,180,6,360,85000],
+  ['DJI Agras T55','8806.94.00',17000,3,165,6,330,82000],
+  ['DJI Agras T25P','8806.94.00',16500,8,500,20,1250,54000],
+  ['DJI Agras T50','8806.94.00',11000,6,220,15,550,0],
+  ['DJI Agras T25','8806.94.00',10500,6,220,15,550,0],
+  ['DJI Agras T20P','8806.94.00',14500,4,230,10,580,0],
+  ['DJI Agras T40','8806.94.00',9500,6,210,15,525,0],
+  ['DJI Mavic 3M','8806.92.00',4500,10,20,18,36,0]];
+const CALC_EXTERIOR = [ // custos no exterior, antes da chegada ao Brasil (US$); va = entra no valor aduaneiro (base dos tributos)
+  {rot:'Frete interno na origem (até o porto ou aeroporto de embarque)', usd:0, va:true},
+  {rot:'Taxas na origem (THC, BL, documentação, despacho de exportação)', usd:0, va:true},
+  {rot:'Inspeção ou certificação na origem', usd:0, va:false},
+  {rot:'Comissão do agente de compras no exterior', usd:0, va:false},
+  {rot:'Outras despesas no exterior', usd:0, va:true}];
+function calcItemNovo(){ return {desc:'',ncm:'',fob:0,qtd:1,peso:0,ii:0,ipi:6.5,pis:2.1,cofins:9.65,mercado:0}; }
 function calcPadrao(cont){
   const c40 = cont==='40';
-  return { modelo:c40?'40':'20', cambioFrete:5.45, cambioDI:5.45, cambioPag:5.45, freteUSD:3300,
-    desp:{capatazia:3500,siscomex:154.23,sda:0,marinha:3500,outros:13000,desDI:1621,dta:688,transp:9000,estadia:5000,arm1:3000,difCamb:0,demurrage:0,arm2:3500},
-    const:Object.fromEntries(CALC_CONST.map(c=>[c[0],c[3]])), cambio1:0, cambio2:0,
-    itens: CALC_DRONES.map((d,i)=>({seq:String(i+1).padStart(3,'0'), totvs:'', desc:d[0], model:'', qtd:c40?d[5]:d[3], usd:d[2], peso:c40?d[6]:d[4],
-      ex:'SIM', ncm:d[1], ii:0, ipi:0.065, pis:0.021, cofins:0.0965, icms:0, ind:0})) };
+  return { modelo: c40?'40':'20',
+    cambioDI:5.45, cambioFrete:5.45, cambioPag:5.45, freteUSD:3300, seguroPct:0.6, seguroUSD:0,
+    exterior: CALC_EXTERIOR.map(x=>Object.assign({},x)),
+    capatazia:3500, siscomexAuto:true, siscomex:154.23, afrmmPct:8,
+    desp:{outros:13000,desDI:1621,dta:688,transp:9000,estadia:5000,arm1:3000,arm2:3500,demurrage:0},
+    lucroReal:true, icmsImp:0, finimp:11, icmsVenda:12, piscofVenda:9.25, margem:21,
+    itens: CALC_DRONES.map(d=>({desc:d[0], ncm:d[1], fob:d[2], qtd:c40?d[5]:d[3], peso:c40?d[6]:d[4], ii:0, ipi:6.5, pis:2.1, cofins:9.65, mercado:d[7]}))
+  };
 }
-function calcVazio(){ const s=calcPadrao('20'); s.modelo='vazio'; s.itens=[calcItemNovo(1)]; return s; }
-function calcItemNovo(n){ return {seq:String(n).padStart(3,'0'),totvs:'',desc:'',model:'',qtd:0,usd:0,peso:0,ex:'',ncm:'',ii:0,ipi:0,pis:0.021,cofins:0.0965,icms:0,ind:0}; }
-let calc = (()=>{ try{ const r=localStorage.getItem(CALC_KEY); if(r){ const d=JSON.parse(r); if(d&&Array.isArray(d.itens)){ const p=calcPadrao('20'); d.desp=Object.assign(p.desp,d.desp); d.const=Object.assign(p.const,d.const); return Object.assign(p,d); } } }catch(e){} return calcPadrao('20'); })();
+function calcVazio(){
+  const s = calcPadrao('20'); s.modelo='vazio';
+  s.itens = [{desc:'',ncm:'',fob:0,qtd:1,peso:0,ii:0,ipi:0,pis:2.1,cofins:9.65,mercado:0}];
+  return s;
+}
+let calc = (()=>{ try{ const r=localStorage.getItem(CALC_KEY); if(r){ const d=JSON.parse(r); if(d&&Array.isArray(d.itens)){ const p=calcPadrao('20'); d.desp=Object.assign(p.desp,d.desp||{}); return Object.assign(p,d); } } }catch(e){} return calcPadrao('20'); })();
 function calcSalvar(){ try{ localStorage.setItem(CALC_KEY, JSON.stringify(calc)); }catch(e){} }
 
-/* Motor: as fórmulas da planilha, coluna a coluna (a letra é a coluna do Excel) */
-function calcPlanilha(s){
-  const N=v=>{v=+v;return isFinite(v)?v:0;}, D=(a,b)=>b?a/b:0; // divisão por zero vira 0 (no Excel, #DIV/0!)
-  const k=s.const, C9=N(s.cambioFrete), G9=N(s.cambioDI), L9=N(s.cambioPag), F=s.desp;
-  const it=s.itens;
-  const J21=it.reduce((a,i)=>a+N(i.qtd),0), M21=it.reduce((a,i)=>a+N(i.peso),0);
-  const O21=it.reduce((a,i)=>a+N(i.qtd)*N(i.usd),0), P21=O21*L9;
-  const E28=N(s.freteUSD), F28=E28*C9;
-  const G29=(P21+F28)*N(k.seguro), F29=G29, E29=D(F29,C9);
-  const F30=N(F.capatazia), F31=N(F.siscomex);
-  // linhas 12+ (primeira passada: até CIF, para os totais usados nos rateios)
-  const L=it.map(i=>{
-    const r={}; r.J=N(i.qtd); r.K=N(i.usd); r.M=N(i.peso);
-    r.L=r.K*L9; r.O=r.J*r.K; r.P=r.O*L9;
-    r.Q=D(E28,M21)*r.M; r.R=r.Q*C9;
-    r.S=D(E29,O21)*r.O; r.T=r.S*C9;
-    r.U=D(r.O,O21)*F30;
-    r.V=r.O+r.Q; r.W=r.P+r.R; r.X=r.V+r.S; r.Y=r.W+r.T; r.Z=r.Y+r.U;
-    r.AA=D(F31,J21)*r.J;
-    r.AF=N(i.ii); r.AG=N(i.ipi); r.AH=N(i.pis); r.AI=N(i.cofins); r.AJ=N(i.icms);
-    r.AL=r.Y*r.AF; r.AM=(r.Y+r.AL)*r.AG; r.AN=r.Y*r.AH; r.AO=r.Y*r.AI; r.AP=0;
-    r.AQ=r.AL+r.AM+r.AN+r.AO+r.AP; r.AR=D(r.AQ,r.J);
-    r.AC=r.Z+r.AL;
-    return r;
+/* Taxa Siscomex (Portaria ME nº 4.131/2021): R$ 115,67 por declaração + valor por adição, por faixa */
+function siscomexTaxa(nAdicoes){
+  const faixas = [[2,38.56],[5,30.85],[10,23.14],[20,15.42],[50,7.71],[Infinity,3.86]];
+  let total = 115.67, n = 0;
+  for(let a=1; a<=nAdicoes; a++){ while(a>faixas[n][0]) n++; total += faixas[n][1]; }
+  return Math.round(total*100)/100;
+}
+
+/* Cálculo puro: recebe o estado e devolve totais e resultado por item */
+function calcImport(s){
+  const N = v => { v=+v; return isFinite(v)?v:0; };
+  const pct = v => N(v)/100;
+  const itens = s.itens.filter(i=>N(i.qtd)>0);
+  const fobTot = itens.reduce((a,i)=>a+N(i.qtd)*N(i.fob),0) * N(s.cambioDI);
+  const pesoTot = itens.reduce((a,i)=>a+N(i.peso),0);
+  const qtdTot = itens.reduce((a,i)=>a+N(i.qtd),0);
+  const adicoes = new Set(itens.map(i=>[String(i.ncm||'').trim(),N(i.ii),N(i.ipi)].join('|'))).size;
+  const siscomex = s.siscomexAuto ? (adicoes?siscomexTaxa(adicoes):0) : N(s.siscomex);
+  const freteR = N(s.freteUSD) * N(s.cambioFrete);
+  const afrmm = freteR * pct(s.afrmmPct);
+  const despRateio = CALC_DESP.reduce((a,[k])=>a+N(s.desp[k]),0);
+  const ext = (s.exterior||[]).map(x=>({rot:x.rot, usd:N(x.usd), va:!!x.va, brl:N(x.usd)*N(s.cambioDI)}));
+  const extVA = ext.filter(x=>x.va).reduce((a,x)=>a+x.brl,0), extFora = ext.filter(x=>!x.va).reduce((a,x)=>a+x.brl,0);
+  const seguroFixo = N(s.seguroUSD)>0 ? N(s.seguroUSD)*N(s.cambioDI) : null; // seguro informado em US$; vazio = % de FOB + frete
+  const icmsImp = Math.min(pct(s.icmsImp),0.95);
+  const T = {fobUSD:0,fob:0,frete:0,seguro:0,origemVA:0,origemFora:0,capatazia:0,va:0,ii:0,ipi:0,pis:0,cofins:0,icms:0,afrmm:0,siscomex:0,desp:0,varCamb:0,desembolso:0,creditos:0,liquido:0};
+  const linhas = s.itens.map(i=>{
+    const q=N(i.qtd);
+    if(q<=0) return null;
+    const fobUSD = q*N(i.fob), fob = fobUSD*N(s.cambioDI);
+    const shFob = fobTot ? fob/fobTot : 0;
+    const shPeso = pesoTot ? N(i.peso)/pesoTot : shFob;
+    const frete = freteR*shPeso;
+    const seguro = seguroFixo!=null ? seguroFixo*shFob : (fob+frete)*pct(s.seguroPct);
+    const origemVA = extVA*shFob, origemFora = extFora*shFob;
+    const capatazia = N(s.capatazia)*shFob;
+    const va = fob+frete+seguro+origemVA+capatazia;
+    const ii = va*pct(i.ii), ipi = (va+ii)*pct(i.ipi), pis = va*pct(i.pis), cofins = va*pct(i.cofins);
+    const af = afrmm*shPeso;
+    const sc = qtdTot ? siscomex*q/qtdTot : 0;
+    const icms = (va+ii+ipi+pis+cofins+af+sc)/(1-icmsImp)*icmsImp;
+    const desp = despRateio*shFob;
+    const varCamb = fobUSD*(N(s.cambioPag)-N(s.cambioDI));
+    const desembolso = va+ii+ipi+pis+cofins+icms+af+sc+desp+origemFora+varCamb;
+    const creditos = ipi+icms+(s.lucroReal?(pis+cofins):0);
+    const liquido = desembolso-creditos;
+    const r = {fobUSD,fob,frete,seguro,origemVA,origemFora,capatazia,va,ii,ipi,pis,cofins,icms,afrmm:af,siscomex:sc,desp,varCamb,desembolso,creditos,liquido};
+    Object.keys(T).forEach(k=>T[k]+=r[k]);
+    const liqU = liquido/q, finU = liqU*pct(s.finimp), totU = liqU+finU;
+    const dedVenda = pct(s.icmsVenda)+pct(s.piscofVenda);
+    const pvSemIPI = totU/(1-pct(s.margem))/(1-dedVenda);
+    const pv = pvSemIPI*(1+pct(i.ipi));
+    const merc = N(i.mercado);
+    const rlMerc = merc ? merc/(1+pct(i.ipi))*(1-dedVenda) : 0;
+    const margemMerc = merc ? (rlMerc-totU)/rlMerc : null;
+    return Object.assign(r,{qtd:q, desembolsoU:desembolso/q, liqU, finU, totU, pv, merc, margemMerc,
+      fobMax: merc ? N(i.fob)*rlMerc*(1-pct(s.margem))/totU : null});
   });
-  const sum=c=>L.reduce((a,r)=>a+r[c],0);
-  const Q21=sum('Q'), Y21=sum('Y'), AL21=sum('AL');
-  // despesas de desembaraço (linhas 28 a 48)
-  const E={}, FF={F28,F29,F30,F31,F32:N(F.sda),F33:N(F.marinha),F34:N(F.outros),F35:N(F.desDI),F36:N(F.dta),F37:N(F.transp),F38:N(F.estadia),F39:N(F.arm1),F40:N(F.difCamb),F41:N(F.demurrage),F42:AL21,F43:N(F.arm2)};
-  E.E28=E28; E.E29=E29; E.E31=D(F31,E28); E.E33=D(FF.F33,F28);
-  ['F34'].forEach(c=>E['E'+c.slice(1)]=D(FF[c],C9));
-  ['F35','F36','F37','F38','F39','F41','F42','F43'].forEach(c=>E['E'+c.slice(1)]=D(FF[c],C9));
-  const F45=Object.values(FF).reduce((a,v)=>a+v,0);
-  const E45=E.E28+E.E29+E.E34+E.E35+E.E36+E.E37+E.E38+E.E39+E.E41+E.E42+E.E43; // =SUM(E28:E29)+SUM(E34:E43)
-  const G45=D(F45,E45), F47=D(F45,P21), F48=D(F45-FF.F42,P21), G43=Y21*N(k.armEst);
-  // rateios das despesas (linha 23) e restante das colunas
-  const R23={AS:FF.F32,AT:FF.F33,AU:FF.F34,AV:FF.F39+FF.F43,AW:FF.F35+FF.F36,AX:FF.F37,AY:FF.F40,AZ:FF.F41};
-  L.forEach(r=>{
-    ['AS','AT','AU','AV','AW','AX'].forEach(c=>r[c]= r.J===0?0:D(R23[c],P21)*r.P);
-    r.AY = r.K===0?0:D(R23.AY,Q21)*r.Q;
-    r.AZ = D(FF.F41,M21)*r.M;
-    r.BA = r.P-(r.O*G9);
-    r.BB = r.AL;
-    r.BC = r.AS+r.AT+r.AU+r.AV+r.AW+r.AX+r.AY+r.AZ+r.BA+r.BB;
-  });
-  const AC21=sum('AC'), AQ21=sum('AQ'), BC21=sum('BC');
-  L.forEach((r,ix)=>{
-    const i=it[ix];
-    r.BD = D(r.BC+r.AQ+r.AC, AC21+AQ21+BC21);
-    r.BH = r.BC+r.AQ+r.AA+r.Z;
-    r.BG = r.J===0?0:r.BH/r.J;
-    r.BI = r.BG-r.AR;
-    r.BJ = r.K*L9; r.BK = (r.BJ*F47)+r.BJ-r.BI; r.BL = r.BI-r.BK;
-    r.BM = r.BI*N(k.finimp);
-    r.BN = N(i.ind);
-    r.BO = D(r.BN,N(k.div)); r.BP = r.BO*N(k.icmsOp); r.BS = 1+r.AG; r.BQ = r.BO*r.BS;
-    r.BR = ((r.BQ*N(k.mva))*N(k.icmsSt))-r.BP;
-    r.BT = (r.BG*r.BS)+r.BR+r.BM;
-    r.BU = r.BT*N(k.markup);
-    r.BY = r.BU*N(k.icmsV); r.BZ = r.BU*r.AG; r.CA = r.BU*N(k.piscofV);
-    r.CB = r.BI+r.BM+r.BZ+r.CA+r.BY; r.CC = r.BU-r.CB; r.CD = D(r.CC,r.BU);
-  });
-  const T={}; ['J','M','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AC','AL','AM','AN','AO','AP','AQ','AS','AT','AU','AV','AW','AX','AY','AZ','BA','BB','BC','BD','BH'].forEach(c=>T[c]=sum(c));
-  T.AE = new Set(it.map(i=>String(i.ncm||'').trim()).filter(Boolean)).size; // AE21: nº de NCMs diferentes (na planilha a fórmula está com #REF!)
-  T.BZ = 0*N(k.bz21); // BZ21 = BU21 × 0,0975, e BU21 está vazio na planilha
-  const F51=P21, E51=O21, F52=Y21, E52=sum('X'), F53=AQ21, E53=D(F53,L9), F54=F45-FF.F42, E54=D(F54,L9);
-  const F55=F52+F53+F54, E55=E52+E53+E54;
-  const P28=N(s.cambio1)+N(s.cambio2), P29=O21*G9;
-  return {L,T,FF,E,F45,E45,G45,F47,F48,G43,G29,
-    extras:{AL25:D(AQ21,P21), BD25:BC21+T.Z, BH25:D(T.BH-P21,P21), AC24:AC21-P21},
-    resumo:{E51,F51,E52,F52,E53,F53,E54,F54,E55,F55,F58:D(F55,F51)},
-    cambio:{P28,P29,P30:P28-P29}};
+  const cDI = N(s.cambioDI)||1;
+  const exterior = {fobUSD:T.fobUSD, freteUSD:N(s.freteUSD), seguroUSD: seguroFixo!=null?N(s.seguroUSD):T.seguro/cDI, itens:ext,
+    origemUSD: ext.reduce((a,x)=>a+x.usd,0)};
+  exterior.totalUSD = exterior.fobUSD+exterior.freteUSD+exterior.seguroUSD+exterior.origemUSD;
+  return {T, linhas, adicoes, siscomex, pesoTot, qtdTot, exterior,
+    fatorDesembolso: T.fob?T.desembolso/T.fob:0, fatorLiquido: T.fob?T.liquido/T.fob:0};
 }
 
 /* ---------- Tela ---------- */
-const CALC_COLS = [ // [coluna, cabeçalho, tipo]  tipo: in-txt / in-num / in-pct = entrada (azul); usd/brl/pct/num/fat = calculado
-  ['B','SEQ. IMP.','in-txt:seq'],['C','Cod Totvs','in-txt:totvs'],['D','DESCRIÇÃO DO PRODUTO','in-txt:desc'],['I','Model Name','in-txt:model'],
-  ['J','QUANT. UNIT','in-num:qtd'],['K','$ / UNIT','in-num:usd'],['L','R$ / UNIT','brl'],['M','NET WT KG','in-num:peso'],['N','NOME PRODUTO RESUMO','nome'],
-  ['O','FOB - USD','usd'],['P','FOB - R$','brl'],['Q','FRETE $','usd'],['R','FRETE R$','brl'],['S','SEGURO $','usd'],['T','SEGURO R$','brl'],['U','CAPATAZIA','brl'],
-  ['V','CFR - USD','usd'],['W','CFR - R$','brl'],['X','CIF - USD','usd'],['Y','CIF - R$','brl'],['Z','CIF + CAPATAZIA R$','brl'],['AA','SISCOMEX','brl'],
-  ['AC','NF II + CIF','brl'],['AD','Ex Tariff','in-txt:ex'],['AE','NCM','in-txt:ncm'],
-  ['AF','II','in-pct:ii'],['AG','IPI','in-pct:ipi'],['AH','PIS','in-pct:pis'],['AI','COFINS','in-pct:cofins'],['AJ','ICMS','in-pct:icms'],
-  ['AL','II (custo)','brl'],['AM','IPI (restit.)','brl'],['AN','PIS (custo)','brl'],['AO','COFINS (custo)','brl'],['AP','ICMS - 18% (restit.)','brl'],['AQ','TOTAL IMPOSTOS','brl'],['AR','TOTAL IMPOSTOS UNITÁRIO','brl'],
-  ['AS','SDA','brl'],['AT','Marinha Mercante','brl'],['AU','Despesas c/ Frete Int','brl'],['AV','Armazenagem (1) e (2)','brl'],['AW','Honorários','brl'],['AX','Transp. Rodov.','brl'],
-  ['AY','dif CAMBIAL','brl'],['AZ','DEMURRAGE','brl'],['BA','VARIAÇÃO CAMBIAL','brl'],['BB','II não recuperável','brl'],['BC','TOTAL','brl'],['BD','PERCENTUAL DE NACIONALIZAÇÃO','pct0'],
-  ['BF','ITEM','item'],['BG','UNITÁRIO','brl'],['BH','TOTAL (DESP+IMP+SISC+CIF)','brl'],['BI','KARDEX','brl'],['BJ','PROVA DOS 9 - PT 1','brl'],['BK','DIF DA PROVA DOS (9) + %','brl'],['BL','SALDO DIF PROVA DOS 9','brl'],
-  ['BM','FINIMP','brl'],['BN','CUSTOS FINAIS DE INDUSTRIALIZAÇÃO (POR ITEM)','in-num:ind'],['BO','Kardex/0,82','brl'],['BP','Icms op Própria','brl'],['BQ','(kardex/0,82) x IPI','brl'],
-  ['BR','ST','brl'],['BS','IPI','fat'],['BT','CUSTO MÉDIO','brl'],['BU','PREÇO DE VENDA','brl'],['BY','ICMS VENDA','brl'],['BZ','IPI VENDA','brl'],
-  ['CA','PIS COFINS VENDA','brl'],['CB','CUSTO TOTAL','brl'],['CC','PV - CUSTO TOTAL','brl'],['CD','MARGEM %','pct0']];
-const cf = {
-  brl:v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}),
-  usd:v=>'US$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}),
-  pct:v=>((+v||0)*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%',
-  pct0:v=>Math.round((+v||0)*100)+'%',
-  fat:v=>(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4}),
-  num:v=>(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:2})};
-function calcSet(path,v,tipo){
-  const ks=path.split('.'); let o=calc;
-  for(let i=0;i<ks.length-1;i++) o=o[ks[i]];
-  o[ks[ks.length-1]] = tipo==='txt' ? v : tipo==='pct' ? (v===''?0:(+v)/100) : (v===''?0:+v);
+const nfmt = (v,d=2) => (+v||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const USDf = v => (+v||0).toLocaleString('pt-BR',{style:'currency',currency:'USD',maximumFractionDigits:0});
+const PCTf = v => v==null||!isFinite(v) ? '—' : (v*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%';
+function cIn(id,val,path,attrs=''){ // campo numérico ligado ao estado
+  return `<input id="${id}" type="number" inputmode="decimal" step="any" value="${val}" ${attrs} oninput="calcSet('${path}',this.value)">`;
+}
+function calcSet(path,v){
+  const ks = path.split('.'); let o = calc;
+  for(let i=0;i<ks.length-1;i++) o = o[ks[i]];
+  const k = ks[ks.length-1];
+  o[k] = (k==='desc'||k==='ncm') ? v : (v===''?0:+v);
   calcSalvar(); calcResultados();
 }
-function cNum(id,val,path,pct){ // campo azul numérico (percentuais aparecem em %, como na planilha)
-  const show = pct ? +((+val||0)*100).toFixed(6) : val;
-  return `<input class="calc-in" id="${id}" type="number" inputmode="decimal" step="any" value="${show}" oninput="calcSet('${path}',this.value,'${pct?'pct':'num'}')">`;
-}
 function eqCalc(){
-  const s=calc;
-  const cab = CALC_COLS.map(([c,t])=>`<th scope="col"><span class="calc-col">${c}</span>${t}</th>`).join('');
-  const linhas = s.itens.map((it,ix)=>`<tr>${CALC_COLS.map(([c,t,tp])=>{
-      const [kind,campo]=tp.split(':');
-      if(campo==='ncm') return `<td class="calc-inp"><div class="calc-ncm"><input id="cn-${ix}" class="calc-in calc-txt" aria-label="NCM (linha ${ix+12})" value="${oesc(it.ncm)}" oninput="calcSet('itens.${ix}.ncm',this.value,'txt');calcNcmConferir()"><button class="btn ghost sm" title="Buscar NCM na tabela oficial" aria-label="Buscar NCM da linha ${ix+12}" onclick="calcNcmAbrir(${ix})">${I('search')}</button></div></td>`;
-      if(kind==='in-txt') return `<td class="calc-inp"><input class="calc-in calc-txt${campo==='desc'?' calc-desc':''}" aria-label="${t} (linha ${ix+12})" value="${oesc(it[campo])}" oninput="calcSet('itens.${ix}.${campo}',this.value,'txt')"></td>`;
-      if(kind==='in-num') return `<td class="calc-inp">${cNum('',it[campo],'itens.'+ix+'.'+campo,false).replace('<input','<input aria-label="'+t+' (linha '+(ix+12)+')"')}</td>`;
-      if(kind==='in-pct') return `<td class="calc-inp">${cNum('',it[campo],'itens.'+ix+'.'+campo,true).replace('<input','<input aria-label="'+t+' % (linha '+(ix+12)+')"')}</td>`;
-      return `<td id="cc-${c}-${ix}"></td>`; }).join('')}
-      <td><button class="btn ghost sm" title="Remover linha" aria-label="Remover linha ${ix+12}" onclick="calcRemover(${ix})">✕</button></td></tr>`).join('');
-  const total = `<tr class="calc-tot">${CALC_COLS.map(([c])=>`<td id="cc-${c}-T"></td>`).join('')}<td></td></tr>`;
-  const desp = `<tr><td>Frete Internacional (DI)</td><td class="calc-inp">${cNum('cFreteUSD',s.freteUSD,'freteUSD')}</td><td id="cd-F28"></td><td></td></tr>
-    <tr><td>Seguro Internacional (DI)</td><td id="cd-E29"></td><td id="cd-F29"></td><td class="muted" id="cd-G29"></td></tr>
-    ${CALC_DESP.map(([key,cel,rot])=>`<tr><td>${rot}${key==='difCamb'?' <span class="muted">(sem valor na planilha)</span>':''}</td><td id="cd-E${cel.slice(1)}"></td><td class="calc-inp">${cNum('cD_'+key,s.desp[key],'desp.'+key)}</td><td class="muted" id="cd-G${cel.slice(1)}"></td></tr>`).join('')
-      .replace('<tr><td>Armazenagem 2','<tr><td>II TOTAL</td><td id="cd-E42"></td><td id="cd-F42"></td><td></td></tr><tr><td>Armazenagem 2')}
-    <tr class="calc-tot"><td>Total</td><td id="cd-E45"></td><td id="cd-F45"></td><td id="cd-G45"></td></tr>
-    <tr><td>NAC — custo de nacionalização (F45 ÷ FOB R$)</td><td></td><td id="cd-F47"></td><td></td></tr>
-    <tr><td>SEM II ((F45 − F42) ÷ FOB R$)</td><td></td><td id="cd-F48"></td><td></td></tr>`;
+  const s = calc;
+  const itensHTML = s.itens.map((it,ix)=>`
+    <div class="calc-item">
+      <div class="calc-item-top">
+        <input aria-label="Descrição do item ${ix+1}" placeholder="Descrição do produto" value="${oesc(it.desc)}" oninput="calcSet('itens.${ix}.desc',this.value)">
+        <button class="btn ghost sm" title="Remover item" aria-label="Remover item ${ix+1}" onclick="calcRemover(${ix})">✕</button>
+      </div>
+      <div class="calc-grid">
+        <div><label for="ci${ix}_ncm">NCM</label><div class="calc-ncm"><input id="ci${ix}_ncm" value="${oesc(it.ncm)}" placeholder="0000.00.00" oninput="calcSet('itens.${ix}.ncm',this.value);calcNcmConferir()"><button class="btn outline sm" title="Buscar NCM na tabela oficial" aria-label="Buscar NCM do item ${ix+1}" onclick="calcNcmAbrir(${ix})">${I('search')}</button></div><div class="calc-ncm-desc" id="cnd${ix}"></div></div>
+        <div><label for="ci${ix}_qtd">Quantidade</label>${cIn('ci'+ix+'_qtd',it.qtd,'itens.'+ix+'.qtd','min="0"')}</div>
+        <div><label for="ci${ix}_fob">FOB unitário (US$)</label>${cIn('ci'+ix+'_fob',it.fob,'itens.'+ix+'.fob','min="0"')}</div>
+        <div><label for="ci${ix}_peso">Peso líquido total (kg)</label>${cIn('ci'+ix+'_peso',it.peso,'itens.'+ix+'.peso','min="0"')}</div>
+      </div>
+      <details class="calc-det"><summary>Tributos e preço de mercado</summary>
+        <div class="calc-grid">
+          <div><label for="ci${ix}_ii">II (%)</label>${cIn('ci'+ix+'_ii',it.ii,'itens.'+ix+'.ii')}</div>
+          <div><label for="ci${ix}_ipi">IPI (%)</label>${cIn('ci'+ix+'_ipi',it.ipi,'itens.'+ix+'.ipi')}</div>
+          <div><label for="ci${ix}_pis">PIS (%)</label>${cIn('ci'+ix+'_pis',it.pis,'itens.'+ix+'.pis')}</div>
+          <div><label for="ci${ix}_cofins">COFINS (%)</label>${cIn('ci'+ix+'_cofins',it.cofins,'itens.'+ix+'.cofins')}</div>
+          <div class="calc-span2"><label for="ci${ix}_merc">Preço de mercado no Brasil, por unidade (R$)</label>${cIn('ci'+ix+'_merc',it.mercado,'itens.'+ix+'.mercado','min="0"')}</div>
+        </div>
+      </details>
+      <div class="calc-item-res" id="calcRes${ix}"></div>
+    </div>`).join('');
   return `
     <div class="card"><h2 class="h3x">Calculadora de importação</h2>
-      <div class="muted">Réplica da planilha <b>FINAL IMPORT COSTS DRONES</b>: os campos em azul são os mesmos que se preenchem na planilha; o resto é calculado com as mesmas fórmulas. Recalcula enquanto você digita e fica salva neste navegador.</div>
-      <div class="calc-top">
-        <div><label for="calcModelo">Aba da planilha</label>
-          <select id="calcModelo" onchange="calcCarregar(this.value)">
-            <option value="20" ${s.modelo==='20'?'selected':''}>Custo Importação 20 DRY DRONES</option>
-            <option value="40" ${s.modelo==='40'?'selected':''}>Custo Importação 40 DRY DRO</option>
-            <option value="vazio" ${s.modelo==='vazio'?'selected':''}>Em branco</option>
-            ${s.modelo==='importado'?`<option value="importado" selected>Planilha anexada: ${oesc(s.origem&&s.origem.arquivo||'')}</option>`:''}
-          </select>
-          <div class="calc-anexo">
-            <label class="btn outline sm" for="calcArq" style="margin:0;cursor:pointer">${I('upload')} Anexar planilha</label>
-            <input id="calcArq" type="file" accept=".xlsx,.xlsm,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" style="display:none" onchange="calcAnexar(this)">
-            <button class="btn ghost sm" onclick="calcModeloCSV()">Baixar modelo (CSV)</button>
-          </div>
-          ${s.modelo==='importado'&&s.origem?`<div class="muted" style="margin-top:4px">Dados de <b>${oesc(s.origem.arquivo)}</b>, aba ${oesc(s.origem.aba)}, importados em ${oesc(s.origem.em)}.</div>`:'<div class="muted" style="margin-top:4px">.xlsx, .xls ou .csv no formato da planilha (cabeçalho com Descrição, Quant., $ / Unit, Net Wt, NCM e alíquotas).</div>'}
+      <div class="muted">Custo nacionalizado por item, preço de venda sugerido e comparação com o preço de mercado. Recalcula enquanto você digita e fica salva neste navegador.</div>
+      <label for="calcModelo">Começar a partir de</label>
+      <select id="calcModelo" onchange="calcCarregar(this.value)">
+        <option value="20" ${s.modelo==='20'?'selected':''}>Planilha de drones: contêiner 20' (48 un.)</option>
+        <option value="40" ${s.modelo==='40'?'selected':''}>Planilha de drones: contêiner 40' (110 un.)</option>
+        <option value="vazio" ${s.modelo==='vazio'?'selected':''}>Em branco</option>
+        ${s.modelo==='importado'?`<option value="importado" selected>Planilha anexada: ${oesc(s.origem&&s.origem.arquivo||'')}</option>`:''}
+      </select>
+      <div class="calc-anexo">
+        <label class="btn outline sm" for="calcArq" style="margin:0;cursor:pointer">${I('upload')} Anexar planilha</label>
+        <input id="calcArq" type="file" accept=".xlsx,.xlsm,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" style="display:none" onchange="calcAnexar(this)">
+        <button class="btn ghost sm" onclick="calcModeloCSV()">Baixar modelo (CSV)</button>
+      </div>
+      <div class="muted" style="margin-top:4px">${s.modelo==='importado'&&s.origem?`Dados de <b>${oesc(s.origem.arquivo)}</b>, aba ${oesc(s.origem.aba)}, importados em ${oesc(s.origem.em)}.`:'Anexe .xlsx, .xls ou .csv no formato da planilha de custos (cabeçalho com Descrição, Quant., $ / Unit, Net Wt, NCM e alíquotas).'}</div>
+    </div>
+
+    <div class="calc-cols"><div>
+    <div class="card"><h2 class="h3x">Câmbio</h2>
+      <div class="calc-grid">
+        <div><label for="cDI">Câmbio do registro da DI (R$/US$)</label>${cIn('cDI',s.cambioDI,'cambioDI')}</div>
+        <div><label for="cFr">Câmbio do frete (R$/US$)</label>${cIn('cFr',s.cambioFrete,'cambioFrete')}</div>
+        <div><label for="cPg">Câmbio do pagamento final (R$/US$)</label>${cIn('cPg',s.cambioPag,'cambioPag')}</div>
+      </div>
+      <div class="muted" style="margin-top:6px">A diferença entre o câmbio da DI e o do pagamento entra como variação cambial.</div>
+    </div>
+
+    <div class="card"><h2 class="h3x">Custos antes da chegada ao Brasil (US$)</h2>
+      <div class="muted" style="margin-bottom:4px">Tudo que é cobrado até a mercadoria chegar ao porto ou aeroporto no Brasil, em dólar. O FOB de cada item fica no cartão do item.</div>
+      <div class="calc-ext">
+        <div class="calc-ext-row">
+          <div class="calc-ext-rot"><b>Frete internacional</b><span class="muted">Rateado pelo peso · entra no valor aduaneiro</span></div>
+          <div class="calc-ext-usd"><label for="cFrete">US$</label>${cIn('cFrete',s.freteUSD,'freteUSD','min="0"')}</div>
+          <div class="calc-ext-brl" id="cxFrete"></div>
         </div>
-        <div class="calc-cambios">
-          <div><label for="cC9">Tx Cambial Frete INT (C9)</label>${cNum('cC9',s.cambioFrete,'cambioFrete')}</div>
-          <div><label for="cG9">Tx Cambial dia do registro da DI (G9)</label>${cNum('cG9',s.cambioDI,'cambioDI')}</div>
-          <div><label for="cL9">Tx Cambial Pgt Final (L9)</label>${cNum('cL9',s.cambioPag,'cambioPag')}</div>
+        <div class="calc-ext-row">
+          <div class="calc-ext-rot"><b>Seguro internacional</b><span class="muted">Deixe 0 para estimar em <input class="calc-mini" id="cSeg" type="number" step="any" min="0" value="${s.seguroPct}" aria-label="Seguro em % de FOB + frete" oninput="calcSet('seguroPct',this.value)">% de FOB + frete · entra no valor aduaneiro</span></div>
+          <div class="calc-ext-usd"><label for="cSegUSD">US$</label>${cIn('cSegUSD',s.seguroUSD,'seguroUSD','min="0"')}</div>
+          <div class="calc-ext-brl" id="cxSeguro"></div>
         </div>
+        ${(s.exterior||[]).map((x,i)=>`<div class="calc-ext-row">
+          <div class="calc-ext-rot"><input class="calc-ext-nome" aria-label="Descrição da despesa no exterior ${i+1}" value="${oesc(x.rot)}" oninput="calc.exterior[${i}].rot=this.value;calcSalvar()">
+            <label class="calc-chk"><input type="checkbox" ${x.va?'checked':''} onchange="calc.exterior[${i}].va=this.checked;calcSalvar();calcResultados()"> Entra no valor aduaneiro (base dos tributos)</label></div>
+          <div class="calc-ext-usd"><label for="cX${i}">US$</label>${cIn('cX'+i,x.usd,'exterior.'+i+'.usd','min="0"')}</div>
+          <div class="calc-ext-brl"><span id="cxR${i}"></span><button class="btn ghost sm" title="Remover" aria-label="Remover despesa no exterior ${i+1}" onclick="calc.exterior.splice(${i},1);calcSalvar();rEquipe()">✕</button></div>
+        </div>`).join('')}
       </div>
+      <button class="btn outline sm" style="margin-top:8px" onclick="calc.exterior.push({rot:'Nova despesa no exterior',usd:0,va:true});calcSalvar();rEquipe()">+ Adicionar despesa no exterior</button>
+      <div class="calc-ext-tot" id="cxTotal"></div>
+      <div class="muted" style="margin-top:6px">Convertidos pelo câmbio da DI e rateados pelo valor FOB de cada item (o frete, pelo peso). Pela valoração aduaneira, frete, seguro e gastos até o porto de embarque entram na base dos tributos; comissão de compra não entra. Marque conforme o caso.</div>
     </div>
 
-    <div class="card"><h2 class="h3x">Itens — linhas 12 em diante (role para o lado)</h2>
-      <div class="calc-wrap" role="region" aria-label="Tabela de itens" tabindex="0">
-        <table class="calc-tab"><thead><tr>${cab}<th></th></tr></thead><tbody>${linhas}${total}</tbody></table>
-      </div>
-      <button class="btn outline sm" style="margin-top:10px" onclick="calcAdicionar()">+ Adicionar linha</button>
-      <div class="calc-extras" id="calcExtras"></div>
+    <div class="card"><h2 class="h3x">Itens (${s.itens.length})</h2>
+      ${itensHTML}
+      <button class="btn outline block" onclick="calcAdicionar()">+ Adicionar item</button>
     </div>
 
-    <div class="calc-cols2">
-      <div class="card"><h2 class="h3x">Despesas de desembaraço (B26 a F48)</h2>
-        <div class="calc-wrap"><table class="calc-tab calc-desp"><thead><tr><th>Despesa</th><th>USD</th><th>R$</th><th></th></tr></thead><tbody>${desp}</tbody></table></div>
+    <div class="card"><h2 class="h3x">Despesas no Brasil (R$)</h2>
+      <div class="calc-grid">
+        <div><label for="cCap">Capatazia</label>${cIn('cCap',s.capatazia,'capatazia','min="0"')}</div>
+        <div><label for="cAf">AFRMM (% do frete)</label>${cIn('cAf',s.afrmmPct,'afrmmPct','min="0"')}</div>
+        ${CALC_DESP.map(([k,t])=>`<div><label for="cD_${k}">${t}</label>${cIn('cD_'+k,s.desp[k],'desp.'+k,'min="0"')}</div>`).join('')}
       </div>
-      <div>
-        <div class="card"><h2 class="h3x">Totais (B51 a F59)</h2><div id="calcResumo"></div></div>
-        <div class="card"><h2 class="h3x">Câmbio pago (O26 a P30)</h2>
-          <div class="eqgrid">
-            <div><label for="cCb1">Valor câmbio 1 (R$)</label>${cNum('cCb1',s.cambio1,'cambio1')}</div>
-            <div><label for="cCb2">Valor câmbio 2 (R$)</label>${cNum('cCb2',s.cambio2,'cambio2')}</div>
-          </div><div id="calcCambio" style="margin-top:8px"></div></div>
-      </div>
+      <div style="margin-top:12px">${switchHTML('cSiscAuto','Calcular a Taxa Siscomex pelo número de adições',s.siscomexAuto,'v=>{calc.siscomexAuto=v;calcSalvar();rEquipe()}')}</div>
+      ${s.siscomexAuto?'':`<label for="cSisc">Taxa Siscomex (R$)</label>${cIn('cSisc',s.siscomex,'siscomex','min="0"')}`}
+      <div class="muted" style="margin-top:6px" id="calcSiscInfo"></div>
     </div>
 
-    <div class="card"><details><summary class="h3x" style="cursor:pointer;margin:0">Constantes usadas nas fórmulas da planilha</summary>
-      <div class="muted" style="margin:8px 0">Na planilha estes números ficam dentro das fórmulas. Aqui eles aparecem para você poder ajustar; os valores padrão são os da planilha.</div>
-      <div class="calc-grid">${CALC_CONST.map(([key,cel,rot])=>`<div><label for="cK_${key}">${rot} <span class="muted">(${cel})</span></label>${cNum('cK_'+key,s.const[key],'const.'+key)}</div>`).join('')}</div>
-      <button class="btn ghost sm" style="margin-top:8px" onclick="calc.const=calcPadrao('20').const;calcSalvar();rEquipe()">Voltar às constantes da planilha</button>
-    </details></div>
-
-    <div class="calc-actions">
-      <button class="btn default" onclick="calcCSV()">Exportar em CSV (abre no Excel)</button>
-      <button class="btn outline" onclick="calcCarregar(calc.modelo==='vazio'?'20':calc.modelo,true)">Restaurar os valores da planilha</button>
+    <div class="card"><h2 class="h3x">Tributação e venda</h2>
+      ${switchHTML('cLR','Empresa no Lucro Real (PIS e COFINS da importação viram crédito)',s.lucroReal,'v=>{calc.lucroReal=v;calcSalvar();calcResultados()}')}
+      <div class="calc-grid" style="margin-top:4px">
+        <div><label for="cIcmsI">ICMS na importação (%)</label>${cIn('cIcmsI',s.icmsImp,'icmsImp','min="0" max="95"')}</div>
+        <div><label for="cFin">Custo financeiro / FINIMP (%)</label>${cIn('cFin',s.finimp,'finimp','min="0"')}</div>
+        <div><label for="cIcmsV">ICMS na venda (%)</label>${cIn('cIcmsV',s.icmsVenda,'icmsVenda','min="0"')}</div>
+        <div><label for="cPcV">PIS/COFINS na venda (%)</label>${cIn('cPcV',s.piscofVenda,'piscofVenda','min="0"')}</div>
+        <div class="calc-span2"><label for="cMg">Margem-alvo sobre a receita líquida (%)</label>${cIn('cMg',s.margem,'margem','min="0" max="90"')}</div>
+      </div>
+      <div class="muted" style="margin-top:6px">ICMS na importação: 0% pressupõe diferimento por regime especial; sem ele, MG cobra 18%. Na venda, mercadoria importada para outro estado paga 4%; dentro de MG, 18%.</div>
     </div>
-    <div class="note">Mesmas fórmulas da planilha original, inclusive pontos que ela calcula de um jeito próprio: o FOB em R$ usa o câmbio do pagamento final (L9); o ICMS restituível (AP) é fixo em 0; a estadia (F38) entra no total F45 mas não no custo por item; F55 soma frete e seguro de novo, pois F45 já os inclui. A contagem de NCMs (AE21), que na planilha está com #REF!, aqui conta os NCMs diferentes. A lupa ao lado do NCM busca na tabela oficial da Receita Federal (atualizada toda semana); NCM inexistente fica em vermelho.</div>`;
+    </div>
+
+    <div class="calc-side">
+      <div class="card"><h2 class="h3x">Resumo do embarque</h2><div id="calcResumo"></div></div>
+      <div class="card"><h2 class="h3x">Por unidade</h2><div id="calcTabela"></div></div>
+      <div class="calc-actions">
+        <button class="btn default block" onclick="calcCSV()">Exportar resultado (CSV)</button>
+        <button class="btn outline block" onclick="calcCarregar(calc.modelo==='vazio'?'20':calc.modelo,true)">Restaurar valores da planilha</button>
+      </div>
+      <div class="note">Base: planilha "FINAL IMPORT COSTS DRONES". A lupa ao lado do NCM busca na tabela oficial da Receita (atualizada toda semana). Diferenças em relação à planilha: frete e seguro entram uma vez só no total; estadia entra no custo por item; capatazia entra no valor aduaneiro; AFRMM é % do frete; a Taxa Siscomex segue a Portaria ME 4.131/2021; o preço sugerido parte do custo líquido de créditos. Estimativa para decisão comercial: confirme com o despachante antes de fechar.</div>
+    </div></div>`;
 }
+const N0 = v => +v>0;
 function calcResultados(){
-  if(!document.getElementById('calcResumo')) return;
-  const R=calcPlanilha(calc);
-  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
-  const fmtCol = {}; CALC_COLS.forEach(([c,,tp])=>fmtCol[c]=tp);
-  R.L.forEach((r,ix)=>CALC_COLS.forEach(([c,,tp])=>{
-    if(tp.startsWith('in-')) return;
-    if(tp==='nome') return set(`cc-${c}-${ix}`, calc.itens[ix].desc);
-    if(tp==='item') return set(`cc-${c}-${ix}`, calc.itens[ix].totvs);
-    set(`cc-${c}-${ix}`, cf[tp](r[c]));
-  }));
-  CALC_COLS.forEach(([c,,tp])=>{
-    let v = R.T[c];
-    if(c==='B') return set('cc-B-T','TOTAL (21)');
-    if(v==null) return set(`cc-${c}-T`,'');
-    if(c==='J'||c==='M'||c==='AE') return set(`cc-${c}-T`, cf.num(v));
-    set(`cc-${c}-T`, (tp.startsWith('in-')?cf.brl:cf[tp]||cf.brl)(v));
+  const box = document.getElementById('calcResumo'); if(!box) return;
+  const R = calcImport(calc), T = R.T;
+  const sr = (k,v,b) => `<div class="specrow"${b?' style="font-size:.82rem"':''}><span>${k}</span><span>${v}</span></div>`;
+  const X = R.exterior, U = v=>(+v||0).toLocaleString('pt-BR',{style:'currency',currency:'USD'});
+  box.innerHTML =
+    '<div class="calc-sub">No exterior (US$)</div>' +
+    sr('FOB', U(X.fobUSD)) + sr('Frete internacional', U(X.freteUSD)) + sr('Seguro internacional'+(N0(calc.seguroUSD)?'':' (estimado)'), U(X.seguroUSD)) +
+    (X.origemUSD ? sr('Despesas na origem', U(X.origemUSD)) : '') +
+    sr('<b>Total até o Brasil</b>', '<b>'+U(X.totalUSD)+'</b>', true) +
+    '<div class="calc-sub">No Brasil (R$)</div>' +
+    sr('FOB', BRL(T.fob)) +
+    sr('Frete + seguro', BRL(T.frete+T.seguro)) +
+    (T.origemVA||T.origemFora ? sr('Despesas na origem', BRL(T.origemVA+T.origemFora)) : '') +
+    sr('Valor aduaneiro (CIF + capatazia'+(T.origemVA?' + origem':'')+')', BRL(T.va)) +
+    sr('II', BRL(T.ii)) + sr('IPI', BRL(T.ipi)) + sr('PIS + COFINS', BRL(T.pis+T.cofins)) + sr('ICMS', BRL(T.icms)) +
+    sr('AFRMM + Siscomex', BRL(T.afrmm+T.siscomex)) +
+    sr('Despesas no Brasil', BRL(T.desp)) +
+    (Math.abs(T.varCamb)>0.005 ? sr('Variação cambial', BRL(T.varCamb)) : '') +
+    sr('<b>Desembolso total</b>', BRL(T.desembolso), true) +
+    sr('Créditos de impostos', '− '+BRL(T.creditos)) +
+    sr('<b>Custo líquido</b>', BRL(T.liquido), true) +
+    sr('Desembolso ÷ FOB', nfmt(R.fatorDesembolso,3)+'×') +
+    sr('Custo líquido ÷ FOB', nfmt(R.fatorLiquido,3)+'×');
+  const setT=(id,v)=>{ const e=document.getElementById(id); if(e) e.innerHTML=v; };
+  setT('cxFrete','= '+BRL(X.freteUSD*(+calc.cambioFrete||0)));
+  setT('cxSeguro','= '+BRL(T.seguro)+(N0(calc.seguroUSD)?'':`<br><span class="muted">estimado: ${U(X.seguroUSD)}</span>`));
+  X.itens.forEach((x,i)=>setT('cxR'+i,'= '+BRL(x.brl)));
+  setT('cxTotal',`Total no exterior: <b>${U(X.totalUSD)}</b> (FOB ${U(X.fobUSD)} + frete ${U(X.freteUSD)} + seguro ${U(X.seguroUSD)}${X.origemUSD?' + origem '+U(X.origemUSD):''})`);
+  const info = document.getElementById('calcSiscInfo');
+  if(info) info.textContent = R.adicoes+' adição(ões) (NCM + alíquotas diferentes) · Taxa Siscomex '+BRL(R.siscomex)+' · peso total '+nfmt(R.pesoTot,0)+' kg · '+nfmt(R.qtdTot,0)+' unidade(s)';
+  const linhasOK = R.linhas.map((l,ix)=>({l,ix,it:calc.itens[ix]})).filter(x=>x.l);
+  document.getElementById('calcTabela').innerHTML = linhasOK.length ? linhasOK.map(({l,it})=>{
+    const chip = l.margemMerc==null ? '' : `<span class="chip ${l.margemMerc>=0?'ok':'cancel'}">${PCTf(l.margemMerc)}</span>`;
+    return `<div class="calc-u">
+      <div class="row"><b>${oesc(it.desc||'Item sem descrição')}</b>${chip}</div>
+      ${sr('Custo nacionalizado (desembolso)', BRL(l.desembolsoU))}
+      ${sr('Custo líquido + FINIMP', BRL(l.totU))}
+      ${sr('Preço sugerido (com IPI)', BRL(l.pv))}
+      ${l.merc ? sr('Preço de mercado', BRL(l.merc)) + sr('Margem no preço de mercado', `<span class="${l.margemMerc>=0?'pos':'neg'}">${PCTf(l.margemMerc)}</span>`) + sr('FOB máximo p/ margem-alvo', USDf(l.fobMax)) : ''}
+    </div>`; }).join('') : '<div class="empty">Informe ao menos um item com quantidade.</div>';
+  calc.itens.forEach((it,ix)=>{
+    const el = document.getElementById('calcRes'+ix); if(!el) return;
+    const l = R.linhas[ix];
+    el.innerHTML = l ? `Custo líquido + FINIMP <b>${BRL(l.totU)}</b>/un. · preço sugerido <b>${BRL(l.pv)}</b>${l.margemMerc!=null?` · margem no preço de mercado <b class="${l.margemMerc>=0?'pos':'neg'}">${PCTf(l.margemMerc)}</b>`:''}` : 'Sem quantidade: fora do cálculo.';
   });
-  document.getElementById('calcExtras').innerHTML =
-    `<span>AL25 impostos ÷ FOB R$: <b>${(R.extras.AL25*100).toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4})}%</b></span>
-     <span>BD25 CIF + despesas destino: <b>${cf.brl(R.extras.BD25)}</b></span>
-     <span>BH25 (total − FOB) ÷ FOB: <b>${cf.pct(R.extras.BH25)}</b></span>
-     <span>AC24 NF − FOB R$: <b>${cf.brl(R.extras.AC24)}</b></span>`;
-  const usd=v=>'US$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  set('cd-F28',cf.brl(R.FF.F28)); set('cd-E29',usd(R.E.E29)); set('cd-F29',cf.brl(R.FF.F29)); set('cd-G29','G29 = (FOB R$ + frete R$) × '+cf.pct(calc.const.seguro));
-  set('cd-E31',cf.pct(R.E.E31)); set('cd-E33',cf.pct(R.E.E33)); set('cd-G31','% do frete US$'); set('cd-G33','% do frete R$');
-  ['34','35','36','37','38','39','41','43'].forEach(n=>set('cd-E'+n,usd(R.E['E'+n])));
-  set('cd-E42',usd(R.E.E42)); set('cd-F42',cf.brl(R.FF.F42)); set('cd-G43','G43: '+cf.brl(R.G43)+' (estimativa '+cf.pct(calc.const.armEst)+' do CIF; 10 dias)');
-  set('cd-E45',usd(R.E45)); set('cd-F45',cf.brl(R.F45)); set('cd-G45',cf.fat(R.G45)); set('cd-F47',cf.pct(R.F47)); set('cd-F48',cf.pct(R.F48));
-  const z=R.resumo, sr=(k,a,b,neg)=>`<div class="specrow"${neg?' style="font-size:.82rem"':''}><span>${k}</span><span>${a}${b?' · '+b:''}</span></div>`;
-  document.getElementById('calcResumo').innerHTML =
-    sr('Total FOB',usd(z.E51),cf.brl(z.F51)) + sr('Total CIF',usd(z.E52),cf.brl(z.F52)) + sr('Total Impostos',usd(z.E53),cf.brl(z.F53)) +
-    sr('Total Despesas',usd(z.E54),cf.brl(z.F54)) + sr('<b>TOTAL</b>','<b>'+usd(z.E55)+'</b>','<b>'+cf.brl(z.F55)+'</b>',true) +
-    sr('Fator de cálculo preço venda (total gasto ÷ FOB)','<b>'+cf.fat(z.F58)+'</b>','',true) + sr('%',cf.fat(z.F58),'');
-  const c=R.cambio;
-  document.getElementById('calcCambio').innerHTML = sr('Total câmbio pago',cf.brl(c.P28)) + sr('Valor DI (FOB US$ × G9)',cf.brl(c.P29)) + sr('Saldo diferença real',cf.brl(c.P30));
 }
 function calcCarregar(m,confirmar){
   if(m==='importado') return;
-  if(confirmar && !confirm('Voltar aos valores da planilha? As alterações feitas nesta calculadora serão perdidas.')) return;
+  if(confirmar && !confirm('Voltar aos valores da planilha? Suas alterações nesta calculadora serão perdidas.')) return;
   calc = m==='vazio' ? calcVazio() : calcPadrao(m);
-  calcSalvar(); rEquipe(); toast(m==='vazio'?'Calculadora em branco':'Valores da aba '+(m==='40'?'40':'20')+' DRY carregados');
+  calcSalvar(); rEquipe(); toast(m==='vazio'?'Calculadora em branco':'Valores da planilha carregados ('+m+"')");
 }
-function calcAdicionar(){ calc.itens.push(calcItemNovo(calc.itens.length+1)); calcSalvar(); rEquipe(); }
-function calcRemover(ix){ calc.itens.splice(ix,1); if(!calc.itens.length) calc.itens.push(calcItemNovo(1)); calcSalvar(); rEquipe(); }
+function calcCarregarImportado(){}
+function calcAdicionar(){ calc.itens.push(calcItemNovo()); calcSalvar(); rEquipe(); }
+function calcRemover(ix){ calc.itens.splice(ix,1); if(!calc.itens.length) calcAdicionar(); else { calcSalvar(); rEquipe(); } }
 function calcCSV(){
-  const R=calcPlanilha(calc);
-  const q=v=>{ if(v==null) return ''; if(typeof v==='number') return String(Math.round(v*1e6)/1e6).replace('.',','); return '"'+String(v).replace(/"/g,'""')+'"'; };
-  const cols=CALC_COLS.map(c=>c[0]);
-  const linhas=[CALC_COLS.map(([c,t])=>q(c+' - '+t)).join(';')];
-  R.L.forEach((r,ix)=>{ const it=calc.itens[ix]; linhas.push(CALC_COLS.map(([c,,tp])=>{
-    const [kind,campo]=tp.split(':');
-    if(kind.startsWith('in-')) return q(kind==='in-txt'?it[campo]:+it[campo]);
-    if(tp==='nome') return q(it.desc); if(tp==='item') return q(it.totvs);
-    return q(r[c]); }).join(';')); });
-  linhas.push(cols.map(c=>c==='B'?q('TOTAL'):q(R.T[c])).join(';'));
-  linhas.push(''); linhas.push(q('Despesas de desembaraço')+';'+q('USD')+';'+q('R$'));
-  [['Frete Internacional (DI)','E28','F28'],['Seguro Internacional (DI)','E29','F29']].forEach(([t,e,f])=>linhas.push([q(t),q(R.E[e]),q(R.FF[f])].join(';')));
-  CALC_DESP.forEach(([k,cel,t])=>linhas.push([q(t),q(R.E['E'+cel.slice(1)]),q(R.FF[cel])].join(';')));
-  linhas.push([q('II TOTAL'),q(R.E.E42),q(R.FF.F42)].join(';'));
-  linhas.push([q('Total'),q(R.E45),q(R.F45)].join(';'));
-  linhas.push([q('NAC'),'',q(R.F47)].join(';')); linhas.push([q('SEM II'),'',q(R.F48)].join(';'));
-  const z=R.resumo; linhas.push('');
-  [['Total FOB','E51','F51'],['Total CIF','E52','F52'],['Total Impostos','E53','F53'],['Total Despesas','E54','F54'],['TOTAL','E55','F55']].forEach(([t,e,f])=>linhas.push([q(t),q(z[e]),q(z[f])].join(';')));
-  linhas.push([q('Fator de Calculo preço venda'),'',q(z.F58)].join(';'));
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['﻿'+linhas.join('\n')],{type:'text/csv;charset=utf-8'}));
-  a.download='calculo-importacao-'+(calc.modelo==='40'?'40dry':calc.modelo==='20'?'20dry':'')+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  const R = calcImport(calc);
+  const cab = ['Item','NCM','Qtd','FOB unit US$','FOB R$','Frete R$','Seguro R$','Despesas na origem (no valor aduaneiro) R$','Despesas na origem (fora do valor aduaneiro) R$','Capatazia R$','Valor aduaneiro R$','II R$','IPI R$','PIS R$','COFINS R$','ICMS R$','AFRMM R$','Siscomex R$','Despesas R$','Variação cambial R$','Desembolso R$','Créditos R$','Custo líquido R$','Desembolso unit R$','Custo líquido + FINIMP unit R$','Preço sugerido unit R$','Preço de mercado R$','Margem no preço de mercado %','FOB máximo US$'];
+  const n = v => v==null||v===''?'':(typeof v==='number'?v.toFixed(2).replace('.',','):'"'+String(v).replace(/"/g,'""')+'"');
+  const linhas = R.linhas.map((l,ix)=>{ if(!l) return null; const it=calc.itens[ix];
+    return [it.desc,it.ncm,l.qtd,+it.fob,l.fob,l.frete,l.seguro,l.origemVA,l.origemFora,l.capatazia,l.va,l.ii,l.ipi,l.pis,l.cofins,l.icms,l.afrmm,l.siscomex,l.desp,l.varCamb,l.desembolso,l.creditos,l.liquido,l.desembolsoU,l.totU,l.pv,l.merc||'',l.margemMerc==null?'':l.margemMerc*100,l.fobMax==null?'':l.fobMax].map(n).join(';'); }).filter(Boolean);
+  const T=R.T;
+  linhas.push(['TOTAL','',R.qtdTot,'',T.fob,T.frete,T.seguro,T.origemVA,T.origemFora,T.capatazia,T.va,T.ii,T.ipi,T.pis,T.cofins,T.icms,T.afrmm,T.siscomex,T.desp,T.varCamb,T.desembolso,T.creditos,T.liquido].map(n).join(';'));
+  const X=R.exterior;
+  linhas.push(''); linhas.push(n('Custos antes da chegada ao Brasil')+';'+n('US$')+';'+n('R$'));
+  linhas.push([n('FOB'),n(X.fobUSD),n(T.fob)].join(';'));
+  linhas.push([n('Frete internacional'),n(X.freteUSD),n(T.frete)].join(';'));
+  linhas.push([n('Seguro internacional'),n(X.seguroUSD),n(T.seguro)].join(';'));
+  X.itens.forEach(x=>linhas.push([n(x.rot+(x.va?' (no valor aduaneiro)':' (fora do valor aduaneiro)')),n(x.usd),n(x.brl)].join(';')));
+  linhas.push([n('Total no exterior'),n(X.totalUSD),''].join(';'));
+  const csv = '\ufeff'+cab.join(';')+'\n'+linhas.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'calculo-importacao-'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   toast('CSV gerado ✓');
 }
@@ -4210,9 +4247,8 @@ function calcLerAba(linhas){ // linhas = matriz (sheet_to_json header:1)
     if((desc==null||desc==='') && (totvs==null||totvs==='') && (model==null||model==='')){
       if(R.itens.length) break; else continue;
     }
-    const it=calcItemNovo(R.itens.length+1);
+    const it={};
     ['seq','totvs','desc','model','ex','ncm'].forEach(c=>{ const v=g(c); if(v!=null&&v!=='') it[c]=String(v).trim(); });
-    if(cols.seq==null) it.seq=String(R.itens.length+1).padStart(3,'0');
     ['qtd','usd','peso','ii','ipi','pis','cofins','icms','ind'].forEach(c=>{ if(cols[c]==null) return; const v=cNumLido(g(c),pctCampo[c]); if(v!=null) it[c]=v; });
     R.itens.push(it);
     if(R.itens.length>=500){ R.avisos.push('Lidas só as primeiras 500 linhas.'); break; }
@@ -4261,8 +4297,15 @@ async function calcAnexar(inp){
 }
 function calcAplicarImport(arquivo,aba){
   const R=aba.R;
+  const p100 = (v,pad) => v==null ? pad : Math.round(v*100*1e6)/1e6; // planilha guarda 6,5% como 0,065
+  const itens = R.itens.map(i=>({desc:i.desc||i.model||'', ncm:i.ncm||'', fob:i.usd||0, qtd:i.qtd||0, peso:i.peso||0,
+    ii:p100(i.ii,0), ipi:p100(i.ipi,0), pis:p100(i.pis,2.1), cofins:p100(i.cofins,9.65), mercado:0}));
   // câmbios, frete e despesas que não vierem na planilha continuam com os valores que já estavam na calculadora
-  calc = Object.assign({}, calc, {modelo:'importado', origem:{arquivo, aba:aba.nome, em:new Date().toLocaleString('pt-BR')}, itens:R.itens, desp:Object.assign({}, calc.desp, R.desp)});
+  const desp = Object.assign({}, calc.desp);
+  ['outros','desDI','dta','transp','estadia','arm1','arm2','demurrage'].forEach(k=>{ if(R.desp[k]!=null) desp[k]=R.desp[k]; });
+  calc = Object.assign({}, calc, {modelo:'importado', origem:{arquivo, aba:aba.nome, em:new Date().toLocaleString('pt-BR')}, itens, desp});
+  if(R.desp.capatazia!=null) calc.capatazia=R.desp.capatazia;
+  if(R.desp.siscomex!=null){ calc.siscomexAuto=false; calc.siscomex=R.desp.siscomex; }
   Object.assign(calc, R.cambios);
   if(R.freteUSD!=null) calc.freteUSD=R.freteUSD;
   calcSalvar(); rEquipe();
@@ -4271,8 +4314,8 @@ function calcAplicarImport(arquivo,aba){
   if(R.avisos.length) setTimeout(()=>toast(R.avisos.join(' ')),3000);
 }
 function calcModeloCSV(){
-  const cab='SEQ. IMP.;Cod Totvs;DESCRIÇÃO DO PRODUTO;Model Name;QUANT. UNIT;$ / UNIT;NET WT KG;Ex Tariff;NCM;II;IPI;PIS;COFINS;ICMS;CUSTOS FINAIS DE INDUSTRIALIZAÇÃO';
-  const ex='001;;DJI Agras T25P;;8;16500;500;SIM;8806.94.00;0%;6,5%;2,1%;9,65%;0%;0';
+  const cab='DESCRIÇÃO DO PRODUTO;NCM;QUANT. UNIT;$ / UNIT;NET WT KG;II;IPI;PIS;COFINS';
+  const ex='DJI Agras T25P;8806.94.00;8;16500;500;0%;6,5%;2,1%;9,65%';
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+cab+'\n'+ex+'\n'],{type:'text/csv;charset=utf-8'}));
   a.download='modelo-calculadora-importacao.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
 }
@@ -4389,17 +4432,22 @@ function calcNcmListar(){
 }
 function calcNcmUsar(c){
   if(_ncmItem==null||!calc.itens[_ncmItem]) return closeSheet();
-  calc.itens[_ncmItem].ncm = ncmFmt(c); calcSalvar(); closeSheet(); rEquipe();
+  calc.itens[_ncmItem].ncm = ncmFmt(c); calcSalvar(); closeSheet();
+  const el=document.getElementById('ci'+_ncmItem+'_ncm'); if(el) el.value=ncmFmt(c);
+  calcResultados(); calcNcmConferir();
   toast('NCM '+ncmFmt(c)+' aplicado ao item');
 }
 function calcNcmConferir(){ // marca NCMs que não existem na tabela e mostra a descrição ao passar o mouse
   ncmCarregar().then(()=>{
     calc.itens.forEach((it,ix)=>{
-      const el=document.getElementById('cn-'+ix); if(!el) return;
+      const el=document.getElementById('ci'+ix+'_ncm'); if(!el) return;
       const c=String(it.ncm||'').replace(/\D/g,'');
       const f=c?NCM.porCodigo.get(c):null;
-      el.title = f ? ncmFmt(f.c)+' — '+[f.pos,...f.sub,f.d].filter((v,i,a)=>a.indexOf(v)===i).join(' › ') : (c?'NCM não encontrado na tabela vigente':'');
+      const txt = f ? [f.pos,...f.sub,f.d].filter((v,i,a)=>a.indexOf(v)===i).join(' › ') : '';
+      el.title = f ? ncmFmt(f.c)+' — '+txt : (c?'NCM não encontrado na tabela vigente':'');
       el.classList.toggle('ncm-invalido', !!c && !f);
+      const d=document.getElementById('cnd'+ix);
+      if(d){ d.textContent = f ? (/^outr/i.test(f.d) ? [[f.pos,...f.sub].filter(t=>!/^outr/i.test(t)).pop()||f.pos, f.d].join(' › ') : f.d) : (c && c.length>=8 ? 'Não existe na tabela NCM vigente' : ''); d.classList.toggle('neg', !!c && !f); }
     });
   }).catch(()=>{});
 }
