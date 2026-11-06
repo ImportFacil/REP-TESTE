@@ -40,6 +40,8 @@ export interface Config {
   filaEventosUrl?: string;
   arquivos: { modo: 's3' | 'local'; bucket?: string; pasta: string };
   sentryDsn?: string;
+  /** A API também roda as rotinas e consome a fila (dispensa o worker; usado em homologação para economizar). */
+  workerNaApi: boolean;
 }
 
 const AMBIENTES: Ambiente[] = ['local', 'teste', 'dev', 'homolog', 'prod'];
@@ -117,6 +119,7 @@ export function lerConfig(env: NodeJS.ProcessEnv = process.env): Config {
       ? { modo: 's3', bucket: env.BUCKET_ARQUIVOS, pasta: '' }
       : { modo: 'local', pasta: env.PASTA_ARQUIVOS ?? '/tmp/importfacil-arquivos' },
     sentryDsn: env.SENTRY_DSN || undefined,
+    workerNaApi: env.WORKER_NA_API === 'true',
   };
 }
 

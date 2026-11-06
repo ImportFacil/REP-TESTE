@@ -1,0 +1,51 @@
+# Liga e desliga a homologação para gastar menos (ver infra/scripts/pausar-retomar.sh).
+#
+# Horário automático (variável do repositório HOMOLOG_HORARIO):
+#   vazia ou "comercial": liga de segunda a sexta às 8h e desliga todo dia às 20h (horário de Brasília);
+#   "sempre":             não liga nem desliga sozinho (fica como estiver);
+#   "pausado":            só desliga às 20h, todo dia (mantém parado, inclusive quando a AWS religa o banco após 7 dias).
+# Também dá para rodar à mão em Actions > "Homologação: ligar e desligar" > Run workflow.
+name: "Homologação: ligar e desligar"
+
+on:
+  schedule:
+    - cron: "0 11 * * 1-5" # 8h em Brasília, segunda a sexta: ligar
+    - cron: "0 23 * * *" # 20h em Brasília, todo dia: desligar
+  workflow_dispatch:
+    inputs:
+      acao:
+        description: O que fazer
+        type: choice
+        options: [retomar, pausar, situacao]
+        default: retomar
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: homolog-liga-desliga
+  cancel-in-progress: false
+
+jobs:
+  executar:
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.acao || (github.event.schedule == '0 11 * * 1-5' && 'retomar' || 'pausar') }}
+    if: >-
+      vars.AWS_PAPEL_BUILD != '' && (
+        github.event_name == 'workflow_dispatch' ||
+        (github.event.schedule == '0 11 * * 1-5' && vars.HOMOLOG_HORARIO != 'sempre' && vars.HOMOLOG_HORARIO != 'pausado') ||
+        (github.event.schedule == '0 23 * * *' && vars.HOMOLOG_HORARIO != 'sempre')
+      )
+    runs-on: ubuntu-latest
+    environment: homolog
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PAPEL_DEPLOY }}
+          aws-region: sa-east-1
+      - name: Executar
+        run: |
+          acao="${{ github.event_name == 'workflow_dispatch' && inputs.acao || (github.event.schedule == '0 11 * * 1-5' && 'retomar' || 'pausar') }}"
+          infra/scripts/pausar-retomar.sh "$acao" homolog

@@ -206,76 +206,111 @@ resource "aws_iam_role_policy" "github_deploy" {
   for_each = var.ambientes_github
   role     = aws_iam_role.github_deploy[each.key].id
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid      = "LerParametrosDoAmbiente"
-        Effect   = "Allow"
-        Action   = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath"]
-        Resource = "arn:${data.aws_partition.atual.partition}:ssm:${var.regiao}:${local.conta}:parameter/${local.prefix}/${each.key}/*"
-      },
-      {
-        Sid      = "DefinicaoDeTarefa"
-        Effect   = "Allow"
-        Action   = ["ecs:DescribeTaskDefinition", "ecs:RegisterTaskDefinition"]
-        Resource = "*"
-      },
-      {
-        Sid      = "RodarMigracao"
-        Effect   = "Allow"
-        Action   = ["ecs:RunTask"]
-        Resource = "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:task-definition/${local.prefix}-${each.key}-api:*"
-        Condition = {
-          ArnEquals = { "ecs:cluster" = "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:cluster/${local.prefix}-${each.key}" }
-        }
-      },
-      {
-        Sid    = "AcompanharEAtualizarServico"
-        Effect = "Allow"
-        Action = ["ecs:DescribeTasks", "ecs:DescribeServices", "ecs:UpdateService"]
-        Resource = [
-          "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:task/${local.prefix}-${each.key}/*",
-          "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:service/${local.prefix}-${each.key}/${local.prefix}-${each.key}-api",
-        ]
-      },
-      {
-        Sid      = "PassarPapeisDaTarefa"
-        Effect   = "Allow"
-        Action   = ["iam:PassRole"]
-        Resource = "arn:${data.aws_partition.atual.partition}:iam::${local.conta}:role/${local.prefix}-${each.key}-api-*"
-        Condition = {
-          StringEquals = { "iam:PassedToService" = "ecs-tasks.amazonaws.com" }
-        }
-      },
-      {
-        Sid      = "LogsDaMigracao"
-        Effect   = "Allow"
-        Action   = ["logs:GetLogEvents", "logs:FilterLogEvents"]
-        Resource = "arn:${data.aws_partition.atual.partition}:logs:${var.regiao}:${local.conta}:log-group:/ecs/${local.prefix}-${each.key}-api:*"
-      },
-      {
-        Sid      = "VerImagem"
-        Effect   = "Allow"
-        Action   = ["ecr:DescribeImages"]
-        Resource = aws_ecr_repository.api.arn
-      },
-      {
-        Sid    = "PublicarSite"
-        Effect = "Allow"
-        Action = ["s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
-        Resource = [
-          "arn:${data.aws_partition.atual.partition}:s3:::${local.prefix}-${each.key}-site-${local.conta}",
-          "arn:${data.aws_partition.atual.partition}:s3:::${local.prefix}-${each.key}-site-${local.conta}/*",
-        ]
-      },
-      {
-        Sid      = "LimparCacheDoSite"
-        Effect   = "Allow"
-        Action   = ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"]
-        Resource = "*"
-      },
-    ]
+    Version   = "2012-10-17"
+    Statement = concat(local.deploy_comum[each.key], each.key == "prod" ? [] : local.deploy_pausar[each.key])
   })
+}
+
+locals {
+  arn = "arn:${data.aws_partition.atual.partition}"
+
+  # Dev e homologação: ligar e desligar o ambiente fora do horário (infra/scripts/pausar-retomar.sh).
+  deploy_pausar = { for amb, _ in var.ambientes_github : amb => [
+    {
+      Sid      = "PausarBanco"
+      Effect   = "Allow"
+      Action   = ["rds:StopDBInstance", "rds:StartDBInstance", "rds:DescribeDBInstances"]
+      Resource = "${local.arn}:rds:${var.regiao}:${local.conta}:db:${local.prefix}-${amb}"
+    },
+    {
+      Sid      = "PausarEscalaDaApi"
+      Effect   = "Allow"
+      Action   = ["application-autoscaling:RegisterScalableTarget", "application-autoscaling:DescribeScalableTargets"]
+      Resource = "*"
+    },
+    {
+      Sid      = "VerAlarmes"
+      Effect   = "Allow"
+      Action   = ["cloudwatch:DescribeAlarms"]
+      Resource = "*"
+    },
+    {
+      Sid      = "SilenciarAlarmes"
+      Effect   = "Allow"
+      Action   = ["cloudwatch:DisableAlarmActions", "cloudwatch:EnableAlarmActions"]
+      Resource = "${local.arn}:cloudwatch:${var.regiao}:${local.conta}:alarm:${local.prefix}-${amb}-*"
+    },
+  ] }
+
+  deploy_comum = { for amb, _ in var.ambientes_github : amb => [
+    {
+      Sid      = "LerParametrosDoAmbiente"
+      Effect   = "Allow"
+      Action   = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath"]
+      Resource = "arn:${data.aws_partition.atual.partition}:ssm:${var.regiao}:${local.conta}:parameter/${local.prefix}/${amb}/*"
+    },
+    {
+      Sid      = "DefinicaoDeTarefa"
+      Effect   = "Allow"
+      Action   = ["ecs:DescribeTaskDefinition", "ecs:RegisterTaskDefinition"]
+      Resource = "*"
+    },
+    {
+      Sid      = "RodarMigracao"
+      Effect   = "Allow"
+      Action   = ["ecs:RunTask"]
+      Resource = "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:task-definition/${local.prefix}-${amb}-api:*"
+      Condition = {
+        ArnEquals = { "ecs:cluster" = "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:cluster/${local.prefix}-${amb}" }
+      }
+    },
+    {
+      Sid    = "AcompanharEAtualizarServico"
+      Effect = "Allow"
+      Action = ["ecs:DescribeTasks", "ecs:DescribeServices", "ecs:UpdateService"]
+      Resource = [
+        "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:task/${local.prefix}-${amb}/*",
+        "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:service/${local.prefix}-${amb}/${local.prefix}-${amb}-api",
+        "arn:${data.aws_partition.atual.partition}:ecs:${var.regiao}:${local.conta}:service/${local.prefix}-${amb}/${local.prefix}-${amb}-worker",
+      ]
+    },
+    {
+      Sid      = "PassarPapeisDaTarefa"
+      Effect   = "Allow"
+      Action   = ["iam:PassRole"]
+      Resource = "arn:${data.aws_partition.atual.partition}:iam::${local.conta}:role/${local.prefix}-${amb}-api-*"
+      Condition = {
+        StringEquals = { "iam:PassedToService" = "ecs-tasks.amazonaws.com" }
+      }
+    },
+    {
+      Sid      = "LogsDaMigracao"
+      Effect   = "Allow"
+      Action   = ["logs:GetLogEvents", "logs:FilterLogEvents"]
+      Resource = "arn:${data.aws_partition.atual.partition}:logs:${var.regiao}:${local.conta}:log-group:/ecs/${local.prefix}-${amb}-api:*"
+    },
+    {
+      Sid      = "VerImagem"
+      Effect   = "Allow"
+      Action   = ["ecr:DescribeImages"]
+      Resource = aws_ecr_repository.api.arn
+    },
+    {
+      Sid    = "PublicarSite"
+      Effect = "Allow"
+      Action = ["s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+      Resource = [
+        "arn:${data.aws_partition.atual.partition}:s3:::${local.prefix}-${amb}-site-${local.conta}",
+        "arn:${data.aws_partition.atual.partition}:s3:::${local.prefix}-${amb}-site-${local.conta}/*",
+      ]
+    },
+    {
+      Sid      = "LimparCacheDoSite"
+      Effect   = "Allow"
+      Action   = ["cloudfront:CreateInvalidation", "cloudfront:GetInvalidation"]
+      Resource = "*"
+    },
+  ] }
 }
 
 output "bucket_estado" {

@@ -201,6 +201,18 @@ variable "retencao_logs_dias" {
   default = 30
 }
 
+variable "waf_habilitado" {
+  description = "Liga o WAF na frente do CloudFront (criado em us-east-1, cerca de US$ 10/mês). Em homologação pode ficar desligado."
+  type        = bool
+  default     = true
+}
+
+variable "worker_na_api" {
+  description = "A API também faz o trabalho do worker (rotinas e fila) e o serviço do worker fica com 0 tarefas. Economia para homologação."
+  type        = bool
+  default     = false
+}
+
 variable "waf_limite_por_ip" {
   description = "Requisições por IP a cada 5 minutos antes de bloquear."
   type        = number

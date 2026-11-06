@@ -97,6 +97,11 @@ module "plataforma" {
   api_quantidade_max = 2
   gateway_pagamento  = "simulador"
   retencao_logs_dias = 30
+
+  # Conta gratuita (créditos da AWS): sem WAF (só homologação, cerca de US$ 10/mês a menos)
+  # e a própria API faz o trabalho do worker (uma tarefa a menos, cerca de US$ 19/mês).
+  waf_habilitado = false
+  worker_na_api  = true
 }
 
 output "plataforma" {

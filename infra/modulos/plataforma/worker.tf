@@ -2,6 +2,10 @@
 # e roda as rotinas (Pix vencido, parcelas vencidas, régua de cobrança, orçamentos vencidos).
 # As rotinas são agendadas dentro do próprio worker, com trava no banco para não rodarem em dobro.
 
+locals {
+  worker_quantidade = var.worker_na_api ? 0 : 1
+}
+
 resource "aws_ecs_task_definition" "worker" {
   family                   = "${local.nome}-worker"
   requires_compatibilities = ["FARGATE"]
@@ -41,7 +45,7 @@ resource "aws_ecs_service" "worker" {
   name                   = "${local.nome}-worker"
   cluster                = aws_ecs_cluster.principal.id
   task_definition        = aws_ecs_task_definition.worker.arn
-  desired_count          = 1
+  desired_count          = local.worker_quantidade
   launch_type            = "FARGATE"
   propagate_tags         = "SERVICE"
   enable_execute_command = false

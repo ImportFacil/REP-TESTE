@@ -2,7 +2,12 @@
 
 locals {
   parametros = {
+    "nome"                   = local.nome
+    "banco/id"               = aws_db_instance.principal.identifier
     "ecs/cluster"            = aws_ecs_cluster.principal.name
+    "ecs/api-min"            = tostring(var.api_quantidade_min)
+    "ecs/api-max"            = tostring(var.api_quantidade_max)
+    "ecs/worker-quantidade"  = tostring(local.worker_quantidade)
     "ecs/servico"            = aws_ecs_service.api.name
     "ecs/familia"            = aws_ecs_task_definition.api.family
     "ecs/conteiner"          = "api"

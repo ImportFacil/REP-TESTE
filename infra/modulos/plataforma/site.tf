@@ -101,7 +101,7 @@ resource "aws_cloudfront_distribution" "site" {
   default_root_object = "index.html"
   price_class         = "PriceClass_All" # inclui os pontos de presença no Brasil
   http_version        = "http2and3"
-  web_acl_id          = aws_wafv2_web_acl.borda.arn
+  web_acl_id          = one(aws_wafv2_web_acl.borda[*].arn)
   aliases             = local.com_dominio ? [var.dominio_site] : []
 
   origin {
@@ -164,9 +164,10 @@ resource "aws_cloudfront_distribution" "site" {
   }
 }
 
-# ---------- WAF (precisa ficar em us-east-1 por ser do CloudFront) ----------
+# ---------- WAF (precisa ficar em us-east-1 por ser do CloudFront; opcional em homologação) ----------
 
 resource "aws_wafv2_web_acl" "borda" {
+  count    = var.waf_habilitado ? 1 : 0
   provider = aws.us_east_1
   name     = "${local.nome}-borda"
   scope    = "CLOUDFRONT"

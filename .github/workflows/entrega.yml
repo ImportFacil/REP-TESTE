@@ -1,5 +1,6 @@
 # Entrega contínua: a cada commit no main, testa, publica a imagem e faz o deploy em homologação.
 # Produção recebe a MESMA imagem, depois da aprovação no environment "producao" do GitHub.
+# Produção só entra quando a variável do repositório PRODUCAO_ATIVA for "true" (perto do lançamento).
 #
 # Enquanto a AWS não estiver configurada (variável AWS_PAPEL_BUILD vazia), só os testes rodam.
 name: Entrega
@@ -96,7 +97,7 @@ jobs:
 
   producao:
     needs: [imagem, homolog]
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && vars.PRODUCAO_ATIVA == 'true'
     uses: ./.github/workflows/_deploy.yml
     with:
       ambiente: prod

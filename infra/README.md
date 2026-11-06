@@ -2,17 +2,23 @@
 
 Tudo na região **São Paulo (sa-east-1)**, em uma conta AWS, com três ambientes separados (cada um com a sua rede, banco, chaves e login).
 
+> **Começando pela conta gratuita?** Siga [`docs/conta-aws-gratuita.md`](../docs/conta-aws-gratuita.md): cria só a homologação com um comando no CloudShell, e a produção fica para perto do lançamento.
+
 A configuração atual é a **de início**, enxuta até haver clientes reais:
 
 | Ambiente | Para quê | Rede | Banco | API | Cache |
 | --- | --- | --- | --- | --- | --- |
 | `dev` (opcional) | Trabalho dos desenvolvedores | sem NAT | micro, backup de 1 dia | 1 tarefa pequena | desligado |
-| `homolog` | Testes da equipe antes de cada entrega | sem NAT | micro, backup de 7 dias | 1 a 2 tarefas pequenas | desligado |
+| `homolog` | Testes da equipe antes de cada entrega | sem NAT, sem WAF | micro, backup de 7 dias | 1 a 2 tarefas pequenas, que também fazem o papel do worker | desligado |
 | `prod` | Clientes reais | 1 NAT | small, 1 zona, backup de 35 dias, proteção contra exclusão | 1 a 4 tarefas | desligado |
 
-Custo estimado (preços de tabela em São Paulo, pouco tráfego, sem impostos): **cerca de US$ 110 por mês em homologação e US$ 230 em produção**, e uns US$ 100 a mais se o `dev` for criado. O Redis está desligado porque o código só passa a usá-lo na fase 2.
+Custo estimado (preços de tabela em São Paulo, pouco tráfego, sem impostos): **cerca de US$ 85 por mês em homologação (US$ 60 com o horário automático) e US$ 245 em produção**, e uns US$ 80 a mais se o `dev` for criado. O Redis está desligado porque o código ainda não o usa.
 
 **Sem NAT** (dev e homologação), a API roda nas sub-redes públicas com IP próprio, o que economiza cerca de US$ 70 por mês por ambiente. O grupo de segurança continua recusando qualquer conexão que não venha do balanceador, e o banco segue sem acesso à internet.
+
+**Horário automático (dev e homologação):** o workflow *Homologação: ligar e desligar* usa `infra/scripts/pausar-retomar.sh` para zerar as tarefas, parar o banco e silenciar os alarmes à noite e nos fins de semana. Variável `HOMOLOG_HORARIO`: vazia (dias úteis, das 8h às 20h), `sempre` ou `pausado`. O deploy liga o ambiente se ele estiver pausado.
+
+**Produção** só recebe deploy quando a variável do repositório `PRODUCAO_ATIVA` for `true`.
 
 ### Quando chegarem os clientes reais
 
@@ -32,10 +38,10 @@ A troca para duas zonas e a mudança de classe do banco são feitas pela AWS com
 
 | Peça | Recurso AWS | Arquivo |
 | --- | --- | --- |
-| Borda (HTTPS, cache do site, bloqueio de ataques) | CloudFront + WAF (+ Route 53 e certificados, se houver domínio) | `site.tf` |
+| Borda (HTTPS, cache do site, bloqueio de ataques) | CloudFront + WAF (opcional, `waf_habilitado`) (+ Route 53 e certificados, se houver domínio) | `site.tf` |
 | Site e painel | S3 privado, servido só pelo CloudFront | `site.tf` |
 | API | ECS Fargate atrás de um balanceador que só aceita o CloudFront | `api.tf` |
-| Worker (fila de eventos e rotinas) | ECS Fargate, mesma imagem da API | `worker.tf` |
+| Worker (fila de eventos e rotinas) | ECS Fargate, mesma imagem da API (ou dentro da própria API, com `worker_na_api`) | `worker.tf` |
 | Fila (fase 2: webhooks, NF-e, avisos) | SQS com fila de erros | `fila.tf` |
 | Banco de dados | RDS PostgreSQL 16, criptografado, só TLS | `banco.tf` |
 | Cache | ElastiCache Redis, criptografado | `cache.tf` |
@@ -80,7 +86,7 @@ Em **Settings → Secrets and variables → Actions → Variables** do repositó
 | `AWS_PAPEL_BUILD` | saída `papel_build` |
 | `ECR_REPOSITORIO` | saída `repositorio_imagens` |
 
-Em **Settings → Environments**, crie três environments: `dev`, `homolog` e `producao`. Em cada um, crie a variável `AWS_PAPEL_DEPLOY` com o papel correspondente da saída `papeis_deploy` (e, se usar o Sentry, `SENTRY_DSN_SITE`). No `producao`, marque **Required reviewers** e escolha quem aprova as entregas.
+Em **Settings → Environments**, crie os environments que for usar: `homolog`, e depois `producao` (e `dev`, se quiser). Em cada um, crie a variável `AWS_PAPEL_DEPLOY` com o papel correspondente da saída `papeis_deploy` (e, se usar o Sentry, `SENTRY_DSN_SITE`). No `producao`, marque **Required reviewers** e escolha quem aprova as entregas.
 
 ### 3. Publicar a primeira imagem
 
@@ -104,7 +110,7 @@ Repita para `prod` (e `dev`, se quiser). Confirme a inscrição no e-mail de ale
 
 Rode o workflow **Entrega** de novo (ou faça um commit). Ele migra o banco, cria os tipos de cliente, sobe a API e publica o site.
 
-Depois crie o primeiro administrador da equipe, com uma tarefa avulsa no ECS (substitua os valores):
+Depois crie o primeiro administrador da equipe pelo workflow **Criar administrador** (Actions › Run workflow, com e-mail, nome e ambiente). Ou, pela linha de comando, com uma tarefa avulsa no ECS (substitua os valores):
 
 ```bash
 AMB=homolog

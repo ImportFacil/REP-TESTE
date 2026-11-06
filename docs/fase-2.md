@@ -41,4 +41,4 @@ Total de testes da API: 82 (56 de ponta a ponta contra PostgreSQL).
 
 Localmente, siga `backend/README.md` (banco, API e dados de demonstração) e rode o site com `cd frontend && npm ci && npm run dev`. Ele abre em http://localhost:3001 com usuários de demonstração, sem senha.
 
-Na AWS, depois de criar os ambientes (`infra/README.md`), cada commit no `main` publica o site e a API em homologação. O protótipo antigo continua em `/prototipo/`.
+Na AWS, comece pela conta gratuita, só com a homologação ([`conta-aws-gratuita.md`](conta-aws-gratuita.md)). Depois disso, cada commit no `main` publica o site e a API em homologação. O protótipo antigo continua em `/prototipo/`.

@@ -40,7 +40,15 @@ export class FilaSqs implements Fila {
   /** Usado pelo worker: busca mensagens, processa e apaga só as que deram certo. */
   async consumir(processar: Processador, parar: () => boolean): Promise<void> {
     while (!parar()) {
-      const r = await this.sqs.send(new ReceiveMessageCommand({ QueueUrl: this.url, MaxNumberOfMessages: 10, WaitTimeSeconds: 20 }));
+      let r;
+      try {
+        r = await this.sqs.send(new ReceiveMessageCommand({ QueueUrl: this.url, MaxNumberOfMessages: 10, WaitTimeSeconds: 20 }));
+      } catch (e) {
+        // Falha passageira (rede, credenciais renovando): espera e tenta de novo, sem derrubar o processo.
+        console.error('Falha ao ler a fila; nova tentativa em 5 s:', (e as Error).message);
+        await new Promise((ok) => setTimeout(ok, 5000));
+        continue;
+      }
       for (const msg of r.Messages ?? []) {
         try {
           await processar(JSON.parse(msg.Body ?? '{}'));

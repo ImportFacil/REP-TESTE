@@ -122,6 +122,7 @@ locals {
     REDIS_HOST                 = try(aws_elasticache_replication_group.principal[0].primary_endpoint_address, "")
     GATEWAY                    = var.gateway_pagamento
     SENTRY_DSN                 = var.sentry_dsn
+    WORKER_NA_API              = tostring(var.worker_na_api)
   }
 
   segredos_api = [

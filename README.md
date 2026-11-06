@@ -11,7 +11,7 @@ Plataforma B2B da ImportFácil: loja para clientes empresariais, orçamentos, or
 | `index.html` | Protótipo navegável de todas as telas (dados ficam no navegador) | Pronto; é publicado como site de cada ambiente |
 | `frontend/` | Site em Next.js ligado à API (loja, Painel da equipe, app instalável) | **Pronto** |
 | `backend/` | API em NestJS + PostgreSQL, e o worker | **Fases 1 e 2 prontas:** login, empresas, catálogo e preços, crédito, pedidos, pagamentos (simulados até o Asaas), orçamentos, ordens de importação, régua de cobrança, auditoria |
-| `infra/` | Infraestrutura AWS em Terraform (São Paulo) | **Fase 1 pronta:** dev, homologação e produção |
+| `infra/` | Infraestrutura AWS em Terraform (São Paulo) | **Pronta:** dev, homologação e produção. Para começar só com a homologação na conta gratuita: [`docs/conta-aws-gratuita.md`](docs/conta-aws-gratuita.md) |
 | `.github/workflows/` | Testes, publicação da imagem e deploy | Pronto; o deploy liga quando a AWS for configurada |
 | `docs/` | Situação da fase 1 e próximos passos | — |
 
