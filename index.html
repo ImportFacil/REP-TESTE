@@ -888,6 +888,16 @@
   .calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
   @media (min-width:640px){.calc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   .calc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .calc-anexo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+  .calc-ncm{display:flex;align-items:center;gap:2px}
+  .calc-ncm .btn{padding:4px 6px;min-height:0}
+  .calc-in.ncm-invalido{color:var(--critical);border-color:var(--critical)}
+  .ncm-lista{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .ncm-op{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:9px 10px;cursor:pointer;font-family:inherit;color:inherit}
+  .ncm-op:hover,.ncm-op:focus-visible{border-color:var(--ring);background:var(--accent)}
+  .ncm-cod{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;font-weight:700;white-space:nowrap;padding-top:1px}
+  .ncm-txt{display:flex;flex-direction:column;gap:2px;font-size:.76rem;min-width:0}
+  .ncm-txt span{color:var(--muted-foreground);font-size:.7rem}
 </style>
 <link rel="manifest" href="prototipo-globo.webmanifest">
 <link rel="apple-touch-icon" href="prototipo-globo-apple.png">
@@ -3693,7 +3703,7 @@ function rEquipe(){
     <div class="note" style="margin:0 0 12px">Protótipo da área interna. No sistema real, só a equipe ImportFácil acessa esta tela, com login próprio.</div>
     <div class="seg" role="tablist">${abas.map(([k,t])=>`<button role="tab" aria-selected="${eqTab===k}" class="${eqTab===k?'on':''}" onclick="eqTab='${k}';rEquipe()">${t}</button>`).join('')}</div>
     ${corpo}<div style="height:18px"></div>`;
-  if(eqTab==='calc') calcResultados();
+  if(eqTab==='calc'){ calcResultados(); setTimeout(calcNcmConferir,600); }
 }
 
 /* ---------- Crédito: análise do cadastro ---------- */
@@ -3996,6 +4006,7 @@ function eqCalc(){
   const cab = CALC_COLS.map(([c,t])=>`<th scope="col"><span class="calc-col">${c}</span>${t}</th>`).join('');
   const linhas = s.itens.map((it,ix)=>`<tr>${CALC_COLS.map(([c,t,tp])=>{
       const [kind,campo]=tp.split(':');
+      if(campo==='ncm') return `<td class="calc-inp"><div class="calc-ncm"><input id="cn-${ix}" class="calc-in calc-txt" aria-label="NCM (linha ${ix+12})" value="${oesc(it.ncm)}" oninput="calcSet('itens.${ix}.ncm',this.value,'txt');calcNcmConferir()"><button class="btn ghost sm" title="Buscar NCM na tabela oficial" aria-label="Buscar NCM da linha ${ix+12}" onclick="calcNcmAbrir(${ix})">${I('search')}</button></div></td>`;
       if(kind==='in-txt') return `<td class="calc-inp"><input class="calc-in calc-txt${campo==='desc'?' calc-desc':''}" aria-label="${t} (linha ${ix+12})" value="${oesc(it[campo])}" oninput="calcSet('itens.${ix}.${campo}',this.value,'txt')"></td>`;
       if(kind==='in-num') return `<td class="calc-inp">${cNum('',it[campo],'itens.'+ix+'.'+campo,false).replace('<input','<input aria-label="'+t+' (linha '+(ix+12)+')"')}</td>`;
       if(kind==='in-pct') return `<td class="calc-inp">${cNum('',it[campo],'itens.'+ix+'.'+campo,true).replace('<input','<input aria-label="'+t+' % (linha '+(ix+12)+')"')}</td>`;
@@ -4018,7 +4029,15 @@ function eqCalc(){
             <option value="20" ${s.modelo==='20'?'selected':''}>Custo Importação 20 DRY DRONES</option>
             <option value="40" ${s.modelo==='40'?'selected':''}>Custo Importação 40 DRY DRO</option>
             <option value="vazio" ${s.modelo==='vazio'?'selected':''}>Em branco</option>
-          </select></div>
+            ${s.modelo==='importado'?`<option value="importado" selected>Planilha anexada: ${oesc(s.origem&&s.origem.arquivo||'')}</option>`:''}
+          </select>
+          <div class="calc-anexo">
+            <label class="btn outline sm" for="calcArq" style="margin:0;cursor:pointer">${I('upload')} Anexar planilha</label>
+            <input id="calcArq" type="file" accept=".xlsx,.xlsm,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" style="display:none" onchange="calcAnexar(this)">
+            <button class="btn ghost sm" onclick="calcModeloCSV()">Baixar modelo (CSV)</button>
+          </div>
+          ${s.modelo==='importado'&&s.origem?`<div class="muted" style="margin-top:4px">Dados de <b>${oesc(s.origem.arquivo)}</b>, aba ${oesc(s.origem.aba)}, importados em ${oesc(s.origem.em)}.</div>`:'<div class="muted" style="margin-top:4px">.xlsx, .xls ou .csv no formato da planilha (cabeçalho com Descrição, Quant., $ / Unit, Net Wt, NCM e alíquotas).</div>'}
+        </div>
         <div class="calc-cambios">
           <div><label for="cC9">Tx Cambial Frete INT (C9)</label>${cNum('cC9',s.cambioFrete,'cambioFrete')}</div>
           <div><label for="cG9">Tx Cambial dia do registro da DI (G9)</label>${cNum('cG9',s.cambioDI,'cambioDI')}</div>
@@ -4059,7 +4078,7 @@ function eqCalc(){
       <button class="btn default" onclick="calcCSV()">Exportar em CSV (abre no Excel)</button>
       <button class="btn outline" onclick="calcCarregar(calc.modelo==='vazio'?'20':calc.modelo,true)">Restaurar os valores da planilha</button>
     </div>
-    <div class="note">Mesmas fórmulas da planilha original, inclusive pontos que ela calcula de um jeito próprio: o FOB em R$ usa o câmbio do pagamento final (L9); o ICMS restituível (AP) é fixo em 0; a estadia (F38) entra no total F45 mas não no custo por item; F55 soma frete e seguro de novo, pois F45 já os inclui. A contagem de NCMs (AE21), que na planilha está com #REF!, aqui conta os NCMs diferentes.</div>`;
+    <div class="note">Mesmas fórmulas da planilha original, inclusive pontos que ela calcula de um jeito próprio: o FOB em R$ usa o câmbio do pagamento final (L9); o ICMS restituível (AP) é fixo em 0; a estadia (F38) entra no total F45 mas não no custo por item; F55 soma frete e seguro de novo, pois F45 já os inclui. A contagem de NCMs (AE21), que na planilha está com #REF!, aqui conta os NCMs diferentes. A lupa ao lado do NCM busca na tabela oficial da Receita Federal (atualizada toda semana); NCM inexistente fica em vermelho.</div>`;
 }
 function calcResultados(){
   if(!document.getElementById('calcResumo')) return;
@@ -4099,6 +4118,7 @@ function calcResultados(){
   document.getElementById('calcCambio').innerHTML = sr('Total câmbio pago',cf.brl(c.P28)) + sr('Valor DI (FOB US$ × G9)',cf.brl(c.P29)) + sr('Saldo diferença real',cf.brl(c.P30));
 }
 function calcCarregar(m,confirmar){
+  if(m==='importado') return;
   if(confirmar && !confirm('Voltar aos valores da planilha? As alterações feitas nesta calculadora serão perdidas.')) return;
   calc = m==='vazio' ? calcVazio() : calcPadrao(m);
   calcSalvar(); rEquipe(); toast(m==='vazio'?'Calculadora em branco':'Valores da aba '+(m==='40'?'40':'20')+' DRY carregados');
@@ -4130,6 +4150,258 @@ function calcCSV(){
   a.download='calculo-importacao-'+(calc.modelo==='40'?'40dry':calc.modelo==='20'?'20dry':'')+'-'+new Date().toISOString().slice(0,10)+'.csv';
   document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   toast('CSV gerado ✓');
+}
+
+/* ---------- Anexar planilha (.xlsx, .xls, .csv) ----------
+   Lê a planilha no navegador (SheetJS, carregado só quando precisa) e preenche a calculadora:
+   itens pela linha de cabeçalho (DESCRIÇÃO, QUANT., $ / UNIT, NET WT, NCM, II, IPI...),
+   câmbios pelos rótulos "Tx Cambial" e despesas pelo bloco "Despesas de Desembaraço". */
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+let _xlsxCarregando = null;
+function calcCarregarXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(_xlsxCarregando) return _xlsxCarregando;
+  _xlsxCarregando = new Promise((ok,erro)=>{
+    const s=document.createElement('script'); s.src=XLSX_URL; s.async=true;
+    s.onload=()=>window.XLSX?ok(window.XLSX):erro(new Error('leitor de planilhas indisponível'));
+    s.onerror=()=>{ _xlsxCarregando=null; erro(new Error('sem conexão para carregar o leitor de planilhas')); };
+    document.head.appendChild(s);
+  });
+  return _xlsxCarregando;
+}
+const cNorm = v => String(v==null?'':v).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+function cNumLido(v, pct){ // número do Excel ou texto "1.234,56", "6,5%", "R$ 3.500"
+  if(v==null||v==='') return null;
+  if(typeof v==='number') return isFinite(v) ? (pct && v>1 ? v/100 : v) : null;
+  let t=String(v).trim(); const temPct=t.includes('%');
+  t=t.replace(/[^\d,.\-]/g,'');
+  if(t.includes(',')&&t.includes('.')) t = t.lastIndexOf(',')>t.lastIndexOf('.') ? t.replace(/\./g,'').replace(',','.') : t.replace(/,/g,'');
+  else if(t.includes(',')) t=t.replace(',','.');
+  const n=parseFloat(t); if(!isFinite(n)) return null;
+  return temPct ? n/100 : (pct && n>1 ? n/100 : n);
+}
+const CALC_CAB = [ // campo, teste do cabeçalho (texto normalizado), é percentual
+  ['seq',h=>/^seq/.test(h)],['totvs',h=>/totvs/.test(h)],['desc',h=>/descri|^produto$|^item$/.test(h)],['model',h=>/^model/.test(h)],
+  ['qtd',h=>/^quant|^qtd|quantidade/.test(h)],
+  ['usd',h=>/^\$ ?\/ ?unit|^us\$|usd.*unit|unit.*usd|fob.*unit|unit.*fob|valor unit.*(us|usd|\$)|preco unit.*(us|usd|\$)/.test(h)&&!/^r\$/.test(h)],
+  ['peso',h=>/net ?wt|peso/.test(h)],['ex',h=>/^ex\b|ex.?tarif/.test(h)],['ncm',h=>/^ncm/.test(h)],
+  ['ii',h=>/^ii( ?%)?$|imposto de importacao/.test(h),true],['ipi',h=>/^ipi( ?%)?$/.test(h),true],['pis',h=>/^pis( ?%)?$/.test(h),true],
+  ['cofins',h=>/^cofins( ?%)?$/.test(h),true],['icms',h=>/^icms( ?%)?$/.test(h),true],['ind',h=>/industrializa/.test(h)]];
+const CALC_DESP_ROT = [ // rótulo da planilha → campo
+  [/frete internacional/,'freteUSD'],[/^seguro/,null],[/capatazia/,'capatazia'],[/siscomex/,'siscomex'],[/^s\.?d\.?a/,'sda'],[/marinha/,'marinha'],
+  [/other charges|outras taxas/,'outros'],[/desembaraco di/,'desDI'],[/desembaraco dta|^dta/,'dta'],[/transporte/,'transp'],[/estadia/,'estadia'],
+  [/armazenagem 2|eadi/,'arm2'],[/armazenagem/,'arm1'],[/dif\.? cambial/,'difCamb'],[/demurrage/,'demurrage'],[/^ii total/,null]];
+function calcLerAba(linhas){ // linhas = matriz (sheet_to_json header:1)
+  const R={itens:[],cambios:{},desp:{},freteUSD:null,avisos:[]};
+  // cabeçalho dos itens
+  let hRow=-1, cols={};
+  for(let r=0;r<Math.min(linhas.length,60)&&hRow<0;r++){
+    const row=linhas[r]||[]; const ns=row.map(cNorm);
+    if(ns.some(h=>/descri|^produto$/.test(h)) && ns.some(h=>/^quant|^qtd|quantidade/.test(h))){
+      hRow=r;
+      ns.forEach((h,c)=>{ if(!h) return; for(const [campo,teste] of CALC_CAB){ if(cols[campo]==null && teste(h)){ cols[campo]=c; break; } } });
+    }
+  }
+  if(hRow<0) return null;
+  const pctCampo = Object.fromEntries(CALC_CAB.map(x=>[x[0],!!x[2]]));
+  for(let r=hRow+1;r<linhas.length;r++){
+    const row=linhas[r]||[]; const g=c=>cols[c]==null?null:row[cols[c]];
+    const desc=g('desc'), totvs=g('totvs'), model=g('model');
+    if((desc==null||desc==='') && (totvs==null||totvs==='') && (model==null||model==='')){
+      if(R.itens.length) break; else continue;
+    }
+    const it=calcItemNovo(R.itens.length+1);
+    ['seq','totvs','desc','model','ex','ncm'].forEach(c=>{ const v=g(c); if(v!=null&&v!=='') it[c]=String(v).trim(); });
+    if(cols.seq==null) it.seq=String(R.itens.length+1).padStart(3,'0');
+    ['qtd','usd','peso','ii','ipi','pis','cofins','icms','ind'].forEach(c=>{ if(cols[c]==null) return; const v=cNumLido(g(c),pctCampo[c]); if(v!=null) it[c]=v; });
+    R.itens.push(it);
+    if(R.itens.length>=500){ R.avisos.push('Lidas só as primeiras 500 linhas.'); break; }
+  }
+  ['qtd','usd','peso','ncm'].forEach(c=>{ if(cols[c]==null) R.avisos.push('Coluna "'+({qtd:'quantidade',usd:'$ / unit',peso:'peso (net wt)',ncm:'NCM'})[c]+'" não encontrada.'); });
+  // câmbios
+  for(let r=0;r<linhas.length;r++){ const row=linhas[r]||[];
+    row.forEach((v,c)=>{ const h=cNorm(v); if(!/tx cambial|taxa cambial|taxa de cambio|cambio/.test(h) || /valor cambio|cambio pago|total cambio/.test(h)) return;
+      let val=null; for(let k=1;k<=3&&val==null;k++) val=cNumLido(row[c+k]); if(val==null&&linhas[r+1]) val=cNumLido(linhas[r+1][c]);
+      if(val==null||val<=0) return;
+      if(/frete/.test(h)) R.cambios.cambioFrete=val; else if(/registro|\bdi\b/.test(h)) R.cambios.cambioDI=val; else if(/pgt|pagamento|final/.test(h)) R.cambios.cambioPag=val;
+    }); }
+  // despesas de desembaraço
+  let dRow=-1, cUSD=-1, cBRL=-1, cRot=-1;
+  for(let r=0;r<linhas.length&&dRow<0;r++){ const ns=(linhas[r]||[]).map(cNorm);
+    const iu=ns.indexOf('usd'), ib=ns.indexOf('r$');
+    if(iu>=0&&ib>=0&&ns.some(h=>/despes/.test(h))){ dRow=r; cUSD=iu; cBRL=ib; cRot=ns.findIndex(h=>/despes/.test(h)); } }
+  if(dRow>=0){
+    for(let r=dRow+1;r<Math.min(linhas.length,dRow+40);r++){
+      const row=linhas[r]||[]; const rot=cNorm(row[cRot]); if(!rot) continue;
+      if(/^total/.test(rot)) break;
+      const m=CALC_DESP_ROT.find(([re])=>re.test(rot)); if(!m||!m[1]) continue;
+      if(m[1]==='freteUSD'){ const v=cNumLido(row[cUSD]); if(v!=null) R.freteUSD=v; continue; }
+      const v=cNumLido(row[cBRL]); R.desp[m[1]] = v==null?0:v;
+    }
+  }
+  return R;
+}
+async function calcAnexar(inp){
+  const f=inp.files&&inp.files[0]; inp.value=''; if(!f) return;
+  if(f.size>10*1024*1024){ toast('Planilha muito grande (máx. 10 MB)'); return; }
+  toast('Lendo a planilha…');
+  try{
+    const X=await calcCarregarXLSX();
+    const buf=await f.arrayBuffer();
+    const texto=/\.(csv|txt)$/i.test(f.name);
+    const wb=X.read(buf,{type:'array',cellDates:false,raw:texto}); // CSV: mantém o texto ("12,5", "6,5%") para ler no padrão brasileiro
+    const abas=wb.SheetNames.map(n=>{ const ws=wb.Sheets[n]; if(!ws||!ws['!ref']) return null;
+      const R=calcLerAba(X.utils.sheet_to_json(ws,{header:1,raw:true,defval:null,blankrows:true})); return R&&R.itens.length?{nome:n,R}:null; }).filter(Boolean);
+    if(!abas.length){ toast('Não achei uma tabela de itens (cabeçalho com Descrição e Quantidade) nesta planilha'); return; }
+    if(abas.length===1) return calcAplicarImport(f.name,abas[0]);
+    window._calcAbas={arquivo:f.name,abas};
+    openSheet(`<h2>Qual aba usar?</h2><div class="muted" style="margin-bottom:10px">${oesc(f.name)} tem ${abas.length} abas com itens.</div>
+      ${abas.map((a,i)=>`<button class="btn outline block" style="margin-bottom:8px;justify-content:space-between" onclick="calcAplicarImport(_calcAbas.arquivo,_calcAbas.abas[${i}]);closeSheet()"><span>${oesc(a.nome)}</span><span class="muted">${a.R.itens.length} itens</span></button>`).join('')}`);
+  }catch(e){ toast('Não consegui ler a planilha: '+e.message); }
+}
+function calcAplicarImport(arquivo,aba){
+  const R=aba.R;
+  // câmbios, frete e despesas que não vierem na planilha continuam com os valores que já estavam na calculadora
+  calc = Object.assign({}, calc, {modelo:'importado', origem:{arquivo, aba:aba.nome, em:new Date().toLocaleString('pt-BR')}, itens:R.itens, desp:Object.assign({}, calc.desp, R.desp)});
+  Object.assign(calc, R.cambios);
+  if(R.freteUSD!=null) calc.freteUSD=R.freteUSD;
+  calcSalvar(); rEquipe();
+  const nDesp=Object.keys(R.desp).length+(R.freteUSD!=null?1:0), nCamb=Object.keys(R.cambios).length;
+  toast(`Planilha importada: ${R.itens.length} itens` + (nCamb||nDesp ? `, ${nCamb} câmbio(s) e ${nDesp} despesa(s)` : '. Câmbio e despesas mantidos como estavam'));
+  if(R.avisos.length) setTimeout(()=>toast(R.avisos.join(' ')),3000);
+}
+function calcModeloCSV(){
+  const cab='SEQ. IMP.;Cod Totvs;DESCRIÇÃO DO PRODUTO;Model Name;QUANT. UNIT;$ / UNIT;NET WT KG;Ex Tariff;NCM;II;IPI;PIS;COFINS;ICMS;CUSTOS FINAIS DE INDUSTRIALIZAÇÃO';
+  const ex='001;;DJI Agras T25P;;8;16500;500;SIM;8806.94.00;0%;6,5%;2,1%;9,65%;0%;0';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+cab+'\n'+ex+'\n'],{type:'text/csv;charset=utf-8'}));
+  a.download='modelo-calculadora-importacao.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+
+/* ---------- Busca de NCM (tabela oficial da Receita Federal / Siscomex) ----------
+   prototipo-ncm.json é atualizado toda semana pelo workflow "Tabela NCM" do GitHub. */
+let NCM = null, _ncmCarregando = null;
+const NCM_SINONIMOS = { // termo do dia a dia → termos da nomenclatura
+  drone:['nao tripulados'], dji:['nao tripulados'], agras:['nao tripulados'], mavic:['nao tripulados'], drones:['nao tripulados'], vant:['nao tripulados'], rpa:['nao tripulados'],
+  celular:['telefones inteligentes','telefones celulares'], smartphone:['telefones inteligentes'], notebook:['processamento de dados, portateis'], laptop:['processamento de dados, portateis'],
+  computador:['processamento de dados'], tablet:['processamento de dados, portateis'], tv:['receptores de televisao','monitores'], televisao:['receptores de televisao'],
+  pneu:['pneumaticos'], pneus:['pneumaticos'], bateria:['acumuladores eletricos'], baterias:['acumuladores eletricos'], pilha:['pilhas'],
+  carregador:['conversores estaticos','carregadores'], fonte:['conversores estaticos'], led:['diodos emissores de luz'], lampada:['lampadas'],
+  'painel solar':['celulas fotovoltaicas','fotovoltaic'], solar:['fotovoltaic'], geladeira:['refrigeradores'], freezer:['congeladores'],
+  'ar condicionado':['ar-condicionado','condicionadores de ar'], furadeira:['furadeiras','perfuradoras'], parafusadeira:['ferramentas eletromecanicas'],
+  esmerilhadeira:['ferramentas eletromecanicas','esmerilhadoras'], trator:['tratores'], roçadeira:['cortadores de grama','motocultores'], rocadeira:['cortadores de grama','motocultores'],
+  pulverizador:['pulverizadores'], bomba:['bombas'], motor:['motores'], cabo:['fios, cabos','cabos'], fio:['fios'], tomada:['tomadas'], disjuntor:['disjuntores'],
+  nitrila:['borracha'], latex:['borracha'], luva:['luvas'], luvas:['luvas'], mascara:['mascaras'], seringa:['seringas'], camera:['cameras'], impressora:['impressoras'], monitor:['monitores'],
+  semente:['sementes'], fertilizante:['adubos','fertilizantes'], adubo:['adubos'], herbicida:['herbicidas'], inseticida:['inseticidas'], fungicida:['fungicidas'],
+  irrigacao:['irrigacao','aspersores'], gotejador:['irrigacao'], 'pivo central':['irrigacao'] };
+const NCM_DICAS = [ // atalhos para produtos frequentes da ImportFácil: aparecem primeiro, com a regra de classificação
+  {termos:['drone','drones','vant','rpa','agras','dji','mavic','aereos nao tripulados'], prefixos:['88069','88062'],
+   nota:'Drones: 8806.9 quando fazem voo programado sem intervenção do piloto (caso dos drones agrícolas, SC Cosit 98.027/2025); 8806.2 quando só voam pilotados remotamente. O código final depende do peso máximo de decolagem.'},
+  {termos:['peca de drone','partes de drone','helice','braco do drone'], prefixos:['880730'], nota:'Partes de drones (posição 88.07).'}];
+const NCM_PARADAS = new Set(['de','da','do','das','dos','para','com','sem','e','em','a','o','as','os','por','um','uma','tipo','modelo','kit','pecas','peca']);
+function ncmCarregar(){
+  if(NCM) return Promise.resolve(NCM);
+  if(_ncmCarregando) return _ncmCarregando;
+  _ncmCarregando = fetch('prototipo-ncm.json',{cache:'no-cache'}).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(d=>{
+    const desc = new Map(d.n.map(([c,t])=>[c,t]));
+    const limpa = t => String(t||'').replace(/^[-–\s]+/,'').replace(/:$/,'').trim();
+    const folhas = d.n.filter(([c])=>c.length===8).map(([c,t])=>{
+      const anc=[2,4,5,6,7].map(n=>c.slice(0,n)).filter(p=>desc.has(p)).map(p=>limpa(desc.get(p)));
+      const pos = desc.get(c.slice(0,4)) ? limpa(desc.get(c.slice(0,4))) : '';
+      const sub = [5,6,7].map(n=>c.slice(0,n)).filter(p=>desc.has(p)).map(p=>limpa(desc.get(p)));
+      return {c, d:limpa(t), pos, sub, cap:anc[0]||'',
+        nF:cNorm(t), nS:cNorm(sub.join(' ')), nP:cNorm(pos), nC:cNorm(anc[0]||'')};
+    });
+    NCM = {meta:{atualizadoEm:d.atualizadoEm, ato:d.ato, total:d.total}, folhas, porCodigo:new Map(folhas.map(f=>[f.c,f]))};
+    return NCM;
+  }).catch(e=>{ _ncmCarregando=null; throw e; });
+  return _ncmCarregando;
+}
+const ncmFmt = c => c && c.length===8 ? c.slice(0,4)+'.'+c.slice(4,6)+'.'+c.slice(6) : c;
+function ncmBuscar(q, limite=40){
+  if(!NCM) return [];
+  const qn=cNorm(q); if(!qn) return [];
+  const dig=qn.replace(/[.\s-]/g,'');
+  if(/^\d{2,8}$/.test(dig)) return NCM.folhas.filter(f=>f.c.startsWith(dig)).slice(0,limite).map(f=>({f,s:0}));
+  // grupos de alternativas: cada palavra da busca (com sinônimos); frases de 2 palavras também viram sinônimo
+  let palavras=qn.replace(/[^\w\s-]/g,' ').split(' ').filter(w=>w.length>=3&&!NCM_PARADAS.has(w));
+  const grupos=[];
+  for(let i=0;i<palavras.length;i++){
+    const dupla=palavras[i]+' '+(palavras[i+1]||'');
+    if(NCM_SINONIMOS[dupla]){ grupos.push([dupla,...NCM_SINONIMOS[dupla]]); i++; continue; }
+    const w=palavras[i]; const raiz=w.length>5?w.replace(/(oes|aes|ais|eis|res|es|s)$/,''):w;
+    grupos.push([raiz,...(NCM_SINONIMOS[w]||[])]);
+  }
+  if(!grupos.length) return [];
+  const brutas = grupos.map(g=>g[0]);
+  // todas as palavras precisam aparecer; se nada aparecer assim, mostra os que têm mais palavras em comum
+  const res=[];
+  for(const f of NCM.folhas){
+    let s=0, acertos=0;
+    grupos.forEach((g,gi)=>{
+      let melhor=0;
+      for(const alt of g){ if(f.nF.includes(alt)) melhor=Math.max(melhor,4); else if(f.nS.includes(alt)) melhor=Math.max(melhor,3); else if(f.nP.includes(alt)) melhor=Math.max(melhor,2); else if(f.nC.includes(alt)) melhor=Math.max(melhor,1); }
+      if(melhor){ acertos++; s += melhor*(gi===0?1.5:1); } // a 1ª palavra costuma ser o produto ("drone pulverizador")
+    });
+    if(acertos && /\bpartes?\b|\bpecas?\b/.test(f.nF+' '+f.nS+' '+f.nP) && !/\bpartes?\b|\bpecas?\b/.test(qn)) s-=3; // peças só quando pedidas
+    if(acertos){
+      brutas.forEach(w=>{ if(f.nF.includes(w)) s+=0.6; else if(f.nS.includes(w)||f.nP.includes(w)) s+=0.3; }); // a palavra digitada vale mais que o sinônimo
+      res.push({f, a:acertos, s: s - (/^outr/.test(f.nF)?0.5:0)});
+    }
+  }
+  const max = res.reduce((m,r)=>Math.max(m,r.a),0);
+  const sel = res.filter(r=>r.a===max);
+  sel.parcial = max<grupos.length;
+  const out = sel.sort((a,b)=>b.s-a.s||a.f.c.localeCompare(b.f.c)).slice(0,limite);
+  out.parcial = sel.parcial;
+  return out;
+}
+let _ncmItem = null;
+function calcNcmAbrir(ix){
+  _ncmItem = ix; const it=calc.itens[ix]||{};
+  const q = it.desc || it.model || '';
+  openSheet(`<h2>Buscar NCM</h2>
+    <div class="muted" style="margin-bottom:6px">Item: <b>${oesc(it.desc||'sem descrição')}</b>. Busque pelo nome do produto, pelo material ou pelo começo do código.</div>
+    <label for="ncmQ">Buscar na tabela NCM</label>
+    <input id="ncmQ" type="search" autocomplete="off" value="${oesc(q)}" placeholder="ex.: drone pulverizador, furadeira, 8424" oninput="calcNcmListar()">
+    <div class="muted" id="ncmMeta" style="margin-top:6px">Carregando a tabela oficial…</div>
+    <div id="ncmLista" class="ncm-lista"></div>`);
+  ncmCarregar().then(()=>{ document.getElementById('ncmMeta').textContent = `Tabela NCM oficial da Receita Federal (Siscomex), ${NCM.meta.total.toLocaleString('pt-BR')} códigos · ${NCM.meta.atualizadoEm}${NCM.meta.ato?' · '+NCM.meta.ato:''}`; calcNcmListar(); })
+    .catch(e=>{ const m=document.getElementById('ncmMeta'); if(m) m.textContent='Não consegui carregar a tabela NCM ('+e.message+'). Verifique a conexão.'; });
+  setTimeout(()=>{ const i=document.getElementById('ncmQ'); if(i){ i.focus(); i.select(); } },250);
+}
+function calcNcmListar(){
+  const box=document.getElementById('ncmLista'); if(!box||!NCM) return;
+  const q=document.getElementById('ncmQ').value;
+  const qn=cNorm(q);
+  const dica=NCM_DICAS.find(d=>d.termos.some(t=>qn.includes(t)));
+  let r=ncmBuscar(q);
+  if(dica){
+    const fixos=dica.prefixos.flatMap(p=>NCM.folhas.filter(f=>f.c.startsWith(p)));
+    const vistos=new Set(fixos.map(f=>f.c));
+    const resto=r.filter(x=>!vistos.has(x.f.c));
+    r=[...fixos.map(f=>({f,s:99,dica:true})),...resto].slice(0,40); r.parcial=false;
+  }
+  box.innerHTML = (dica?`<div class="note" style="margin:0">${oesc(dica.nota)}</div>`:'') + (r.parcial&&r.length?'<div class="muted" style="padding:2px">Nenhum código tem todas as palavras; mostrando os mais próximos.</div>':'') + (r.length ? r.map(({f})=>`<button class="ncm-op" onclick="calcNcmUsar('${f.c}')">
+      <span class="ncm-cod">${ncmFmt(f.c)}</span>
+      <span class="ncm-txt"><b>${oesc(f.d)}</b><span>${oesc([f.pos,...f.sub.filter(s=>s!==f.d)].join(' › '))}</span></span></button>`).join('')
+    + (r.length>=40?'<div class="muted" style="padding:8px 2px">Mostrando os 40 primeiros. Refine a busca para ver outros.</div>':'')
+    : `<div class="empty">${cNorm(q)?'Nada encontrado. Tente outra palavra (ex.: o material ou a função do produto) ou o começo do código.':'Digite o nome do produto ou o começo do código.'}</div>`);
+}
+function calcNcmUsar(c){
+  if(_ncmItem==null||!calc.itens[_ncmItem]) return closeSheet();
+  calc.itens[_ncmItem].ncm = ncmFmt(c); calcSalvar(); closeSheet(); rEquipe();
+  toast('NCM '+ncmFmt(c)+' aplicado ao item');
+}
+function calcNcmConferir(){ // marca NCMs que não existem na tabela e mostra a descrição ao passar o mouse
+  ncmCarregar().then(()=>{
+    calc.itens.forEach((it,ix)=>{
+      const el=document.getElementById('cn-'+ix); if(!el) return;
+      const c=String(it.ncm||'').replace(/\D/g,'');
+      const f=c?NCM.porCodigo.get(c):null;
+      el.title = f ? ncmFmt(f.c)+' — '+[f.pos,...f.sub,f.d].filter((v,i,a)=>a.indexOf(v)===i).join(' › ') : (c?'NCM não encontrado na tabela vigente':'');
+      el.classList.toggle('ncm-invalido', !!c && !f);
+    });
+  }).catch(()=>{});
 }
 
 /* ---------- dados de exemplo ---------- */
