@@ -1,6 +1,6 @@
 /* Service worker do protótipo: deixa instalável e funcionando sem internet
    (o protótipo guarda tudo no próprio aparelho). A versão nova entra na próxima abertura. */
-const VERSAO = 'prototipo-v2';
+const VERSAO = 'prototipo-v3';
 const ARQUIVOS = ['./', './index.html', './prototipo.webmanifest', './prototipo-icone-192.png', './prototipo-icone-512.png', './prototipo-icone-apple.png'];
 
 self.addEventListener('install', (e) => {
