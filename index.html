@@ -584,6 +584,73 @@
   .tlstep.done .dot{background:var(--good);border-color:var(--good)}
   .tlstep .ln{width:2px;background:var(--hairline);margin-left:6px;height:16px}
   .tlstep.done .ln{background:var(--good)}
+  /* Carrinho (layout "Shopping Cart" da Flowbite, adaptado ao CSS do protótipo) */
+  .cart-tt{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;margin:2px 0 12px}
+  .cart-tt h1{margin:0;font-size:1.15rem;font-weight:600;color:var(--foreground)}
+  .cart-tt .muted{font-size:.8rem}
+  .cart-tt a{margin-left:auto;font-size:.8rem;font-weight:500;cursor:pointer;color:var(--foreground);text-decoration:underline}
+  .cart{display:flex;flex-direction:column;gap:14px;margin-bottom:12px}
+  @media (min-width:1024px){.cart{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}}
+  .cart-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .cart-it{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:14px;display:flex;flex-direction:column;gap:12px}
+  .cart-it .ft{flex:none;width:80px;height:80px;border-radius:var(--radius-md);background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;overflow:hidden;border:0;padding:0;cursor:pointer}
+  .cart-it .ft img{width:100%;height:100%;object-fit:cover}
+  .cart-it .ft svg{width:34px;height:34px}
+  .cart-it .qp{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .cart-it .lp{font-size:1rem;font-weight:700;color:var(--foreground);text-align:right;white-space:nowrap}
+  .cart-it .lp small{display:block;font-size:.7rem;font-weight:400;color:var(--muted-foreground)}
+  .cart-it .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+  .cart-it .nm{font:inherit;font-size:.9rem;font-weight:500;color:var(--foreground);background:none;border:0;padding:0;text-align:left;cursor:pointer}
+  .cart-it .nm:hover{text-decoration:underline}
+  .cart-it .meta{font-size:.74rem;color:var(--muted-foreground)}
+  .cart-it .meta a{cursor:pointer;color:var(--foreground);text-decoration:underline}
+  .cart-it .meta svg{width:14px;height:14px;vertical-align:-2px;margin-right:2px}
+  .cart-it .acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px}
+  .cart-it .acts button{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:.78rem;font-weight:500;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--muted-foreground)}
+  .cart-it .acts button:hover{color:var(--foreground);text-decoration:underline}
+  .cart-it .acts button.rm{color:var(--critical)}
+  .cart-it .acts button.on{color:var(--brand)}
+  .cart-it .acts svg{width:17px;height:17px}
+  .cart-stp{display:inline-flex;align-items:center;gap:2px}
+  .cart-stp button{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--muted);color:var(--foreground);font-size:1rem;line-height:1;cursor:pointer}
+  .cart-stp button:hover{background:color-mix(in oklab,var(--muted) 80%,var(--foreground))}
+  .cart-stp b{min-width:48px;text-align:center;font-size:.84rem;font-weight:600}
+  @media (min-width:768px){
+    .cart-it{flex-direction:row;align-items:center;gap:18px}
+    .cart-it .ft{order:1} .cart-it .info{order:2} .cart-it .qp{order:3;justify-content:flex-end;gap:18px}
+    .cart-it .lp{min-width:120px}
+  }
+  .cart-sug h2{margin:12px 0 10px;font-size:1.05rem;font-weight:600;color:var(--foreground)}
+  .cart-sug .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .cart-sc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+  .cart-sc .ft{height:140px;border-radius:var(--radius-md);background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;overflow:hidden;border:0;padding:0;cursor:pointer}
+  .cart-sc .ft img{width:100%;height:100%;object-fit:cover}
+  .cart-sc .ft svg{width:48px;height:48px}
+  .cart-sc .nm{font:inherit;font-size:.92rem;font-weight:600;line-height:1.25;color:var(--foreground);background:none;border:0;padding:0;text-align:left;cursor:pointer}
+  .cart-sc .nm:hover{text-decoration:underline}
+  .cart-sc .ds{margin:4px 0 0;font-size:.76rem;color:var(--muted-foreground);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cart-sc .old{font-size:.82rem;font-weight:600;color:var(--muted-foreground);text-decoration:line-through}
+  .cart-sc .new{font-size:1.05rem;font-weight:700;color:var(--critical)}
+  .cart-sc .new small{font-size:.7rem;font-weight:400;color:var(--muted-foreground)}
+  .cart-sc .bt{margin-top:auto;display:flex;gap:8px}
+  .cart-sc .bt .fav{flex:none;width:38px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  .cart-sc .bt .fav.on{color:var(--brand)}
+  .cart-sc .bt .add{flex:1}
+  .cart-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:14px}
+  .cart-box h2{margin:0;font-size:1.05rem;font-weight:600;color:var(--foreground)}
+  .cart-box dl{display:flex;justify-content:space-between;gap:12px;margin:0;font-size:.84rem}
+  .cart-box dt{color:var(--muted-foreground)} .cart-box dd{margin:0;font-weight:500;color:var(--foreground)}
+  .cart-box dd.pos{color:var(--green-txt)}
+  .cart-box .lns{display:flex;flex-direction:column;gap:8px}
+  .cart-box dl.tot{border-top:1px solid var(--border);padding-top:10px}
+  .cart-box dl.tot dt,.cart-box dl.tot dd{font-weight:700;font-size:1rem;color:var(--foreground)}
+  .cart-box .ou{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.8rem;color:var(--muted-foreground)}
+  .cart-box .ou a{display:inline-flex;align-items:center;gap:4px;font-weight:500;color:var(--brand);text-decoration:underline;cursor:pointer}
+  .cart-box .ou a:hover{text-decoration:none}
+  .cart-box label{display:block;margin:0 0 6px;font-size:.8rem;font-weight:500;color:var(--foreground)}
+  .cart-box .alert{margin:0}
+  .cart-pad{height:70px}
+  @media (min-width:1024px){ #abar{display:none!important} .cart-pad{display:none} }
   /* Acompanhe o seu pedido (layout de rastreio da Flowbite, adaptado ao CSS do protótipo) */
   .trk-tt{font-size:1.05rem;font-weight:600;margin:2px 0 12px;color:var(--foreground)}
   .trk{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
@@ -1860,47 +1927,87 @@ function pedidoRapido(){
 function rCarrinho(){
   const el=document.getElementById('scr-carrinho');
   if(!carrinho.length){
-    el.innerHTML=`<div class="section-title" style="margin-top:0">Carrinho</div>
+    el.innerHTML=`<div class="cart-tt"><h1>Carrinho de compras</h1></div>
       <div class="card"><div class="empty">Seu carrinho está vazio.<br>Comece pelas categorias.</div>
       <button class="btn default block" onclick="go('categorias')">Ver categorias</button>
-      <button class="btn outline block" style="margin-top:8px" onclick="sheetPedidoRapido()">Pedido rápido por códigos</button></div>`;
-    return;
+      <button class="btn outline block" style="margin-top:8px" onclick="sheetPedidoRapido()">Pedido rápido por códigos</button></div>
+      ${cartSugestoes()}`;
+    escondeBar(); return;
   }
   const falta=faltaMin();
+  const tabela=carrinho.reduce((t,i)=>t+prodOf(i.pid).tabela*i.qtd,0), econ=tabela-subtotal();
   el.innerHTML=`
-    <div class="section-title" style="margin-top:0">Carrinho · ${qtdCarrinho()} itens <a onclick="sheetPedidoRapido()" style="margin-left:auto">Pedido rápido</a></div>
-    ${falta>0?`<div class="alert">⚠️<div><b>Pedido mínimo de ${BRL(P().min)}</b>Faltam ${BRL(falta)} para fechar o pedido como ${P().nome}.</div></div>`:''}
-    <div class="card">
-      ${carrinho.map(i=>{
-        const p=prodOf(i.pid);
-        return `<div class="plist" style="cursor:default">
-          ${thumb(p,54)}
-          <div class="info">
-            <div class="nm">${p.nome}</div>
-            <div class="muted">${BRL(preco(p))} / ${p.un}${p.mult>1?' · múltiplo '+p.mult:''}</div>
-            <div class="rcb" style="margin:2px 0 0;font-size:.72rem">${I('truck')} ${recebTxt(i.receb)} · <a class="lnk-underline" style="cursor:pointer;color:var(--foreground)" onclick="trocaReceb(${i.pid})">alterar</a></div>
-            <div class="row" style="margin-top:6px">
-              <span class="stepper">
-                <button onclick="mudaQtd(${i.pid},-1)">−</button><b>${i.qtd}</b><button onclick="mudaQtd(${i.pid},1)">+</button>
+    <div class="cart-tt"><h1>Carrinho de compras</h1><span class="muted">${carrinho.length} produto(s) · ${qtdCarrinho()} unidades</span>
+      <a onclick="sheetPedidoRapido()">Pedido rápido por códigos</a></div>
+    <div class="cart">
+      <div class="cart-col">
+        ${carrinho.map(i=>{ const p=prodOf(i.pid), fav=favoritos.includes(p.id);
+          return `<div class="cart-it">
+            <button type="button" class="ft" aria-label="Ver ${oesc(p.nome)}" onclick="abrirProd(${p.id})">${arte(p,80)}</button>
+            <div class="qp">
+              <span class="cart-stp" role="group" aria-label="Quantidade de ${oesc(p.nome)}">
+                <button type="button" aria-label="Diminuir" onclick="mudaQtd(${p.id},-1)">−</button><b>${i.qtd} ${oesc(p.un)}</b><button type="button" aria-label="Aumentar" onclick="mudaQtd(${p.id},1)">+</button>
               </span>
-              <b style="font-size:.86rem">${BRL(preco(p)*i.qtd)}</b>
-              <button class="iconbtn" onclick="removeItem(${i.pid})">${I('trash')}</button>
+              <span class="lp">${BRL(preco(p)*i.qtd)}<small>${BRL(preco(p))} / ${oesc(p.un)}</small></span>
             </div>
+            <div class="info">
+              <button type="button" class="nm" onclick="abrirProd(${p.id})">${oesc(p.nome)}</button>
+              <div class="meta">${oesc(p.marca||'')}${p.cod?' · '+oesc(p.cod):''}${p.mult>1?' · vendido de '+p.mult+' em '+p.mult:''}<br>${I('truck')} ${recebTxt(i.receb)} · <a onclick="trocaReceb(${p.id})">alterar</a></div>
+              <div class="acts">
+                <button type="button" class="${fav?'on':''}" onclick="toggleFav(${p.id})">${I('heart')} ${fav?'Nos favoritos':'Adicionar aos favoritos'}</button>
+                <button type="button" class="rm" onclick="removeItem(${p.id})">${I('x')} Remover</button>
+              </div>
+            </div>
+          </div>`; }).join('')}
+        ${cartSugestoes()}
+      </div>
+      <div class="cart-col">
+        <div class="cart-box">
+          <h2>Resumo do pedido</h2>
+          <div class="lns">
+            <dl><dt>Preço de tabela</dt><dd>${BRL(tabela)}</dd></dl>
+            ${econ>0.005?`<dl><dt>Economia ${P()?P().nome:''} (${descPct()}%)</dt><dd class="pos">-${BRL(econ)}</dd></dl>`:''}
+            <dl><dt>Frete (CIF)</dt><dd class="pos">${frete()?BRL(frete()):'Grátis'}</dd></dl>
+            <dl class="tot"><dt>Total</dt><dd>${BRL(totalGeral())}</dd></dl>
           </div>
-        </div>`;
-      }).join('')}
+          ${falta>0?`<div class="alert">⚠️<div><b>Pedido mínimo de ${BRL(P().min)}</b>Faltam ${BRL(falta)} para fechar o pedido como ${P().nome}.</div></div>`:''}
+          ${P()?`<button type="button" class="btn default block" ${falta>0?'disabled':''} onclick="go('checkout')">${falta>0?'Mínimo não atingido':'Fechar pedido'}</button>`
+               :`<button type="button" class="btn default block" onclick="mostrarPerfil()">Entrar para fechar o pedido</button>`}
+          <div class="ou"><span>ou</span><a onclick="go('categorias')">Continuar comprando ${I('chevron-right')}</a></div>
+          <div class="muted" style="font-size:.74rem;text-align:center">Pix com ${politica.pixDesc}% de desconto, boleto após aprovação de crédito ou cartão em até 12×.</div>
+        </div>
+        <form class="cart-box" onsubmit="cartCupom();return false">
+          <div><label for="cupom">Tem um cupom ou vale-compra?</label><input id="cupom" autocomplete="off" placeholder="Digite o código"></div>
+          <button type="submit" class="btn outline block">Aplicar cupom</button>
+        </form>
+      </div>
     </div>
-    <div class="card">
-      <div class="row"><span class="muted">Subtotal</span><b>${BRL(subtotal())}</b></div>
-      <div class="row" style="margin-top:5px"><span class="muted">Economia ${P()?P().nome:''} (${descPct()}%)</span>
-        <b class="pos">− ${BRL(carrinho.reduce((s,i)=>s+(prodOf(i.pid).tabela-preco(prodOf(i.pid)))*i.qtd,0))}</b></div>
-      <div class="row" style="margin-top:5px"><span class="muted">Frete (CIF)</span>
-        <b class="pos">Grátis</b></div>
-      <div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--hairline)">
-        <span style="font-weight:700">Total</span><b style="font-size:1.2rem">${BRL(totalGeral())}</b></div>
-    </div>
-    <div style="height:70px"></div>`;
+    <div class="cart-pad"></div>`;
   montaActionbar(falta);
+}
+/* "Quem comprou também comprou": itens do catálogo do cliente, das mesmas categorias do carrinho, fora do carrinho */
+function cartSugestoes(){
+  if(!P()) return '';
+  const noCarr=new Set(carrinho.map(i=>i.pid)), cats=new Set(carrinho.map(i=>prodOf(i.pid).cat));
+  const base=prodsPerfil().filter(p=>!p.orc&&p.estoque&&!noCarr.has(p.id));
+  const r=[...base.filter(p=>cats.has(p.cat)),...base.filter(p=>!cats.has(p.cat)&&p.dest),...base].filter((p,i,a)=>a.indexOf(p)===i).slice(0,3);
+  if(!r.length) return '';
+  return `<div class="cart-sug"><h2>${carrinho.length?'Quem comprou também comprou':'Sugestões para a sua empresa'}</h2><div class="grid">
+    ${r.map(p=>{ const fav=favoritos.includes(p.id); return `<div class="cart-sc">
+      <button type="button" class="ft" aria-label="Ver ${oesc(p.nome)}" onclick="abrirProd(${p.id})">${arte(p,140)}</button>
+      <div><button type="button" class="nm" onclick="abrirProd(${p.id})">${oesc(p.nome)}</button>${p.desc?`<p class="ds">${oesc(p.desc)}</p>`:''}</div>
+      <div>${preco(p)<p.tabela?`<div class="old">${BRL(p.tabela)}</div>`:''}<div class="new">${BRL(preco(p))} <small>/ ${oesc(p.un)}</small></div></div>
+      <div class="bt">
+        <button type="button" class="btn outline fav ${fav?'on':''}" aria-label="${fav?'Remover dos favoritos':'Adicionar aos favoritos'}" title="${fav?'Nos favoritos':'Adicionar aos favoritos'}" onclick="toggleFav(${p.id})">${I('heart')}</button>
+        <button type="button" class="btn default add" onclick="sheetAdd(${p.id})">${I('cart')} Adicionar</button>
+      </div>
+    </div>`; }).join('')}
+  </div></div>`;
+}
+function cartCupom(){
+  const c=(document.getElementById('cupom').value||'').trim();
+  if(!c){ toast('Digite o código do cupom'); return; }
+  toast('Cupom "'+c.slice(0,30)+'" não encontrado. Os cupons são liberados pelo comercial.');
 }
 function montaActionbar(falta){
   let bar=document.getElementById('abar');
