@@ -584,6 +584,43 @@
   .tlstep.done .dot{background:var(--good);border-color:var(--good)}
   .tlstep .ln{width:2px;background:var(--hairline);margin-left:6px;height:16px}
   .tlstep.done .ln{background:var(--good)}
+  /* Acompanhe o seu pedido (layout de rastreio da Flowbite, adaptado ao CSS do protótipo) */
+  .trk-tt{font-size:1.05rem;font-weight:600;margin:2px 0 12px;color:var(--foreground)}
+  .trk{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+  @media (min-width:1024px){.trk{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}}
+  .trk-itens{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .trk-item{padding:14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+  .trk-item .top{display:flex;align-items:center;gap:14px}
+  .trk-item .ft{flex:none;width:54px;height:54px;border-radius:var(--radius-md);background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .trk-item .ft img{width:100%;height:100%;object-fit:cover}
+  .trk-item .ft svg{width:26px;height:26px}
+  .trk-item .nm{flex:1;min-width:0;font:inherit;font-size:.84rem;font-weight:500;color:var(--foreground);background:none;border:0;padding:0;text-align:left;cursor:pointer}
+  .trk-item .nm:hover{text-decoration:underline}
+  .trk-item .bt{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.76rem;color:var(--muted-foreground)}
+  .trk-item .bt b{color:var(--foreground);font-weight:500}
+  .trk-item .val{display:flex;align-items:center;gap:14px;color:var(--foreground);white-space:nowrap}
+  .trk-item .pr{font-size:1rem;font-weight:700}
+  .trk-sum{padding:14px;background:var(--muted);display:flex;flex-direction:column;gap:7px;font-size:.8rem}
+  .trk-sum dl{display:flex;justify-content:space-between;gap:12px;margin:0}
+  .trk-sum dt{color:var(--muted-foreground)} .trk-sum dd{margin:0;font-weight:500;color:var(--foreground)}
+  .trk-sum dd.pos{color:var(--green-txt)}
+  .trk-sum dl.tot{border-top:1px solid var(--border);padding-top:9px;margin-top:2px}
+  .trk-sum dl.tot dt,.trk-sum dl.tot dd{font-size:.95rem;font-weight:700;color:var(--foreground)}
+  .trk-hist{margin-bottom:0}
+  .trk-hist h3{margin:0 0 14px;font-size:.95rem;font-weight:600;color:var(--foreground)}
+  .trk-tl{list-style:none;margin:0 0 18px 12px;padding:0;border-left:1px solid var(--border)}
+  .trk-tl li{position:relative;padding:0 0 22px 24px;color:var(--muted-foreground)}
+  .trk-tl li:last-child{padding-bottom:2px}
+  .trk-tl .ic{position:absolute;left:-12px;top:0;width:24px;height:24px;border-radius:50%;background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px var(--card)}
+  .trk-tl .ic svg{width:14px;height:14px}
+  .trk-tl h4{margin:0 0 2px;font-size:.84rem;font-weight:600;color:var(--foreground)}
+  .trk-tl p{margin:0;font-size:.76rem}
+  .trk-tl li.done,.trk-tl li.done h4{color:var(--brand)}
+  .trk-tl li.done .ic{background:color-mix(in oklab,var(--brand) 14%,var(--card));color:var(--brand)}
+  .trk-tl li.cancel,.trk-tl li.cancel h4{color:var(--critical)}
+  .trk-tl li.cancel .ic{background:color-mix(in oklab,var(--critical) 14%,var(--card));color:var(--critical)}
+  .trk-acts{display:flex;flex-wrap:wrap;gap:8px}
+  .trk-acts .btn{flex:1 1 150px}
   .tlstep span{font-size:.76rem;color:var(--ink-2)}
   .tlstep.done span{color:var(--ink);font-weight:600}
   /* Rodapé (daisyUI footer-center, adaptado) — barra com o copyright, em todas as páginas, inclusive no login */
@@ -1967,6 +2004,7 @@ function finalizar(){
   pedidos.unshift({num, por:(cad.respNome||cfg.email||'Comprador'), aprov:(cad.compNome||''),
     itens:carrinho.map(i=>({...i})), total:tot, frete:frete(), pgto, cartao,
     status: ck.meio==='cartao' ? 2 : 1, data:dataHoje(), ref:document.getElementById('ckRef').value});
+  pedMarca(pedidos[0],1); if(ck.meio==='cartao') pedMarca(pedidos[0],2);
   if(ck.meio==='pix') gerarParcelas(num, pgto, tot, D0);
   if(ck.meio==='boleto') pedidos[0].aguardaFat = true;      // boletos nascem no faturamento, com a NF-e
   if(ck.meio==='cartao') faturar(pedidos[0], true);          // cartão: pago na hora, nota emitida já
@@ -1983,6 +2021,7 @@ const ehPix = p => /pix/i.test(p.forma||'');
 const pixExpirado = p => !p.pago && ehPix(p) && p.expira && Date.now() > p.expira;
 function pixPendente(num){ return parcelas.find(p=>p.pedido===num && !p.pago && ehPix(p)); }
 function statusTxt(o){
+  if(o.cancelado) return 'Cancelado';
   const px = pixPendente(o.num);
   if(px) return pixExpirado(px) ? 'Aguardando pagamento (Pix expirado)' : 'Aguardando pagamento';
   if(o.aguardaFat && o.status<3) return STATUS[o.status]+' · boletos no faturamento';
@@ -1997,9 +2036,9 @@ function faturar(o, silencioso){
   if(!silencioso) toast(o.num+': faturado · NF-e '+o.nfe.n+(nParcelas(o.num)?' · boletos emitidos':''));
 }
 function avancaStatus(o){
-  if(!o || o.status>=5) return;
+  if(!o || o.status>=5 || o.cancelado) return;
   if(pixPendente(o.num)){ toast('Aguardando o pagamento do Pix'); return; }
-  o.status++;
+  o.status++; pedMarca(o,o.status);
   if(o.status===3) faturar(o);
   else toast(o.num+': '+STATUS[o.status]);
 }
@@ -2011,7 +2050,7 @@ function pedLinha(o){
       <div class="muted">${o.data} · ${o.itens.length} item(ns) · ${o.pgto}</div>
       ${o.por?`<div style="display:flex;align-items:center;gap:6px;margin-top:4px">
         ${avatarHTML(o.por,{size:'sm'})}<span class="muted">${oesc(o.por)}</span></div>`:''}
-      <div style="margin-top:3px"><span class="chip ${pixPendente(o.num)&&pixExpirado(pixPendente(o.num))?'cancel':o.status>=5?'ok':o.status>=2?'blue':'pend'}">${statusTxt(o)}</span></div>
+      <div style="margin-top:3px"><span class="chip ${o.cancelado||(pixPendente(o.num)&&pixExpirado(pixPendente(o.num)))?'cancel':o.status>=5?'ok':o.status>=2?'blue':'pend'}">${statusTxt(o)}</span></div>
     </div>
     <b style="font-size:.84rem">${BRL(o.total)}</b>
   </div>`;
@@ -2058,19 +2097,8 @@ function rPedido(){
   const o=pedidos.find(x=>x.num===pedidoAtual); if(!o){go('pedidos');return;}
   document.getElementById('scr-pedido').innerHTML=
     back('pedidos','Pedido '+o.num)+`
-    <div class="card"><h2 class="h3x">Acompanhamento</h2>
-      <div class="tl">
-        ${[1,2,3,4,5].map((s,i)=>`
-          <div class="tlstep ${o.status>=s?'done':''}"><span class="dot"></span><span>${STATUS[s]}</span></div>
-          ${i<4?`<div class="tlstep ${o.status>s?'done':''}"><span class="ln"></span></div>`:''}`).join('')}
-      </div>
-      ${o.status<5?`<div class="muted" style="margin-top:12px">O status é atualizado pela equipe ImportFácil. No protótipo, avance pelo Painel da equipe.</div>`:''}
-    </div>
-    <div class="card"><h2 class="h3x">Itens</h2>
-      ${o.itens.map(i=>{const p=prodOf(i.pid);return `<div class="specrow"><span>${i.qtd} × ${p.nome}${i.receb==='d45'?' · recebimento em 45 dias':''}</span><span>${BRL(preco(p)*i.qtd)}</span></div>`;}).join('')}
-      <div class="specrow"><span>Frete</span><span>${o.frete===0?'Grátis':BRL(o.frete)}</span></div>
-      <div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--hairline)"><b>Total</b><b>${BRL(o.total)}</b></div>
-    </div>
+    <h1 class="trk-tt">Acompanhe a entrega do pedido ${o.num}</h1>
+    ${pedRastreio(o)}
     ${pixPendente(o.num)?`<div class="alert">${pixExpirado(pixPendente(o.num))?'⏰':'⏳'}<div><b>${statusTxt(o)}</b>${pixExpirado(pixPendente(o.num))?'O Pix venceu sem pagamento. Gere um novo código para liberar o pedido.':'Pague o Pix para liberar o pedido.'}</div><button class="btn default sm" onclick="sheetPagar('${pixPendente(o.num).id}')">${pixExpirado(pixPendente(o.num))?'Gerar novo Pix':'Pagar'}</button></div>`:''}
     ${o.aguardaFat?`<div class="card"><h2 class="h3x">Boletos</h2><div class="muted">${o.pgto}. Os boletos são emitidos no faturamento, junto com a nota fiscal, e os vencimentos contam a partir dessa data.</div></div>`:''}
     ${cardParcelas(o.num)}
@@ -2091,7 +2119,7 @@ function rPedido(){
         </div>
       </div>
     </div>`:''}
-    <div class="card"><h2 class="h3x">Dados</h2>
+    <div class="card" id="pedDados"><h2 class="h3x">Dados</h2>
       <div class="specrow"><span>Pagamento</span><span>${o.pgto}</span></div>
       ${o.nfe?`<div class="specrow"><span>Nota fiscal</span><span>NF-e ${o.nfe.n} · ${o.nfe.data}</span></div>`:''}
       <div class="specrow"><span>Data</span><span>${o.data}</span></div>
@@ -2107,6 +2135,75 @@ function recomprar(num){
   const o=pedidos.find(x=>x.num===num); if(!o) return;
   o.itens.forEach(i=>{ const e=carrinho.find(c=>c.pid===i.pid); e?e.qtd+=i.qtd:carrinho.push({...i}); });
   badges(); go('carrinho'); toast('Itens do '+num+' adicionados ao carrinho ✓');
+}
+
+/* Acompanhe o seu pedido: itens com resumo de valores + histórico em linha do tempo (mais recente em cima) */
+function pedMarca(o,s){ (o.hist=o.hist||{})[s]=agoraTxt(); }
+function pedPrevisao(o){
+  if(!o.itens.some(i=>i.receb==='d45')) return '';
+  const [d,m,a]=o.data.split('/').map(Number); return fmtD(addD(new Date(a,m-1,d),45));
+}
+const PED_CANCELAVEL = o => !o.cancelado && o.status===1 && !o.cartao && !parcelas.some(p=>p.pedido===o.num&&p.pago);
+function pedRastreio(o){
+  const its=o.itens.map(i=>({i,p:prodOf(i.pid)}));
+  const tabela=its.reduce((t,x)=>t+x.p.tabela*x.i.qtd,0), itens=its.reduce((t,x)=>t+preco(x.p)*x.i.qtd,0);
+  const descTipo=tabela-itens, ajuste=o.total-itens-(o.frete||0);
+  const px=pixPendente(o.num), prev=pedPrevisao(o), h=o.hist||{};
+  const ETAPA={
+    1:{ic:'box',  lbl:'Pedido recebido', feito:'Pedido recebido · '+o.pgto+(o.ref?' · ref. '+oesc(o.ref):'')},
+    2:{ic:'check',lbl:'Aprovação', feito:o.cartao?'Pagamento aprovado no cartão em '+o.cartao.n+'×':/pix/i.test(o.pgto)?'Pagamento do Pix confirmado':'Pedido aprovado pelo comercial',
+       espera:px?(pixExpirado(px)?'Pix vencido: gere um novo código':'Aguardando o pagamento do Pix'):'Em análise pelo comercial'},
+    3:{ic:'file', lbl:'Faturamento', feito:o.nfe?'Nota fiscal emitida · NF-e '+o.nfe.n:'Pedido faturado', espera:'Emissão da nota fiscal'+(o.aguardaFat?' e dos boletos':'')},
+    4:{ic:'truck',lbl:'Transporte', feito:'Pedido saiu para entrega'+(o.frete===0?' · frete grátis':''), espera:'Envio para a transportadora'},
+    5:{ic:'home', lbl:prev?'Previsão de entrega até '+prev:'Entrega', feito:'Produtos entregues', espera:'Entrega no endereço da empresa'}
+  };
+  const quando=s=>h[s]||(s===1?o.data:'');
+  const li=[5,4,3,2,1].map(s=>{ const e=ETAPA[s], ok=o.status>=s && !(o.cancelado&&s>1);
+    if(o.cancelado && s>1) return '';
+    return `<li class="${ok?'done':''}"><span class="ic">${I(ok&&s!==1&&s!==5?'check':e.ic)}</span>
+      <h4>${ok?(quando(s)||STATUS[s]):e.lbl}</h4><p>${ok?e.feito:e.espera}</p></li>`; }).join('');
+  const cancel=o.cancelado?`<li class="cancel"><span class="ic">${I('x')}</span><h4>${o.cancelado}</h4><p>Pedido cancelado</p></li>`:'';
+  return `<div class="trk">
+    <div class="trk-itens">
+      ${its.map(({i,p})=>`<div class="trk-item">
+        <div class="top"><span class="ft">${arte(p,54)}</span>
+          <button type="button" class="nm" onclick="abrirProd(${p.id})">${oesc(p.nome)}${i.receb==='d45'?' · recebimento em 45 dias':''}</button></div>
+        <div class="bt"><span><b>Código:</b> ${oesc(p.cod||String(p.id))}</span>
+          <span class="val"><span>${i.qtd} ${oesc(p.un||'un')}</span><span class="pr">${BRL(preco(p)*i.qtd)}</span></span></div>
+      </div>`).join('')}
+      <div class="trk-sum">
+        <dl><dt>Preço de tabela</dt><dd>${BRL(tabela)}</dd></dl>
+        ${descTipo>0.005?`<dl><dt>Desconto ${P()?'('+P().nome+')':'do tipo de cliente'}</dt><dd class="pos">-${BRL(descTipo)}</dd></dl>`:''}
+        ${ajuste<-0.005?`<dl><dt>Desconto no Pix</dt><dd class="pos">-${BRL(-ajuste)}</dd></dl>`:''}
+        ${ajuste>0.005?`<dl><dt>Juros do cartão</dt><dd>${BRL(ajuste)}</dd></dl>`:''}
+        <dl><dt>Frete</dt><dd${o.frete===0?' class="pos"':''}>${o.frete===0?'Grátis':BRL(o.frete)}</dd></dl>
+        <dl class="tot"><dt>Total</dt><dd>${BRL(o.total)}</dd></dl>
+      </div>
+    </div>
+    <div class="card trk-hist">
+      <h3>Histórico do pedido</h3>
+      <ol class="trk-tl">${cancel}${li}</ol>
+      ${!o.cancelado&&o.status<5?`<div class="muted" style="margin:-6px 0 14px">O andamento é atualizado pela equipe ImportFácil. No protótipo, avance pelo Painel da equipe.</div>`:''}
+      <div class="trk-acts">
+        ${PED_CANCELAVEL(o)?`<button type="button" class="btn outline" onclick="pedCancelar('${o.num}')">Cancelar o pedido</button>`
+          :`<button type="button" class="btn outline" onclick="toast('Protótipo: contato com o atendimento comercial')">Falar com o comercial</button>`}
+        <button type="button" class="btn default" onclick="document.getElementById('pedDados').scrollIntoView({behavior:'smooth',block:'start'})">Detalhes do pedido</button>
+      </div>
+    </div>
+  </div>`;
+}
+function pedCancelar(num){
+  const o=pedidos.find(x=>x.num===num); if(!o||!PED_CANCELAVEL(o)) return;
+  openSheet(`<h2>Cancelar o pedido ${num}?</h2>
+    <div class="muted" style="margin-bottom:12px">O pedido ainda está em análise e nada foi pago. ${pixPendente(num)?'O código Pix deixa de valer.':'Nenhum boleto será emitido.'}</div>
+    <div style="display:flex;gap:8px"><button class="btn outline" style="flex:1" onclick="closeSheet()">Manter pedido</button>
+    <button class="btn default" style="flex:1" onclick="closeSheet();pedCancelarOk('${num}')">Cancelar pedido</button></div>`);
+}
+function pedCancelarOk(num){
+  const o=pedidos.find(x=>x.num===num); if(!o||!PED_CANCELAVEL(o)) return;
+  parcelas=parcelas.filter(p=>!(p.pedido===num&&!p.pago));
+  delete o.aguardaFat; o.cancelado=agoraTxt();
+  badges(); rPedido(); toast('Pedido '+num+' cancelado');
 }
 
 /* ================= ESTRUTURAS DOS MODELOS: filtros da categoria ================= */
@@ -3688,7 +3785,7 @@ function bancoConfirma(id, via){
   p.pagoValor = Math.round(valorAtual(p)*100)/100;
   p.pago = true; p.pagoEm = fmtD(D0); p.pagoVia = via;
   const o = pedidos.find(x=>x.num===p.pedido);
-  if(o && /pix/i.test(o.pgto) && o.status<2) o.status = 2;
+  if(o && /pix/i.test(o.pgto) && o.status<2){ o.status = 2; pedMarca(o,2); }
   closeSheet(); render(cur); badges();
   const resto = parcelas.filter(x=>x.pedido===p.pedido&&!x.pago).length;
   toast('Banco confirmou o '+via+' ✓'+(resto?' · faltam '+resto+' parcela(s) do '+p.pedido:' · '+p.pedido+' quitado'));
@@ -3778,7 +3875,7 @@ function eqPedidos(){
   const ped = pedidos.length ? pedidos.map(o=>{ const px=pixPendente(o.num);
     return `<div class="specrow" style="align-items:center;gap:8px">
       <span style="min-width:0"><b>${o.num}</b> · ${BRL(o.total)}<br><span class="muted">${o.pgto} · ${statusTxt(o)}${o.nfe?' · NF-e '+o.nfe.n:''}</span></span>
-      ${o.status<5?`<button class="btn outline sm" ${px?'disabled title="Aguardando o Pix"':''} onclick="eqPedAvancar('${o.num}')">${o.status===2?'Faturar':'Avançar'}</button>`:'<span class="chip ok">Entregue</span>'}</div>`;}).join('')
+      ${o.cancelado?'<span class="chip cancel">Cancelado</span>':o.status<5?`<button class="btn outline sm" ${px?'disabled title="Aguardando o Pix"':''} onclick="eqPedAvancar('${o.num}')">${o.status===2?'Faturar':'Avançar'}</button>`:'<span class="chip ok">Entregue</span>'}</div>`;}).join('')
     : '<div class="empty">Nenhum pedido da loja ainda.</div>';
   const ocs = ordens.length ? ordens.map(oc=>{const fim = oc.status===OC_ETAPAS[OC_ETAPAS.length-1]||oc.status==='Cancelada', b=bloqueioOC(oc);
       return `<div class="specrow" style="align-items:center;gap:8px">
