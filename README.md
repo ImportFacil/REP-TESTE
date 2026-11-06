@@ -21,7 +21,7 @@ Comece por [`docs/fase-2.md`](docs/fase-2.md) (situação atual) e [`docs/fase-1
 
 Está publicado em **https://importfacil.github.io/REP-TESTE/** (GitHub Pages, atualizado a cada commit no `main`). Também abre direto do arquivo `index.html` no navegador.
 
-O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×), pedidos, orçamentos e ordens de importação (encomenda ou conta e ordem), cadastro para crédito, Financeiro e o Painel da equipe (crédito, pedidos, recebíveis, condições e a **calculadora de importação**, baseada na planilha de custos de drones: custo nacionalizado por item, preço sugerido e comparação com o preço de mercado). Login, boletos, Pix, NF-e, consulta de crédito e CEP são simulados.
+O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×), pedidos, orçamentos e ordens de importação (encomenda ou conta e ordem), cadastro para crédito, Financeiro e o Painel da equipe (crédito, pedidos, recebíveis, condições e a **calculadora de importação**, réplica da planilha FINAL IMPORT COSTS DRONES, abas 20 e 40 DRY, com as mesmas entradas e fórmulas). Login, boletos, Pix, NF-e, consulta de crédito e CEP são simulados.
 
 ## Fases de entrega
 
