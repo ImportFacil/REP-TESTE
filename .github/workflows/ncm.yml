@@ -1,0 +1,43 @@
+# Atualiza a tabela NCM usada pela busca da calculadora de importação (prototipo-ncm.json).
+# Roda toda segunda-feira, quando este arquivo ou o script mudam, e à mão em Actions.
+name: Tabela NCM
+
+on:
+  schedule:
+    - cron: "17 9 * * 1" # segunda-feira, 6h17 em Brasília
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ncm.yml
+      - scripts/ncm/**
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tabela-ncm
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Baixar a NCM vigente do Siscomex
+        run: node scripts/ncm/atualizar.mjs prototipo-ncm.json
+      - name: Gravar no repositório, se mudou
+        run: |
+          if git diff --quiet -- prototipo-ncm.json && git ls-files --error-unmatch prototipo-ncm.json >/dev/null 2>&1; then
+            echo "Tabela NCM sem mudanças."; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prototipo-ncm.json
+          git commit -m "Tabela NCM atualizada pelo Siscomex"
+          git pull --rebase origin main
+          git push origin HEAD:main
