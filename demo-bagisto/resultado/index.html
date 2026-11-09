@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Bagisto + B2B Suite · ImportFácil</title>
+<meta name="description" content="O que foi executado na demonstração Bagisto 2.5 + B2B Suite com o catálogo da ImportFácil e como a loja ficou.">
+<link rel="icon" href="../../prototipo-globo-192.png">
+<style>
+  :root{--fundo:#F6F5F2;--cartao:#fff;--tinta:#18181B;--tinta2:#52525B;--borda:#E4E2DC;--azul:#1D4ED8;--azul-claro:#E8EEFC;--ok:#15803D;--ok-fundo:#DCFCE7;--pend:#92400E;--pend-fundo:#FEF3C7}
+  @media (prefers-color-scheme:dark){:root{--fundo:#141414;--cartao:#1F1F1E;--tinta:#F2F1EE;--tinta2:#B8B6B0;--borda:#34332F;--azul:#7AA2F7;--azul-claro:#1E2A44;--ok:#86EFAC;--ok-fundo:#14301F;--pend:#FCD34D;--pend-fundo:#3A2E10}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--tinta);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--azul)}
+  .wrap{max-width:1160px;margin:0 auto;padding:28px 16px 60px}
+  header{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+  header img{width:48px;height:48px;border-radius:12px}
+  h1{font-size:clamp(24px,3.6vw,34px);line-height:1.15;margin:0}
+  h2{font-size:22px;margin:40px 0 12px}
+  h3{font-size:17px;margin:0 0 4px}
+  .sub{color:var(--tinta2);margin:6px 0 0}
+  .status{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin-top:22px}
+  .cartao{background:var(--cartao);border:1px solid var(--borda);border-radius:16px;padding:18px}
+  .selo{display:inline-block;font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .selo.ok{background:var(--ok-fundo);color:var(--ok)} .selo.pend{background:var(--pend-fundo);color:var(--pend)}
+  .cartao p{margin:0;color:var(--tinta2);font-size:15px}
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+  .links a{display:block;text-decoration:none;color:var(--tinta);background:var(--cartao);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
+  .links a:hover{border-color:var(--azul)}
+  .links a b{display:block;color:var(--azul)} .links a span{color:var(--tinta2);font-size:14px}
+  ol.passos{margin:0;padding-left:22px} ol.passos li{margin:6px 0}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+  figure{margin:0;background:var(--cartao);border:1px solid var(--borda);border-radius:14px;overflow:hidden}
+  figure a{display:block;aspect-ratio:16/10;overflow:hidden;background:#fff}
+  figure img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+  figure.alto a{aspect-ratio:9/12}
+  figcaption{padding:10px 14px;font-size:14px;color:var(--tinta2)} figcaption b{display:block;color:var(--tinta);font-size:15px}
+  table{width:100%;border-collapse:collapse;background:var(--cartao);border:1px solid var(--borda);border-radius:14px;overflow:hidden;font-size:15px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--borda);vertical-align:top}
+  th{background:var(--azul-claro);font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+  tr:last-child td{border-bottom:0}
+  .tabela{overflow-x:auto}
+  code{font-size:14px;background:var(--azul-claro);padding:1px 6px;border-radius:6px}
+  footer{margin-top:44px;color:var(--tinta2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="../../prototipo-globo-192.png" alt="">
+    <div><h1>Demo Bagisto 2.5 + B2B Suite com o catálogo da ImportFácil</h1></div>
+  </header>
+  <p class="sub">O que foi executado e como a loja ficou. Capturas do teste automático de 09/11/2026, versão <code>32e21a2</code>.</p>
+
+  <div class="status">
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Loja montada e testada</h3><p>Instalada do zero no GitHub Actions: 19 de 19 páginas abriram sem erro (visitante, empresa e painel).</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Catálogo da ImportFácil</h3><p>446 produtos, 31 categorias e 5 empresas de demonstração, uma por tipo de cliente, com desconto e crédito.</p></div>
+    <div class="cartao"><span class="selo pend">⏳ Pendente</span><h3>Homologação na AWS</h3><p>Precisa da conta AWS. Enquanto isso, a loja roda no Codespaces ou no computador com Docker.</p></div>
+  </div>
+
+  <h2>Links</h2>
+  <div class="links">
+    <a href="https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto-demo%2Fdevcontainer.json"><b>Abrir a loja para navegar →</b><span>Cria um Codespace com a demo; a primeira abertura leva de 10 a 20 minutos</span></a>
+    <a href="https://github.com/ImportFacil/REP-TESTE/actions/runs/42668409087"><b>Execução do teste →</b><span>Passo a passo do GitHub Actions: montagem, instalação e navegação</span></a>
+    <a href="https://github.com/ImportFacil/REP-TESTE/tree/main/demo-bagisto"><b>Código da demo →</b><span>Dockerfile, instalação, importação do catálogo e instruções</span></a>
+    <a href="https://importfacil.github.io/REP-TESTE/"><b>Protótipo atual →</b><span>Para comparar lado a lado</span></a>
+  </div>
+
+  <h2>O que foi executado</h2>
+  <div class="cartao">
+    <ol class="passos">
+      <li>Exportação do catálogo do protótipo: produtos, categorias, tipos de cliente, fotos e ilustrações.</li>
+      <li>Montagem da imagem Docker com PHP 8.4, Bagisto 2.5.1 e B2B Suite 3.0.1.</li>
+      <li>Instalação em português do Brasil e em reais, com MySQL 8.</li>
+      <li>Carga da ImportFácil:
+        <ul>
+          <li>categorias com ícones e os 446 produtos, com preço, estoque, destaques e especificações;</li>
+          <li>frete grátis;</li>
+          <li>página inicial com banners, avisos, carrosséis e tipos de cliente.</li>
+        </ul>
+      </li>
+      <li>Criação das 5 empresas de demonstração. Cada uma tem catálogo próprio (só as categorias do seu tipo, com o desconto do tipo) e crédito de 2× o pedido mínimo.</li>
+      <li>Navegação automática como visitante, como empresa logada e como administrador, com as capturas abaixo.</li>
+    </ol>
+  </div>
+
+  <h2>Loja (visitante)</h2>
+  <div class="galeria">
+    <figure><a href="01-inicio.jpg"><img src="01-inicio.jpg" alt="Página inicial" loading="lazy"></a><figcaption><b>Página inicial</b>Banners, avisos, categorias, destaques e linha de importação</figcaption></figure>
+    <figure><a href="02-categoria.jpg"><img src="02-categoria.jpg" alt="Categoria" loading="lazy"></a><figcaption><b>Categoria</b>Monitoramento e Segurança</figcaption></figure>
+    <figure><a href="03-produto.jpg"><img src="03-produto.jpg" alt="Produto" loading="lazy"></a><figcaption><b>Produto</b>Preço de tabela: R$ 38.900,00</figcaption></figure>
+    <figure><a href="04-busca.jpg"><img src="04-busca.jpg" alt="Busca" loading="lazy"></a><figcaption><b>Busca</b>“furadeira”</figcaption></figure>
+    <figure class="alto"><a href="05-celular-inicio.jpg"><img src="05-celular-inicio.jpg" alt="Início no celular" loading="lazy"></a><figcaption><b>Celular: início</b>Mesma loja, layout de celular</figcaption></figure>
+    <figure class="alto"><a href="06-celular-produto.jpg"><img src="06-celular-produto.jpg" alt="Produto no celular" loading="lazy"></a><figcaption><b>Celular: produto</b></figcaption></figure>
+  </div>
+
+  <h2>Empresa logada (Cooperativa Vale Verde)</h2>
+  <div class="galeria">
+    <figure><a href="08-empresa-produto.jpg"><img src="08-empresa-produto.jpg" alt="Produto com preço da empresa" loading="lazy"></a><figcaption><b>Preço da empresa</b>Catálogo da cooperativa: −18% = R$ 31.898,00</figcaption></figure>
+    <figure><a href="09-empresa-categoria.jpg"><img src="09-empresa-categoria.jpg" alt="Categoria com preço da empresa" loading="lazy"></a><figcaption><b>Categoria Maquinário</b>Com os preços da empresa</figcaption></figure>
+    <figure><a href="11-empresa-pedido-rapido.jpg"><img src="11-empresa-pedido-rapido.jpg" alt="Pedido rápido" loading="lazy"></a><figcaption><b>Pedido rápido</b>Por código, vários códigos ou planilha CSV</figcaption></figure>
+    <figure><a href="10-empresa-credito.jpg"><img src="10-empresa-credito.jpg" alt="Crédito da empresa" loading="lazy"></a><figcaption><b>Crédito da empresa</b>Limite e saldo disponível</figcaption></figure>
+    <figure><a href="12-empresa-cotacoes.jpg"><img src="12-empresa-cotacoes.jpg" alt="Cotações" loading="lazy"></a><figcaption><b>Cotações</b>Pedidas pelo carrinho e negociadas com mensagens</figcaption></figure>
+    <figure><a href="13-empresa-perfil.jpg"><img src="13-empresa-perfil.jpg" alt="Perfil da empresa" loading="lazy"></a><figcaption><b>Perfil da empresa</b>Dados, usuários e papéis</figcaption></figure>
+  </div>
+
+  <h2>Painel administrativo</h2>
+  <div class="galeria">
+    <figure><a href="14-admin-painel.jpg"><img src="14-admin-painel.jpg" alt="Painel" loading="lazy"></a><figcaption><b>Painel de controle</b></figcaption></figure>
+    <figure><a href="15-admin-produtos.jpg"><img src="15-admin-produtos.jpg" alt="Produtos" loading="lazy"></a><figcaption><b>Produtos</b>Os 446 itens do protótipo</figcaption></figure>
+    <figure><a href="16-admin-empresas.jpg"><img src="16-admin-empresas.jpg" alt="Empresas" loading="lazy"></a><figcaption><b>Empresas</b>Uma por tipo de cliente</figcaption></figure>
+    <figure><a href="17-admin-catalogos.jpg"><img src="17-admin-catalogos.jpg" alt="Catálogos por empresa" loading="lazy"></a><figcaption><b>Catálogos por empresa</b>Categorias e desconto de cada tipo</figcaption></figure>
+    <figure><a href="18-admin-credito.jpg"><img src="18-admin-credito.jpg" alt="Crédito" loading="lazy"></a><figcaption><b>Crédito das empresas</b>2× o pedido mínimo do tipo</figcaption></figure>
+    <figure><a href="19-admin-cotacoes.jpg"><img src="19-admin-cotacoes.jpg" alt="Cotações" loading="lazy"></a><figcaption><b>Cotações</b>Negociação com o cliente</figcaption></figure>
+  </div>
+
+  <h2>Comparação com o protótipo</h2>
+  <div class="tabela"><table>
+    <thead><tr><th>Recurso</th><th>Protótipo</th><th>Bagisto + B2B Suite</th></tr></thead>
+    <tbody>
+      <tr><td>Preço por tipo de cliente</td><td>Sim</td><td>Sim, por catálogo da empresa (desconto e faixas por quantidade)</td></tr>
+      <tr><td>Categorias por tipo de cliente</td><td>Sim</td><td>Sim, pelo catálogo da empresa</td></tr>
+      <tr><td>Pedido rápido por código</td><td>Sim</td><td>Sim, também com planilha CSV</td></tr>
+      <tr><td>Orçamento / cotação</td><td>Orçamento em PDF e ordem de compra</td><td>Cotação negociada, com mensagens e anexos, e ordem de compra</td></tr>
+      <tr><td>Crédito da empresa</td><td>Análise por faixa e boleto parcelado</td><td>Limite de crédito com extrato e pagamento “no crédito”</td></tr>
+      <tr><td>Usuários da empresa</td><td>Não</td><td>Sim, com papéis e permissões</td></tr>
+      <tr><td>Múltiplo de venda</td><td>Sim</td><td>Não (aparece só na descrição)</td></tr>
+      <tr><td>Pedido mínimo por tipo</td><td>Sim</td><td>Não (um mínimo único para a loja)</td></tr>
+      <tr><td>Pix e boleto (Asaas)</td><td>Sim (simulado)</td><td>Não; precisa de um módulo de pagamento</td></tr>
+      <tr><td>Importação, calculadora e NCM</td><td>Sim</td><td>Não; precisa ser programado</td></tr>
+      <tr><td>App instalável no celular</td><td>Sim</td><td>Loja adaptada ao celular (sem app instalável nesta demo)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Acessos da demonstração</h2>
+  <div class="cartao">
+    <p>Valem só dentro da demo, no Codespaces ou no computador.</p>
+    <ul>
+      <li>Painel: <code>/admin</code>, com admin@example.com e a senha admin123.</li>
+      <li>Empresas: <code>/customer/login</code>, com cooperativa@, distribuidora@, revendedor@, construtora@ ou hospital@demo.importfacil.com.br e a senha demo1234.</li>
+    </ul>
+  </div>
+
+  <footer>Empresas e dados de demonstração fictícios · Bagisto e B2B Suite (licença MIT) · ImportFácil, 2026</footer>
+</div>
+</body>
+</html>
