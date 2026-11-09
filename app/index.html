@@ -85,6 +85,11 @@
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
   function desligada(motivo) {
+    if (/porta 8000 está privada/.test(motivo) && /no ar/.test(motivo)) {
+      mostrar('<span class="selo pend">Porta privada</span><h2>A loja está ligada, mas fechada para o celular</h2><p>' + motivo + '</p>'
+        + '<p>Depois disso, leia o QR de novo.</p>');
+      return;
+    }
     mostrar('<span class="selo pend">Loja desligada</span>'
       + '<h2>A loja de teste não está ligada agora</h2>'
       + '<p>' + motivo + '</p>'
@@ -111,22 +116,57 @@
       + '<p style="margin-top:10px;font-size:13px">Endereço atual: <code>' + esc(url) + '</code></p>');
   }
 
-  function testar(url) {
+  function testar(url, motivoFalha) {
     // a loja responde com o ícone do app quando o Codespace está ligado e a porta 8000 é pública
     var img = new Image(), fim = false;
-    var t = setTimeout(function () { if (!fim) { fim = true; desligada('O Codespace não respondeu (pode estar parado ou com a porta 8000 privada).'); } }, 9000);
+    var t = setTimeout(function () { if (!fim) { fim = true; desligada(motivoFalha || 'O Codespace não respondeu (pode estar parado ou com a porta 8000 privada).'); } }, 9000);
     img.onload = function () { if (!fim) { fim = true; clearTimeout(t); ligada(url); } };
-    img.onerror = function () { if (!fim) { fim = true; clearTimeout(t); desligada('O Codespace está parado ou a porta 8000 está privada.'); } };
+    img.onerror = function () { if (!fim) { fim = true; clearTimeout(t); desligada(motivoFalha || 'O Codespace está parado ou a porta 8000 está privada.'); } };
     img.src = url.replace(/\/+$/, '') + '/importfacil/icone-192.png?t=' + Date.now();
   }
 
-  fetch(ENDERECO + '?t=' + Date.now(), { cache: 'no-store' })
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (d) {
-      if (!d || !/^https:\/\/[a-z0-9.-]+\.app\.github\.dev\/?$/i.test(d.url || '')) throw new Error('endereço inválido');
-      testar(d.url);
-    })
-    .catch(function () { desligada('Ainda não há um Codespace da loja registrado.'); });
+  var ESTADO = ENDERECO.replace('endereco.json', 'estado.json');
+  function minutos(iso) { var t = Date.parse(iso); return isFinite(t) ? Math.max(0, Math.round((Date.now() - t) / 60000)) : null; }
+  function linhas(log, n) {
+    var l = (log || []).filter(function (x) { return x && x.trim(); }).slice(-n);
+    return l.length ? '<pre style="white-space:pre-wrap;font-size:12px;background:var(--azul-claro);border-radius:8px;padding:8px;margin:8px 0 0;max-height:220px;overflow:auto">' + esc(l.join('\n')) + '</pre>' : '';
+  }
+  var PORTA = '<p>A porta 8000 precisa estar <b>pública</b>: no Codespace, aba PORTAS → 8000 → botão direito → Visibilidade da porta → Pública.</p>';
+
+  function porEstado(e) {
+    var idade = minutos(e.atualizado);
+    var antigo = idade === null || idade > (e.fase === 'no_ar' ? 20 : 6);
+    if (antigo) { testar(e.url, 'O último sinal do Codespace foi há ' + (idade === null ? '?' : idade) + ' min: ele provavelmente foi desligado.'); return; }
+    if (e.fase === 'instalando') {
+      mostrar('<span class="selo">Instalando</span><h2>A loja está sendo instalada</h2>'
+        + '<p>Na primeira vez leva de 10 a 20 minutos. Esta página se atualiza sozinha. Último sinal há ' + idade + ' min.</p>' + linhas(e.log, 4));
+      setTimeout(verificar, 30000); return;
+    }
+    if (e.fase === 'parou') {
+      mostrar('<span class="selo pend">Instalação parou</span><h2>A loja não conseguiu subir</h2>'
+        + '<p>O Codespace está ligado, mas a instalação parou. As últimas linhas do registro:</p>' + linhas(e.log, 12)
+        + '<p style="margin-top:10px">Envie esta tela para a equipe técnica. Para tentar de novo, reinicie o Codespace.</p>');
+      return;
+    }
+    testar(e.url, e.porta && e.porta !== 'public' ? 'A loja está no ar, mas a porta 8000 está privada.' + PORTA : null);
+  }
+
+  function verificar() {
+    fetch(ESTADO + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (e) { if (!e || !/^https:\/\/[a-z0-9.-]+\.app\.github\.dev\/?$/i.test(e.url || '')) throw new Error('estado inválido'); porEstado(e); })
+      .catch(function () {
+        // Codespaces criados antes desta versão só publicam o endereço
+        fetch(ENDERECO + '?t=' + Date.now(), { cache: 'no-store' })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (d) {
+            if (!d || !/^https:\/\/[a-z0-9.-]+\.app\.github\.dev\/?$/i.test(d.url || '')) throw new Error('endereço inválido');
+            testar(d.url, null);
+          })
+          .catch(function () { desligada('Ainda não há um Codespace da loja registrado.'); });
+      });
+  }
+  verificar();
 })();
 </script>
 </body>

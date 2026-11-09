@@ -57,7 +57,7 @@ As empresas e os dados são fictícios. Não use estas senhas fora do ambiente d
 **No GitHub Codespaces (sem instalar nada):**
 [abrir a loja no Codespaces](https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json)
 (configuração **"Loja ImportFácil (Bagisto + B2B Suite)"**, máquina de 4 núcleos).
-1. A primeira abertura leva de 10 a 20 minutos, porque o Bagisto é instalado e o catálogo é carregado. O andamento fica em `/tmp/loja-bagisto.log`.
+1. A primeira abertura leva de 10 a 20 minutos, porque o Bagisto é instalado e o catálogo é carregado. O andamento fica em `/tmp/loja-bagisto.log`; o estado e as últimas linhas do registro também ficam no ramo `app-endereco` (`estado.json`), que a página do QR mostra.
 2. A porta 8000 fica pública, para o celular abrir sem login no GitHub. O endereço é
    `https://<nome-do-codespace>-8000.app.github.dev`. Se ela continuar privada, clique com o botão direito na porta 8000 → **Port Visibility → Public**.
 3. **App no celular:** leia o QR code da página fixa https://importfacil.github.io/REP-TESTE/app/. Ao ligar, o Codespace publica o seu endereço no ramo `app-endereco`, e a página leva o celular até a loja. Também dá para abrir `<endereço>/app` no computador e ler o QR de lá. No Android, toque em
