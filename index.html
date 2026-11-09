@@ -595,6 +595,87 @@
   .tlstep.done .dot{background:var(--good);border-color:var(--good)}
   .tlstep .ln{width:2px;background:var(--hairline);margin-left:6px;height:16px}
   .tlstep.done .ln{background:var(--good)}
+  /* Painel da equipe · Visão geral (dashboard do Flowbite Admin, adaptado ao CSS do protótipo) */
+  .eq-seg{overflow-x:auto;scrollbar-width:none} .eq-seg::-webkit-scrollbar{display:none}
+  .eq-seg button{flex:1 0 auto;padding:7px 10px;white-space:nowrap}
+  .eqd{--eq-s1:var(--chart-1);--eq-s2:var(--chart-2);--eq-s3:#1baf7a;display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+  body[data-theme="dark"] .eqd{--eq-s3:#199e70}
+  @media (min-width:1024px){
+    .eqd{grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+    .eqd .c6{grid-column:span 6} .eqd .c4{grid-column:span 4} .eqd .c3{grid-column:span 3} .eqd .c2{grid-column:span 2}
+  }
+  .eqd .wg{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:16px;min-width:0;display:flex;flex-direction:column}
+  @media (min-width:640px){ .eqd .wg{padding:20px} }
+  .eqd .wg h3{margin:0;font-size:1rem;font-weight:700;color:var(--foreground)}
+  .eqd .wg .sub{margin:2px 0 0;font-size:.8rem;color:var(--muted-foreground)}
+  .eq-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+  .eq-bar select{width:auto;min-width:150px;margin:0}
+  .eq-bar .ui-switch-row{margin:0}
+  .eq-hd{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:6px 12px;margin-bottom:12px}
+  .eq-big{font-size:1.5rem;font-weight:700;line-height:1.1;color:var(--foreground);font-variant-numeric:tabular-nums}
+  @media (min-width:640px){ .eq-big{font-size:1.75rem} }
+  .eq-dl{display:inline-flex;align-items:center;gap:2px;font-size:.84rem;font-weight:600;white-space:nowrap}
+  .eq-dl.up{color:var(--green-txt)} .eq-dl.down{color:var(--critical)} .eq-dl.flat{color:var(--muted-foreground)}
+  .eq-dl svg{width:16px;height:16px}
+  .eq-dl small{font-weight:400;color:var(--muted-foreground);margin-left:4px}
+  .eq-ft{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--border);margin-top:auto;padding-top:12px;font-size:.78rem;color:var(--muted-foreground)}
+  .eq-ft .lk{font:inherit;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--brand);background:none;border:0;padding:6px 8px;border-radius:var(--radius-md);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+  .eq-ft .lk:hover{background:var(--accent)}
+  .eq-ft .lk svg{width:16px;height:16px}
+  .eq-chart{position:relative;width:100%;margin:4px 0 12px;flex:1;min-height:240px}
+  .eq-chart svg{display:block;width:100%;overflow:visible}
+  .eq-chart .ax{font-size:11px;fill:var(--muted-foreground);font-family:inherit}
+  .eq-chart .gl{stroke:var(--border);stroke-width:1}
+  .eq-chart .cross{stroke:var(--muted-foreground);stroke-width:1;stroke-dasharray:3 3}
+  .eq-mini{display:flex;align-items:flex-end;gap:2px;flex:1;min-height:72px;margin:14px 0 12px}
+  .eq-mini i{flex:1;min-width:4px;background:var(--eq-s1);border-radius:4px 4px 0 0;min-height:2px;cursor:default}
+  .eq-mini i:hover{filter:brightness(1.1)}
+  .eq-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:10px 0 4px}
+  .eq-tabs button{font:inherit;font-size:.82rem;font-weight:500;color:var(--muted-foreground);background:none;border:0;border-bottom:2px solid transparent;padding:8px 10px;cursor:pointer;margin-bottom:-1px}
+  .eq-tabs button.on{color:var(--foreground);border-bottom-color:var(--foreground);font-weight:600}
+  .eq-list{list-style:none;margin:0;padding:0}
+  .eq-list li{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .eq-list li:last-child{border-bottom:0}
+  .eq-list .ft{flex:none;width:40px;height:40px;border-radius:var(--radius-md);background:var(--muted);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .eq-list .ft img{width:100%;height:100%;object-fit:cover} .eq-list .ft svg{width:22px;height:22px}
+  .eq-list .av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--muted);color:var(--foreground);display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:600}
+  .eq-list .nm{flex:1;min-width:0}
+  .eq-list .nm b{display:block;font-size:.84rem;font-weight:600;color:var(--foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .eq-list .nm span{display:block;font-size:.74rem;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .eq-list .vl{text-align:right;font-size:.86rem;font-weight:700;color:var(--foreground);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .eq-list .vl small{display:block;font-size:.7rem;font-weight:400;color:var(--muted-foreground)}
+  .eq-hb{display:flex;flex-direction:column;gap:12px;margin:12px 0}
+  .eq-hb .r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:.8rem}
+  .eq-hb .r span{color:var(--foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .eq-hb .r b{font-weight:600;color:var(--foreground);font-variant-numeric:tabular-nums}
+  .eq-hb .r b small{font-weight:400;color:var(--muted-foreground)}
+  .eq-hb .tr{grid-column:1/-1;height:8px;border-radius:4px;background:var(--muted);overflow:hidden}
+  .eq-hb .tr i{display:block;height:100%;background:var(--eq-s1);border-radius:0 4px 4px 0}
+  .eq-donut{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:14px 0 12px}
+  .eq-donut svg{flex:none;width:150px;height:150px}
+  .eq-donut .lg{flex:1;min-width:150px;display:flex;flex-direction:column;gap:10px}
+  .eq-donut .lg div{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;gap:8px;font-size:.8rem;color:var(--foreground)}
+  .eq-donut .lg i{width:12px;height:12px;border-radius:3px}
+  .eq-donut .lg b{font-weight:600;font-variant-numeric:tabular-nums} .eq-donut .lg b small{font-weight:400;color:var(--muted-foreground)}
+  .eq-tl{list-style:none;margin:12px 0 12px 8px;padding:0;border-left:1px solid var(--border)}
+  .eq-tl li{position:relative;padding:0 0 16px 18px}
+  .eq-tl li:last-child{padding-bottom:0}
+  .eq-tl li::before{content:"";position:absolute;left:-6px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 3px var(--card);border:1px solid var(--border)}
+  .eq-tl time{display:block;font-size:.72rem;color:var(--muted-foreground)}
+  .eq-tl b{display:block;font-size:.84rem;font-weight:600;color:var(--foreground)}
+  .eq-tl span{display:block;font-size:.76rem;color:var(--muted-foreground)}
+  .eq-tbl-wrap{overflow-x:auto;margin:12px -16px 0;padding:0 16px}
+  @media (min-width:640px){ .eq-tbl-wrap{margin:12px -20px 0;padding:0 20px} }
+  .eq-tbl{width:100%;border-collapse:collapse;font-size:.8rem;min-width:620px}
+  .eq-tbl th{text-align:left;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted-foreground);background:var(--muted);padding:10px 12px;white-space:nowrap}
+  .eq-tbl th:first-child{border-radius:var(--radius-md) 0 0 var(--radius-md)} .eq-tbl th:last-child{border-radius:0 var(--radius-md) var(--radius-md) 0}
+  .eq-tbl td{padding:12px;border-bottom:1px solid var(--border);color:var(--foreground);white-space:nowrap}
+  .eq-tbl td .muted{display:block;font-size:.72rem}
+  .eq-tbl td.n{text-align:right;font-weight:600;font-variant-numeric:tabular-nums} .eq-tbl th.n{text-align:right}
+  .eq-tbl tr:last-child td{border-bottom:0}
+  #eqTip{position:fixed;z-index:200;pointer-events:none;background:var(--popover);color:var(--popover-foreground);border:1px solid var(--border);
+    border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.14);padding:7px 10px;font-size:.76rem;line-height:1.35;max-width:240px;display:none}
+  #eqTip b{display:block;font-weight:600}
   /* Carrinho (layout "Shopping Cart" da Flowbite, adaptado ao CSS do protótipo) */
   .cart-tt{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;margin:2px 0 12px}
   .cart-tt h1{margin:0;font-size:1.15rem;font-weight:600;color:var(--foreground)}
@@ -3930,16 +4011,234 @@ function bancoConfirma(id, via){
    No app real fica em outro acesso, só para a equipe, com dados de
    todos os clientes vindos do servidor. Aqui opera sobre este navegador.
    ================================================================== */
-let eqTab = 'cadastros';
+let eqTab = 'geral';
 function rEquipe(){
   escondeBar();
-  const abas = [['cadastros','Crédito'],['pedidos','Pedidos'],['recebiveis','Recebíveis'],['condicoes','Condições'],['calc','Calculadora']];
-  const corpo = {cadastros:eqCadastros, pedidos:eqPedidos, recebiveis:eqRecebiveis, condicoes:eqCondicoes, calc:eqCalc}[eqTab]();
+  const abas = [['geral','Visão geral'],['cadastros','Crédito'],['pedidos','Pedidos'],['recebiveis','Recebíveis'],['condicoes','Condições'],['calc','Calculadora']];
+  const corpo = {geral:eqGeral, cadastros:eqCadastros, pedidos:eqPedidos, recebiveis:eqRecebiveis, condicoes:eqCondicoes, calc:eqCalc}[eqTab]();
   document.getElementById('scr-equipe').innerHTML = back('conta','Painel da equipe')+`
     <div class="note" style="margin:0 0 12px">Protótipo da área interna. No sistema real, só a equipe ImportFácil acessa esta tela, com login próprio.</div>
-    <div class="seg" role="tablist">${abas.map(([k,t])=>`<button role="tab" aria-selected="${eqTab===k}" class="${eqTab===k?'on':''}" onclick="eqTab='${k}';rEquipe()">${t}</button>`).join('')}</div>
+    <div class="seg eq-seg" role="tablist">${abas.map(([k,t])=>`<button role="tab" aria-selected="${eqTab===k}" class="${eqTab===k?'on':''}" onclick="eqTab='${k}';rEquipe()">${t}</button>`).join('')}</div>
     ${corpo}<div style="height:18px"></div>`;
   if(eqTab==='calc'){ calcResultados(); setTimeout(calcNcmConferir,600); }
+  if(eqTab==='geral') eqGraficos();
+}
+
+/* ---------- Visão geral: dashboard do Flowbite Admin adaptado (vendas, indicadores, rankings, pagamentos, atividade e transações) ----------
+   Junta os pedidos feitos neste aparelho com uma carteira de exemplo (10 clientes fictícios, gerada sempre igual) para o painel não ficar vazio. */
+let eqPer = 30, eqDemo = true, eqRank = 'prod', eqTxF = 'todos', eqTxN = 8;
+const EQ_CLIENTES = [
+  {nome:'Cooperativa Vale Verde',     perfil:'cooperativa',   cid:'Rio Verde/GO'},
+  {nome:'Cooperativa Agro Serrana',   perfil:'cooperativa',   cid:'Chapecó/SC'},
+  {nome:'Distribuidora Norte Sul',    perfil:'distribuidora', cid:'Uberlândia/MG'},
+  {nome:'Distribuidora Ponto Forte',  perfil:'distribuidora', cid:'Campinas/SP'},
+  {nome:'Revenda Bom Campo',          perfil:'revendedor',    cid:'Varginha/MG'},
+  {nome:'Casa da Lavoura',            perfil:'revendedor',    cid:'Londrina/PR'},
+  {nome:'Construtora Alicerce',       perfil:'construtora',   cid:'Belo Horizonte/MG'},
+  {nome:'Construtora Prumo',          perfil:'construtora',   cid:'Goiânia/GO'},
+  {nome:'Hospital Bom Pastor',        perfil:'hospital',      cid:'Juiz de Fora/MG'},
+  {nome:'Hospital Vida Plena',        perfil:'hospital',      cid:'Ribeirão Preto/SP'},
+];
+const eqParseD = s => { const [d,m,a]=String(s).split('/').map(Number); return new Date(a,(m||1)-1,d||1); };
+const eqDias = (a,b) => Math.round((b-a)/864e5);
+const eqForma = t => /pix/i.test(t)?'Pix':/cart/i.test(t)?'Cartão':'Boleto';
+function eqK(v){ const a=Math.abs(v);
+  return a>=1e6 ? 'R$ '+(v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi' : a>=1e3 ? 'R$ '+Math.round(v/1e3).toLocaleString('pt-BR')+' mil' : BRL(v); }
+function eqCarteira(){
+  if(eqCarteira._c) return eqCarteira._c;
+  let x=20261109; const rnd=()=>{ x|=0; x=x+0x6D2B79F5|0; let t=Math.imul(x^x>>>15,1|x); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
+  const pick=a=>a[Math.floor(rnd()*a.length)];
+  const prodsDe=k=>PRODUTOS.filter(p=>{ const c=catOf(p.cat); return (!c.perfis||c.perfis.includes(k)) && !p.orc && p.estoque; });
+  const peds=[], tx=[];
+  for(let d=179; d>=0; d--){
+    const dia=addD(D0,-d), util=dia.getDay()!==0&&dia.getDay()!==6;
+    const n = util ? (rnd()<0.62?1:0)+(rnd()<0.22?1:0) : (rnd()<0.12?1:0);
+    for(let k=0;k<n;k++){
+      const c=pick(EQ_CLIENTES), desc=PERFIS[c.perfil].desc, base=prodsDe(c.perfil); if(!base.length) continue;
+      const itens=[]; const nl=1+Math.floor(rnd()*3);
+      for(let j=0;j<nl;j++){ const p=pick(base), un=p.tabela*(1-desc);
+        const alvo=2500+rnd()*22000, qtd=p.mult*Math.max(1,Math.round(alvo/(un*p.mult)));
+        if(!itens.some(i=>i.pid===p.id)) itens.push({pid:p.id,qtd,valor:un*qtd}); }
+      const total=itens.reduce((t,i)=>t+i.valor,0), r=rnd();
+      const forma = r<0.34?'Pix':r<0.86?'Boleto':'Cartão', idade=d;
+      const num='PED-'+(7000+peds.length);
+      const st = idade>20?5:idade>10?4:idade>4?3:idade>1?2:1;
+      peds.push({num, cli:c.nome, perfil:c.perfil, cid:c.cid, data:dia, itens, total:forma==='Pix'?total*0.97:total, forma, status:st, demo:true});
+      const tot=forma==='Pix'?total*0.97:total;
+      if(forma==='Boleto'){ const np=1+Math.floor(rnd()*3);
+        for(let q=1;q<=np;q++){ const venc=addD(dia,30*q), vencido=venc<D0;
+          const atraso = vencido && rnd()<0.09;
+          tx.push({pedido:num, cli:c.nome, forma:'Boleto '+q+'/'+np, valor:tot/np, data:vencido&&!atraso?addD(venc,-Math.floor(rnd()*3)):venc,
+                   st: !vencido?'Pendente':atraso?'Em atraso':'Pago'}); } }
+      else tx.push({pedido:num, cli:c.nome, forma, valor:tot, data:dia, st:'Pago'});
+    }
+  }
+  return eqCarteira._c={peds,tx};
+}
+function eqDados(){
+  const cli = cfg.empresa || (P()?'Cliente '+P().nome:'Cliente deste aparelho');
+  const reais = pedidos.filter(o=>!o.cancelado).map(o=>({num:o.num, cli, perfil:perfilKey(), cid:'este aparelho', data:eqParseD(o.data),
+    itens:o.itens.map(i=>{ const p=prodOf(i.pid); return {pid:i.pid,qtd:i.qtd,valor:preco(p)*i.qtd}; }), total:o.total, forma:eqForma(o.pgto), status:o.status, demo:false}));
+  const txr = [];
+  pedidos.filter(o=>!o.cancelado).forEach(o=>{
+    const ps=parcelas.filter(p=>p.pedido===o.num);
+    if(o.cartao) txr.push({pedido:o.num, cli, forma:'Cartão '+o.cartao.n+'×', valor:o.total, data:eqParseD(o.data), st:'Pago'});
+    ps.forEach(p=>txr.push({pedido:o.num, cli, forma:ehPix(p)?'Pix':'Boleto '+p.n+'/'+p.de, valor:p.valor, data:p.pago&&p.pagoEm?eqParseD(p.pagoEm):p.venc,
+      st:p.pago?'Pago':(p.venc<D0?'Em atraso':'Pendente')}));
+  });
+  const c = eqDemo ? eqCarteira() : {peds:[],tx:[]};
+  return {peds:[...reais,...c.peds], tx:[...txr,...c.tx]};
+}
+const EQ_SETA = {up:'<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>',
+  down:'<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 112 0v11.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>'};
+function eqDelta(a,b,txt){
+  if(!b) return a?`<span class="eq-dl flat">novo<small>${txt||''}</small></span>`:'';
+  const p=(a-b)/b*100, cl=Math.abs(p)<0.5?'flat':p>0?'up':'down';
+  return `<span class="eq-dl ${cl}">${cl!=='flat'?EQ_SETA[cl]:''}${Math.abs(p).toLocaleString('pt-BR',{maximumFractionDigits:1})}%<small>${txt||''}</small></span>`;
+}
+function eqPeriodo(){
+  const {peds,tx}=eqDados(), ini=addD(D0,-(eqPer-1)), iniA=addD(ini,-eqPer);
+  const no=peds.filter(o=>o.data>=ini&&o.data<=D0), ant=peds.filter(o=>o.data>=iniA&&o.data<ini);
+  return {peds,tx,ini,no,ant};
+}
+let eqCache=null;
+function eqGeral(){
+  const d=eqCache=eqPeriodo(), {no,ant,tx}=d;
+  const soma=a=>a.reduce((t,o)=>t+o.total,0);
+  const vend=soma(no), vendA=soma(ant), cli=new Set(no.map(o=>o.cli)).size, cliA=new Set(ant.map(o=>o.cli)).size;
+  const tick=no.length?vend/no.length:0, tickA=ant.length?vendA/ant.length:0;
+  const atr=tx.filter(t=>t.st==='Em atraso'), atrV=atr.reduce((t,x)=>t+x.valor,0);
+  const vazio=!d.peds.length;
+  const per=`<div class="eq-bar" style="margin-bottom:12px">
+      <select aria-label="Período" onchange="eqPer=+this.value;eqTxN=8;rEquipe()">${[[7,'Últimos 7 dias'],[30,'Últimos 30 dias'],[90,'Últimos 90 dias']].map(([v,t])=>`<option value="${v}" ${eqPer===v?'selected':''}>${t}</option>`).join('')}</select>
+      ${switchHTML('eqDemoSw','Incluir a carteira de exemplo (10 clientes fictícios)',eqDemo,'v=>{eqDemo=v;eqTxN=8;rEquipe()}')}
+    </div>`;
+  if(vazio) return per+`<div class="card"><div class="empty">Ainda não há pedidos para mostrar.<br>Faça um pedido na loja ou ligue a carteira de exemplo.</div></div>`;
+  const txt=' vs. período anterior';
+  // rankings
+  const porProd={}, porCli={}, porCat={}, porForma={Pix:0,Boleto:0,'Cartão':0};
+  no.forEach(o=>{ porForma[o.forma]+=o.total;
+    (porCli[o.cli]=porCli[o.cli]||{v:0,n:0,perfil:o.perfil,cid:o.cid}); porCli[o.cli].v+=o.total; porCli[o.cli].n++;
+    o.itens.forEach(i=>{ const p=prodOf(i.pid); (porProd[i.pid]=porProd[i.pid]||{v:0,q:0}); porProd[i.pid].v+=i.valor; porProd[i.pid].q+=i.qtd;
+      const c=catOf(p.cat).nome; porCat[c]=(porCat[c]||0)+i.valor; }); });
+  const topP=Object.entries(porProd).sort((a,b)=>b[1].v-a[1].v).slice(0,5);
+  const topC=Object.entries(porCli).sort((a,b)=>b[1].v-a[1].v).slice(0,5);
+  const cats=Object.entries(porCat).sort((a,b)=>b[1]-a[1]); const totCat=cats.reduce((t,c)=>t+c[1],0)||1;
+  const catsV=cats.length>6?[...cats.slice(0,5),['Outras categorias',cats.slice(5).reduce((t,c)=>t+c[1],0)]]:cats;
+  const ini2=s=>s.split(' ').filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const lista = eqRank==='prod'
+    ? topP.map(([pid,v])=>{ const p=prodOf(+pid); return `<li><span class="ft">${arte(p,40)}</span><div class="nm"><b>${oesc(p.nome)}</b><span>${oesc(catOf(p.cat).nome)} · ${v.q.toLocaleString('pt-BR')} ${oesc(p.un)}</span></div><div class="vl">${eqK(v.v)}<small>${(v.v/vend*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}% das vendas</small></div></li>`; }).join('')
+    : topC.map(([n,v])=>`<li><span class="av" aria-hidden="true">${ini2(n)}</span><div class="nm"><b>${oesc(n)}</b><span>${PERFIS[v.perfil]?PERFIS[v.perfil].nome:''} · ${oesc(v.cid)}</span></div><div class="vl">${eqK(v.v)}<small>${v.n} pedido(s)</small></div></li>`).join('');
+  // atividade recente
+  const ev=[];
+  d.peds.slice().sort((a,b)=>b.data-a.data).slice(0,6).forEach(o=>ev.push({t:o.data, b:'Pedido '+o.num+' · '+eqK(o.total), s:o.cli+' · '+o.forma+' · '+STATUS[o.status]}));
+  tx.filter(t=>t.st==='Pago'&&t.data<=D0).sort((a,b)=>b.data-a.data).slice(0,4).forEach(t=>ev.push({t:t.data, b:'Pagamento recebido · '+eqK(t.valor), s:t.cli+' · '+t.forma+' · '+t.pedido}));
+  atr.sort((a,b)=>b.data-a.data).slice(0,2).forEach(t=>ev.push({t:t.data, b:'Parcela vencida · '+eqK(t.valor), s:t.cli+' · '+t.forma+' · '+t.pedido}));
+  if(cadStatus && cad.enviadoEm) ev.push({t:eqParseD(String(cad.enviadoEm).slice(0,10)), b:'Cadastro: '+cadStatus, s:(cad.razao||'Empresa')+' · CNPJ '+(cad.cnpj||'—')});
+  const evs=ev.filter(e=>!isNaN(e.t)).sort((a,b)=>b.t-a.t).slice(0,6);
+  const quando=t=>{ const n=eqDias(t,D0); return n<=0?'Hoje':n===1?'Ontem':n<0?'Em '+fmtD(t):'Há '+n+' dias · '+fmtD(t).slice(0,5); };
+  // transações
+  const txs=tx.filter(t=>t.st==='Em atraso' || (t.data>=d.ini && t.data<=addD(D0,30))).filter(t=>eqTxF==='todos'||t.st===eqTxF).sort((a,b)=>b.data-a.data);
+  const chipSt=st=>`<span class="chip ${st==='Pago'?'ok':st==='Em atraso'?'cancel':'pend'}">${st==='Pago'?'✓ ':st==='Em atraso'?'! ':''}${st}</span>`;
+  // formas de pagamento
+  const fr=[['Pix','var(--eq-s1)'],['Boleto','var(--eq-s2)'],['Cartão','var(--eq-s3)']];
+  return per+`<div class="eqd">
+    <section class="wg c4" aria-labelledby="eqVendT">
+      <div class="eq-hd"><div><div class="eq-big">${BRL(vend)}</div><h3 id="eqVendT" class="sub" style="font-weight:400;font-size:.9rem">Vendas · ${eqPer===7?'últimos 7 dias':eqPer===30?'últimos 30 dias':'últimos 90 dias'}</h3></div>${eqDelta(vend,vendA,txt)}</div>
+      <div class="eq-chart" id="eqChVendas" role="img" aria-label="Vendas por dia no período"></div>
+      <div class="eq-ft"><span>${fmtD(d.ini)} a ${fmtD(D0)}</span><button type="button" class="lk" onclick="eqCSV()">Relatório de vendas ${I('chevron-right')}</button></div>
+    </section>
+    <section class="wg c2">
+      <h3>Estatísticas do período</h3>
+      <div class="eq-tabs" role="tablist"><button role="tab" aria-selected="${eqRank==='prod'}" class="${eqRank==='prod'?'on':''}" onclick="eqRank='prod';rEquipe()">Produtos mais vendidos</button><button role="tab" aria-selected="${eqRank==='cli'}" class="${eqRank==='cli'?'on':''}" onclick="eqRank='cli';rEquipe()">Clientes</button></div>
+      <ul class="eq-list">${lista||'<li class="muted">Sem vendas no período.</li>'}</ul>
+      <div class="eq-ft"><span>Por valor vendido</span><button type="button" class="lk" onclick="eqTab='pedidos';rEquipe()">Pedidos ${I('chevron-right')}</button></div>
+    </section>
+    <section class="wg c2"><div class="eq-hd" style="margin:0"><div><div class="eq-big">${no.length.toLocaleString('pt-BR')}</div><h3 class="sub" style="font-weight:400">Pedidos no período</h3></div>${eqDelta(no.length,ant.length)}</div>
+      <div class="eq-mini" id="eqMiniPed" aria-hidden="true"></div>
+      <div class="eq-ft"><span>Ticket médio ${eqK(tick)}</span>${eqDelta(tick,tickA)}</div></section>
+    <section class="wg c2"><div class="eq-hd" style="margin:0"><div><div class="eq-big">${cli}</div><h3 class="sub" style="font-weight:400">Clientes que compraram</h3></div>${eqDelta(cli,cliA)}</div>
+      <div class="eq-mini" id="eqMiniCli" aria-hidden="true"></div>
+      <div class="eq-ft"><span>${eqDemo?EQ_CLIENTES.length+1:1} clientes na carteira</span><button type="button" class="lk" onclick="eqTab='cadastros';rEquipe()">Crédito ${I('chevron-right')}</button></div></section>
+    <section class="wg c2"><div class="eq-hd" style="margin:0"><div><div class="eq-big" style="color:${atrV?'var(--critical)':'var(--foreground)'}">${BRL(atrV)}</div><h3 class="sub" style="font-weight:400">Recebíveis em atraso</h3></div><span class="chip ${atr.length?'cancel':'ok'}">${atr.length?'! '+atr.length+' parcela(s)':'✓ em dia'}</span></div>
+      <ul class="eq-list" style="margin-top:8px">${atr.slice(0,3).map(t=>`<li><div class="nm"><b>${oesc(t.cli)}</b><span>${t.pedido} · ${t.forma} · venceu ${fmtD(t.data)}</span></div><div class="vl">${eqK(t.valor)}</div></li>`).join('')||'<li class="muted" style="font-size:.8rem">Nenhuma parcela vencida.</li>'}</ul>
+      <div class="eq-ft"><span>${tx.filter(t=>t.st==='Pendente').length} parcela(s) a vencer</span><button type="button" class="lk" onclick="eqTab='recebiveis';rEquipe()">Recebíveis ${I('chevron-right')}</button></div></section>
+    <section class="wg c2"><h3>Vendas por categoria</h3><p class="sub">Participação no valor vendido</p>
+      <div class="eq-hb">${catsV.map(([n,v])=>`<div class="r" data-tip="<b>${oesc(n)}</b>${BRL(v)} · ${(v/totCat*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%"><span>${oesc(n)}</span><b>${eqK(v)} <small>${Math.round(v/totCat*100)}%</small></b><div class="tr"><i style="width:${Math.max(1,v/Math.max(...catsV.map(c=>c[1]))*100)}%"></i></div></div>`).join('')}</div></section>
+    <section class="wg c2"><h3>Formas de pagamento</h3><p class="sub">Valor vendido por forma</p>
+      <div class="eq-donut"><svg id="eqDonut" viewBox="0 0 150 150" role="img" aria-label="Divisão das vendas por forma de pagamento"></svg>
+        <div class="lg">${fr.map(([k,c])=>`<div data-tip="<b>${k}</b>${BRL(porForma[k])}"><i style="background:${c}"></i><span>${k}</span><b>${Math.round(porForma[k]/(vend||1)*100)}% <small>${eqK(porForma[k])}</small></b></div>`).join('')}</div></div></section>
+    <section class="wg c2"><h3>Atividade recente</h3>
+      <ol class="eq-tl">${evs.map(e=>`<li><time>${quando(e.t)}</time><b>${oesc(e.b)}</b><span>${oesc(e.s)}</span></li>`).join('')}</ol></section>
+    <section class="wg c6"><div class="eq-hd" style="margin:0;flex-wrap:wrap"><div><h3>Transações</h3><p class="sub">Pagamentos do período, parcelas a vencer nos próximos 30 dias e parcelas em atraso</p></div>
+        <select aria-label="Filtrar por situação" style="width:auto;margin:0" onchange="eqTxF=this.value;eqTxN=8;rEquipe()">${['todos','Pago','Pendente','Em atraso'].map(v=>`<option value="${v}" ${eqTxF===v?'selected':''}>${v==='todos'?'Todas as situações':v}</option>`).join('')}</select></div>
+      <div class="eq-tbl-wrap"><table class="eq-tbl"><thead><tr><th>Transação</th><th>Data</th><th class="n">Valor</th><th>Forma</th><th>Situação</th></tr></thead><tbody>
+        ${txs.slice(0,eqTxN).map(t=>`<tr><td>${t.st==='Pago'?'Pagamento de':'Parcela de'} ${oesc(t.cli)}<span class="muted">${t.pedido}</span></td><td>${fmtD(t.data)}</td><td class="n">${BRL(t.valor)}</td><td>${oesc(t.forma)}</td><td>${chipSt(t.st)}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">Nenhuma transação.</td></tr>'}
+      </tbody></table></div>
+      <div class="eq-ft" style="margin-top:8px"><span>Mostrando ${Math.min(eqTxN,txs.length)} de ${txs.length}</span>${txs.length>eqTxN?`<button type="button" class="lk" onclick="eqTxN+=12;rEquipe()">Mostrar mais ${I('chevron-right')}</button>`:''}</div></section>
+  </div>
+  ${eqDemo?'<div class="muted" style="margin-top:10px;font-size:.74rem">A carteira de exemplo usa clientes e pedidos fictícios, sempre os mesmos. Os pedidos feitos neste aparelho entram junto.</div>':''}`;
+}
+/* gráficos desenhados depois que a aba entra na tela (largura real do cartão) */
+function eqGraficos(){
+  const d=eqCache; if(!d||!document.getElementById('eqChVendas')) return;
+  const dias=[...Array(eqPer)].map((_,i)=>addD(d.ini,i));
+  const serie=dias.map(dt=>{ const os=d.no.filter(o=>o.data.getTime()===dt.getTime()); return {dt, v:os.reduce((t,o)=>t+o.total,0), n:os.length}; });
+  // área de vendas
+  const box=document.getElementById('eqChVendas'), W=box.clientWidth||600, H=box.clientHeight||240, ml=58, mr=8, mt=10, mb=26;
+  const max=Math.max(...serie.map(p=>p.v),1), passo=Math.pow(10,Math.floor(Math.log10(max/4))), top=Math.ceil(max/4/passo)*passo*4;
+  const X=i=>ml+(serie.length<2?0:i*(W-ml-mr)/(serie.length-1)), Y=v=>mt+(H-mt-mb)*(1-v/top);
+  let ln=''; serie.forEach((p,i)=>{ ln+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1); });
+  const area=ln+`L${X(serie.length-1).toFixed(1)} ${Y(0)}L${X(0)} ${Y(0)}Z`;
+  const grid=[0,1,2,3,4].map(k=>{ const v=top*k/4, y=Y(v); return `<line class="gl" x1="${ml}" x2="${W-mr}" y1="${y}" y2="${y}"/><text class="ax" x="${ml-8}" y="${y+4}" text-anchor="end">${v?eqK(v).replace(/R\$\s/,''):'0'}</text>`; }).join('');
+  const nx=Math.min(serie.length, W<480?4:7), xs=[...Array(nx)].map((_,k)=>Math.round(k*(serie.length-1)/(nx-1||1)));
+  const xl=xs.map(i=>`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="${i===0?'start':i===serie.length-1?'end':'middle'}">${fmtD(serie[i].dt).slice(0,5)}</text>`).join('');
+  box.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="eqGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--eq-s1)" stop-opacity=".22"/><stop offset="1" stop-color="var(--eq-s1)" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${xl}<path d="${area}" fill="url(#eqGrad)"/><path d="${ln}" fill="none" stroke="var(--eq-s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line class="cross" id="eqCross" y1="${mt}" y2="${H-mb}" style="display:none"/><circle id="eqDot" r="5" fill="var(--eq-s1)" stroke="var(--card)" stroke-width="2" style="display:none"/>
+    <rect x="${ml}" y="0" width="${W-ml-mr}" height="${H-mb}" fill="transparent" id="eqHit"/></svg>`;
+  const hit=document.getElementById('eqHit'), cr=document.getElementById('eqCross'), dot=document.getElementById('eqDot');
+  const mover=e=>{ const r=hit.getBoundingClientRect(), px=e.clientX-r.left, i=Math.max(0,Math.min(serie.length-1,Math.round(px/(r.width)*(serie.length-1)))), p=serie[i];
+    cr.setAttribute('x1',X(i)); cr.setAttribute('x2',X(i)); cr.style.display=''; dot.setAttribute('cx',X(i)); dot.setAttribute('cy',Y(p.v)); dot.style.display='';
+    eqTip(`<b>${fmtD(p.dt)}</b>${BRL(p.v)} · ${p.n} pedido(s)`, e.clientX, e.clientY); };
+  hit.addEventListener('pointermove',mover); hit.addEventListener('pointerdown',mover);
+  hit.addEventListener('pointerleave',()=>{ cr.style.display='none'; dot.style.display='none'; eqTip(); });
+  // mini barras: pedidos e clientes por semana (ou por dia no período de 7 dias)
+  const tam={7:1,30:6,90:10}[eqPer]||7, grupos=[];   // grupos do mesmo tamanho: 7 dias, 5 × 6 dias ou 9 × 10 dias
+  for(let i=0;i<serie.length;i+=tam) grupos.push(serie.slice(i,i+tam));
+  const rot=g=>g.length===1?fmtD(g[0].dt):fmtD(g[0].dt).slice(0,5)+' a '+fmtD(g[g.length-1].dt).slice(0,5);
+  const barras=(id,vals,fmt)=>{ const m=Math.max(...vals,1); document.getElementById(id).innerHTML=vals.map((v,i)=>`<i style="height:${Math.max(3,v/m*100)}%" data-tip="<b>${rot(grupos[i])}</b>${fmt(v)}"></i>`).join(''); };
+  barras('eqMiniPed', grupos.map(g=>g.reduce((t,p)=>t+p.n,0)), v=>v+' pedido(s)');
+  barras('eqMiniCli', grupos.map(g=>new Set(d.no.filter(o=>o.data>=g[0].dt&&o.data<=g[g.length-1].dt).map(o=>o.cli)).size), v=>v+' cliente(s)');
+  // rosca: formas de pagamento (2 px de espaço entre as fatias)
+  const fs=[['Pix','var(--eq-s1)'],['Boleto','var(--eq-s2)'],['Cartão','var(--eq-s3)']].map(([k,c])=>({k,c,v:d.no.filter(o=>o.forma===k).reduce((t,o)=>t+o.total,0)}));
+  const tot=fs.reduce((t,f)=>t+f.v,0)||1, R=60, r=38, cx=75, cy=75; let a0=-Math.PI/2, sv='';
+  fs.filter(f=>f.v>0).forEach(f=>{ const a1=a0+f.v/tot*Math.PI*2, big=a1-a0>Math.PI?1:0, P2=(a,rr)=>(cx+rr*Math.cos(a)).toFixed(2)+' '+(cy+rr*Math.sin(a)).toFixed(2);
+    const full=a1-a0>=Math.PI*2-1e-6;
+    sv+= full ? `<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${f.c}" stroke-width="${R-r}" data-tip="<b>${f.k}</b>${BRL(f.v)} · 100%"/>`
+      : `<path d="M${P2(a0,R)}A${R} ${R} 0 ${big} 1 ${P2(a1,R)}L${P2(a1,r)}A${r} ${r} 0 ${big} 0 ${P2(a0,r)}Z" fill="${f.c}" stroke="var(--card)" stroke-width="2" data-tip="<b>${f.k}</b>${BRL(f.v)} · ${(f.v/tot*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%"/>`;
+    a0=a1; });
+  document.getElementById('eqDonut').innerHTML=sv+`<text x="75" y="72" text-anchor="middle" style="font-size:11px;fill:var(--muted-foreground)">Total</text><text x="75" y="88" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--foreground)">${eqK(tot)}</text>`;
+}
+function eqTip(html,x,y){
+  let t=document.getElementById('eqTip'); if(!t){ t=document.createElement('div'); t.id='eqTip'; t.setAttribute('role','tooltip'); document.body.appendChild(t); }
+  if(!html){ t.style.display='none'; return; }
+  t.innerHTML=html; t.style.display='block';
+  const w=t.offsetWidth, h=t.offsetHeight; let l=x+14, tp=y-h-10;
+  if(l+w>innerWidth-8) l=x-w-14; if(tp<8) tp=y+16; t.style.left=Math.max(8,l)+'px'; t.style.top=tp+'px';
+}
+document.addEventListener('pointerover',e=>{ const el=e.target.closest&&e.target.closest('#scr-equipe [data-tip]'); if(el) eqTip(el.dataset.tip,e.clientX,e.clientY); });
+document.addEventListener('pointermove',e=>{ const el=e.target.closest&&e.target.closest('#scr-equipe [data-tip]'); if(el) eqTip(el.dataset.tip,e.clientX,e.clientY); else if(!(e.target.id==='eqHit')) eqTip(); });
+window.addEventListener('resize',()=>{ if(cur==='equipe'&&eqTab==='geral') eqGraficos(); });
+function eqCSV(){
+  const d=eqCache||eqPeriodo();
+  const lin=[['Data','Pedido','Cliente','Tipo de cliente','Forma de pagamento','Situação','Total (R$)','Exemplo']]
+    .concat(d.no.slice().sort((a,b)=>a.data-b.data).map(o=>[fmtD(o.data),o.num,o.cli,PERFIS[o.perfil]?PERFIS[o.perfil].nome:'',o.forma,STATUS[o.status],o.total.toFixed(2).replace('.',','),o.demo?'sim':'não']));
+  const csv='﻿'+lin.map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='relatorio-vendas-'+fmtD(d.ini).replace(/\//g,'-')+'-a-'+fmtD(D0).replace(/\//g,'-')+'.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  toast('Relatório de vendas baixado ('+d.no.length+' pedidos)');
 }
 
 /* ---------- Crédito: análise do cadastro ---------- */
