@@ -21,9 +21,7 @@ RUN git clone --depth 1 --branch ${BAGISTO_VERSAO} https://github.com/bagisto/ba
  && cp .env.example .env \
  && composer install --no-dev --prefer-dist --optimize-autoloader \
  && composer require "bagisto/b2b-suite:${B2B_VERSAO}" --update-no-dev --prefer-dist \
- # a B2B Suite é registrada à mão e por último (o README dela pede isso)
- && sed -i 's|^];|    Webkul\\B2BSuite\\Providers\\B2BSuiteServiceProvider::class,\n];|' bootstrap/providers.php \
- && grep -q B2BSuiteServiceProvider bootstrap/providers.php \
+ # a B2B Suite é registrada no iniciar.sh, depois da instalação do Bagisto (ela consulta o banco ao iniciar)
  # imagens com endereço relativo (/storage/...): funcionam em qualquer endereço (localhost, Codespaces, AWS)
  && sed -i "s|'url' => env('APP_URL').'/storage',|'url' => env('PUBLIC_STORAGE_URL', env('APP_URL').'/storage'),|" config/filesystems.php \
  && grep -q PUBLIC_STORAGE_URL config/filesystems.php \

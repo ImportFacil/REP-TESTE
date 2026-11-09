@@ -38,7 +38,15 @@ env_set DB_PASSWORD "$DB_PASSWORD"
 env_set MAIL_MAILER log
 env_set QUEUE_CONNECTION sync
 env_set CACHE_STORE file
-grep -q '^APP_KEY=base64' .env || php artisan key:generate --force
+# chave fixa da demonstração (vem do docker-compose); não muda quando o contêiner é recriado
+export APP_KEY="${APP_KEY:-base64:G3s0HjJa4DOfcRBqWof3u6+Xb5rGoGkF04zgoAVN7QQ=}"
+env_set APP_KEY "$APP_KEY"
+
+b2b_ligar() { # registra a B2B Suite por último em bootstrap/providers.php (o README dela pede isso)
+  grep -q B2BSuiteServiceProvider bootstrap/providers.php || \
+    sed -i 's|^];|    Webkul\\B2BSuite\\Providers\\B2BSuiteServiceProvider::class,\n];|' bootstrap/providers.php
+  grep -q B2BSuiteServiceProvider bootstrap/providers.php
+}
 
 consulta() { # imprime o resultado de uma consulta de uma coluna, ou ERRO
   php -r '
@@ -54,14 +62,18 @@ for i in $(seq 1 120); do [ "$(consulta 'select 1')" = "1" ] && break; sleep 2; 
 
 if [ "$(consulta "select count(*) from core_config where code='importfacil.demo.instalado'")" != "1" ]; then
   echo "== Instalando Bagisto (pt_BR, BRL) =="
+  sed -i '/B2BSuiteServiceProvider/d' bootstrap/providers.php
   php artisan bagisto:install -n --force
+  export APP_KEY; env_set APP_KEY "$APP_KEY"   # o instalador gera outra; a da demo prevalece
   echo "== Instalando B2B Suite =="
+  b2b_ligar
   php artisan b2b-suite:install
   echo "== Carregando a ImportFácil =="
   php artisan importfacil:demo /opt/demo/catalogo-importfacil.json /opt/demo/imagens /opt/demo/marca
   php artisan indexer:index --mode=full
 fi
 
+b2b_ligar
 php artisan storage:link >/dev/null 2>&1 || true
 php artisan optimize:clear >/dev/null
 
