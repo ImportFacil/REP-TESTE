@@ -63,7 +63,7 @@ class ImportfacilDemo extends Command
         foreach ($d['categorias'] as $c) {   // ícone da categoria (o mesmo do protótipo) no carrossel e na página
             $arq = $dirImg.'/cat-'.$c['id'].'.png';
             if (is_file($arq) && isset($catIds[$c['id']])) {
-                $caminho = Storage::disk('public')->putFileAs('category/'.$catIds[$c['id']], new \Illuminate\Http\File($arq), 'logo.png');
+                $caminho = Storage::disk('public')->putFileAs('categories/'.$catIds[$c['id']], new \Illuminate\Http\File($arq), 'logo.png');
                 DB::table('categories')->where('id', $catIds[$c['id']])->update(['logo_path' => $caminho]);
             }
         }
