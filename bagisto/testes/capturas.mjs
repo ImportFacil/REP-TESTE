@@ -218,7 +218,12 @@ try {
   }
 } catch (e) { checar('importacao-painel', false, e.message.split('\n')[0]); }
 await visitar(page, '30-admin-calculadora', '/admin/importacao/calculadora', { espera: 'R$ 3.978.913,88', cheia: true });
-if (ordemEnc) await visitar(page, '31-admin-calculadora-da-ordem', `/admin/importacao/calculadora?ordem=${ordemEnc.id}`, { espera: 'Alicates' });
+if (ordemEnc) {
+  // a descrição do item fica num campo de texto (não aparece no texto da página): confere o valor do campo
+  await visitar(page, '31-admin-calculadora-da-ordem', `/admin/importacao/calculadora?ordem=${ordemEnc.id}`, { espera: ordemEnc.numero });
+  const descs = await page.locator('input[name$="[desc]"]').evaluateAll(els => els.map(e => e.value)).catch(() => []);
+  checar('calculadora-com-itens-da-ordem', descs.some(d => /Alicate de Cerca/i.test(d)), `itens: ${descs.join('; ') || 'nenhum'}`);
+}
 await visitar(page, '32-admin-tabela-ncm', '/admin/importacao/ncm?q=' + encodeURIComponent('veículos aéreos'), { espera: '8806' });
 try {
   const r = await page.request.get(base + '/admin/importacao/ncm/buscar?q=8806', { headers: { Accept: 'application/json' } });
