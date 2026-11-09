@@ -1,0 +1,39 @@
+# Demo ImportFácil (Bagisto + B2B Suite). Na pasta demo-bagisto:  docker compose up --build
+# Loja: http://localhost:8000   Painel: http://localhost:8000/admin
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: bagisto
+      MYSQL_USER: bagisto
+      MYSQL_PASSWORD: bagisto
+      MYSQL_ROOT_PASSWORD: bagisto-raiz
+    command: ["--max_allowed_packet=64M", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - dados:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ubagisto", "-pbagisto"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  app:
+    build: .
+    image: importfacil-bagisto-demo
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_DATABASE: bagisto
+      DB_USERNAME: bagisto
+      DB_PASSWORD: bagisto
+      APP_URL: ${APP_URL:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - arquivos:/var/www/bagisto/storage/app/public
+
+volumes:
+  dados:
+  arquivos:

@@ -1,0 +1,15 @@
+{
+  "name": "Demo Bagisto + B2B Suite (ImportFácil)",
+  "dockerComposeFile": ["../../demo-bagisto/docker-compose.yml", "docker-compose.codespaces.yml"],
+  "service": "app",
+  "runServices": ["db", "app"],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
+  "overrideCommand": true,
+  "postStartCommand": "nohup bash /opt/demo/iniciar.sh > /tmp/demo-bagisto.log 2>&1 &",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "Loja ImportFácil (Bagisto)", "onAutoForward": "openBrowser" }
+  },
+  "hostRequirements": { "cpus": 4, "memory": "8gb" }
+}
