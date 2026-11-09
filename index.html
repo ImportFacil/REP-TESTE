@@ -676,7 +676,10 @@
   /* Painel da equipe · Catálogo (CRUD de produtos do Flowbite Admin, adaptado) */
   .cat-wg{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:16px;min-width:0}
   @media (min-width:640px){ .cat-wg{padding:20px} }
-  .cat-hd{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:12px}
+  .cat-hd{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin-bottom:12px}
+  .cat-hd .muted{display:block;margin-top:2px}
+  .cat-drw .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+  .cat-drw textarea{resize:vertical}
   .cat-hd h3{margin:0;font-size:1.15rem;font-weight:700;color:var(--foreground)}
   .cat-hd .muted{font-size:.8rem}
   .cat-tb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
@@ -1316,6 +1319,7 @@ const PATHS = {
   'triangle-alert':'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
   'chevron-right':'<path d="m9 18 6-6-6-6"/>',
   'chevron-left':'<path d="m15 18-6-6 6-6"/>',
+  'plus':'<path d="M12 5v14M5 12h14"/>',
   'badge-check':'<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/>',
   more:'<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
   star:'<polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/>',
@@ -1668,7 +1672,7 @@ const catsPerfil  = () => {                       // 'Monitoramento e Segurança
   const l=CATEGORIAS.filter(catVisivel);
   return perfilKey()==='cooperativa' ? l : [...l.filter(c=>c.id!=='seguranca'), ...l.filter(c=>c.id==='seguranca')];
 };
-const prodVisivel = p => catVisivel(catOf(p.cat));
+const prodVisivel = p => !p.excluido && catVisivel(catOf(p.cat));   // excluído pela equipe: some da loja (pedidos antigos continuam)
 const prodsPerfil = () => PRODUTOS.filter(prodVisivel);
 const impPerfil   = () => prodsPerfil().filter(p=>p.imp);
 /* Prazo para recebimento: toda mercadoria tem a opção de 45 dias (importação programada) */
@@ -1811,7 +1815,7 @@ function rCategorias(){
     <div class="section-title" style="margin-top:0">Todas as categorias</div>
     <div class="grid3">
       ${catsPerfil().map(c=>{
-        const n=PRODUTOS.filter(p=>p.cat===c.id).length;
+        const n=PRODUTOS.filter(p=>p.cat===c.id&&!p.excluido).length;
         return `<div class="catcell" onclick="abrirCat('${c.id}')">${I(c.ic)}<span>${c.nome}</span><span class="muted" style="font-size:.57rem">${n} itens</span></div>`;
       }).join('')}
     </div>`;
@@ -1824,7 +1828,7 @@ function pagMais(l){ pagN+=PAG; (l==='busca'?rBusca:rCategoria)(); }
 function pagRodape(total,l){ return total>pagN?`<div style="text-align:center;margin:14px 0"><div class="muted" style="margin-bottom:6px">Mostrando ${pagN} de ${total}</div><button class="btn outline" onclick="pagMais('${l}')">Mostrar mais ${Math.min(PAG,total-pagN)} itens</button></div>`:''; }
 function rCategoria(){
   const c=catOf(catAtual);
-  const base=PRODUTOS.filter(p=>p.cat===catAtual);
+  const base=PRODUTOS.filter(p=>p.cat===catAtual&&!p.excluido);
   let list=base;
   const subs=[...new Set(base.filter(p=>p.sub).map(p=>p.sub))];
   if(subSel!=='Todas') list=list.filter(p=>p.sub===subSel);
@@ -2085,6 +2089,7 @@ function pedidoRapido(){
     const p=mapa[normCod(m[0])]; let q=parseInt((m[1]||'').replace(/\D/g,''),10);
     if(!p){ falhas.push(oesc(m[0]||l)+': código não encontrado'); return; }
     if(p.orc){ falhas.push(oesc(p.cod)+': produto sob orçamento'); return; }
+    if(!(p.estoque>0)){ falhas.push(oesc(p.cod)+': sem estoque'); return; }
     if(!(q>0)) q=p.mult;
     q=Math.min(p.estoque,Math.max(p.mult,Math.ceil(q/p.mult)*p.mult));
     const it=carrinho.find(x=>x.pid===p.id);
@@ -2509,7 +2514,7 @@ function flPainel(base){
   </div>`;
 }
 function sheetFiltros(){
-  const base=PRODUTOS.filter(p=>p.cat===catAtual);
+  const base=PRODUTOS.filter(p=>p.cat===catAtual&&!p.excluido);
   openSheet(`<h2>Filtros</h2>${flPainel(base)}<button class="btn default block" style="margin-top:10px" onclick="closeSheet()">Ver resultados</button>`);
 }
 
@@ -4112,7 +4117,7 @@ function eqCarteira(){
   if(eqCarteira._c) return eqCarteira._c;
   let x=20261109; const rnd=()=>{ x|=0; x=x+0x6D2B79F5|0; let t=Math.imul(x^x>>>15,1|x); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
   const pick=a=>a[Math.floor(rnd()*a.length)];
-  const prodsDe=k=>PRODUTOS.filter(p=>{ const c=catOf(p.cat); return (!c.perfis||c.perfis.includes(k)) && !p.orc && p.estoque; });
+  const prodsDe=k=>PRODUTOS.filter(p=>{ const c=catOf(p.cat); return (!c.perfis||c.perfis.includes(k)) && !p.orc && p.estoque && !p.excluido; });
   const peds=[], tx=[];
   for(let d=179; d>=0; d--){
     const dia=addD(D0,-d), util=dia.getDay()!==0&&dia.getDay()!==6;
@@ -4323,6 +4328,8 @@ function catLista(){
   return PRODUTOS.filter(p=>{
     if(catCat && p.cat!==catCat) return false;
     if(catPerf){ const c=catOf(p.cat); if(c.perfis && !c.perfis.includes(catPerf)) return false; }
+    if(catFil==='excl') { if(!p.excluido) return false; } else if(p.excluido) return false;
+    if(catFil==='novo' && !p.novo) return false;
     if(catFil==='dest' && !p.dest) return false;
     if(catFil==='sem' && p.estoque>0) return false;
     if(catFil==='baixo' && !(p.estoque>0 && p.estoque<p.mult*3)) return false;
@@ -4337,20 +4344,23 @@ function eqCatalogo(){
   const l=catLista(), tot=l.length, pgs=Math.max(1,Math.ceil(tot/CAT_POR_PG)); if(catPg>=pgs) catPg=pgs-1;
   const pg=l.slice(catPg*CAT_POR_PG,(catPg+1)*CAT_POR_PG);
   const cats=CATEGORIAS.filter(c=>PRODUTOS.some(p=>p.cat===c.id));
-  const nAlt=PRODUTOS.filter(catAlterado).length, nDest=PRODUTOS.filter(p=>p.dest).length, nSem=PRODUTOS.filter(p=>!(p.estoque>0)).length;
+  const ativos=PRODUTOS.filter(p=>!p.excluido), nAlt=ativos.filter(catAlterado).length, nDest=ativos.filter(p=>p.dest).length, nSem=ativos.filter(p=>!(p.estoque>0)).length,
+        nNovo=ativos.filter(p=>p.novo).length, nExcl=PRODUTOS.length-ativos.length;
   const todosPg=pg.length && pg.every(p=>catSel.has(p.id));
   return `<div class="cat-wg">
-    <div class="cat-hd"><h3>Todos os produtos</h3><span class="muted">${PRODUTOS.length} produtos · ${nDest} em destaque · ${nSem} sem estoque${nAlt?' · '+nAlt+' alterado(s)':''}</span></div>
+    <div class="cat-hd"><div><h3>Todos os produtos</h3><span class="muted">${ativos.length} produtos · ${nDest} em destaque · ${nSem} sem estoque${nAlt?' · '+nAlt+' alterado(s)':''}${nNovo?' · '+nNovo+' criado(s)':''}${nExcl?' · '+nExcl+' excluído(s)':''}</span></div>
+      <button type="button" class="btn default" onclick="catNovo()">${I('plus')} Novo produto</button></div>
     <div class="cat-tb" role="search">
       <div class="bs">${I('search')}<input id="catBusca" type="search" placeholder="Buscar por nome, marca, código ou categoria" value="${oesc(catQ)}" aria-label="Buscar produtos" oninput="catQ=this.value;catPg=0;catRender(true)"></div>
       <select aria-label="Categoria" onchange="catCat=this.value;catPg=0;rEquipe()"><option value="">Todas as categorias</option>${cats.map(c=>`<option value="${c.id}" ${catCat===c.id?'selected':''}>${oesc(c.nome)}</option>`).join('')}</select>
       <select aria-label="Tipo de cliente" onchange="catPerf=this.value;catPg=0;rEquipe()"><option value="">Todos os tipos de cliente</option>${Object.entries(PERFIS).map(([k,v])=>`<option value="${k}" ${catPerf===k?'selected':''}>${v.nome}</option>`).join('')}</select>
-      <select aria-label="Situação" onchange="catFil=this.value;catPg=0;rEquipe()">${[['','Todas as situações'],['dest','Em destaque'],['sem','Sem estoque'],['baixo','Estoque baixo'],['orc','Sob orçamento'],['alt','Alterados pela equipe']].map(([v,t])=>`<option value="${v}" ${catFil===v?'selected':''}>${t}</option>`).join('')}</select>
+      <select aria-label="Situação" onchange="catFil=this.value;catPg=0;rEquipe()">${[['','Todas as situações'],['dest','Em destaque'],['sem','Sem estoque'],['baixo','Estoque baixo'],['orc','Sob orçamento'],['alt','Alterados pela equipe'],['novo','Criados pela equipe'],['excl','Excluídos']].map(([v,t])=>`<option value="${v}" ${catFil===v?'selected':''}>${t}</option>`).join('')}</select>
     </div>
     ${catSel.size?`<div class="cat-sel"><b>${catSel.size} selecionado(s)</b>
       <button type="button" class="btn outline sm" onclick="catLote('dest',true)">Destacar</button>
       <button type="button" class="btn outline sm" onclick="catLote('dest',false)">Tirar destaque</button>
-      <button type="button" class="btn outline sm" onclick="catLote('orig')">Restaurar original</button>
+      ${catFil==='excl'?`<button type="button" class="btn outline sm" onclick="catLote('volta')">Restaurar na loja</button>`:`<button type="button" class="btn outline sm" onclick="catLote('orig')">Restaurar original</button>
+      <button type="button" class="btn outline sm" style="color:var(--critical)" onclick="catExcluirPedir([...catSel])">Excluir</button>`}
       <button type="button" class="btn ghost sm" onclick="catSel.clear();rEquipe()">Limpar seleção</button></div>`:''}
     <div id="catTabela">${catTabela(pg,todosPg)}</div>
     <div class="cat-pg" id="catPag">${catPaginacao(tot,pgs)}</div>
@@ -4369,7 +4379,8 @@ function catTabela(pg,todosPg){
       <td class="n" data-l="Preço de tabela">${BRL(p.tabela)}<span class="muted" style="font-weight:400">por ${oesc(p.un)}${p.mult>1?' · múlt. '+p.mult:''}</span></td>
       <td class="n" data-l="Estoque">${p.estoque>0?p.estoque.toLocaleString('pt-BR'):'<span class="chip cancel">! Sem estoque</span>'}${p.estoque>0&&p.estoque<p.mult*3?'<span class="chip pend" style="margin-left:6px">Baixo</span>':''}</td>
       <td data-l="Destaque"><button type="button" role="switch" class="ui-switch" aria-checked="${!!p.dest}" data-state="${p.dest?'checked':'unchecked'}" aria-label="Destaque: ${oesc(p.nome)}" onclick="uiSwitch(this,v=>catDest(${p.id},v))"><span class="ui-switch-thumb"></span></button></td>
-      <td><button type="button" class="ed" onclick="catAbrir(${p.id})">${I('file')} Editar</button>${catAlterado(p)?' <span class="chip blue" title="Alterado pela equipe">Alterado</span>':''}</td>
+      <td>${p.excluido?`<button type="button" class="ed" onclick="catVolta([${p.id}])">${I('check')} Restaurar</button> <span class="chip cancel">Excluído</span>`
+        :`<button type="button" class="ed" onclick="catAbrir(${p.id})">${I('file')} Editar</button>${p.novo?' <span class="chip ok" title="Criado pela equipe">Novo</span>':catAlterado(p)?' <span class="chip blue" title="Alterado pela equipe">Alterado</span>':''}`}</td>
     </tr>`).join('')||'<tr><td colspan="8" class="muted" style="padding:20px 12px">Nenhum produto encontrado com esses filtros.</td></tr>'}
     </tbody></table></div>`;
 }
@@ -4392,9 +4403,10 @@ function catSelPg(on){ const l=catLista().slice(catPg*CAT_POR_PG,(catPg+1)*CAT_P
 function catDest(id,on){ const p=prodOf(id); p.dest=on?1:0; salvarEstado(); toast((on?'Em destaque: ':'Fora dos destaques: ')+p.nome); rEquipe(); }
 function catLote(acao,v){
   const ps=[...catSel].map(prodOf).filter(Boolean);
-  ps.forEach(p=>{ if(acao==='dest') p.dest=v?1:0; else { const a=CAT_ORIG[p.id]; p.tabela=a.tabela; p.estoque=a.estoque; p.dest=a.dest?1:0; } });
+  if(acao==='volta'){ catVolta(ps.map(p=>p.id)); return; }
+  ps.forEach(p=>{ if(acao==='dest') p.dest=v?1:0; else { const a=CAT_ORIG[p.id]; if(a){ p.tabela=a.tabela; p.estoque=a.estoque; p.dest=a.dest?1:0; } } });
   catSel.clear(); salvarEstado(); rEquipe();
-  toast(acao==='dest'?(v?ps.length+' produto(s) em destaque':ps.length+' produto(s) fora dos destaques'):ps.length+' produto(s) voltaram aos valores originais');
+  toast(acao==='dest'?(v?ps.length+' produto(s) em destaque':ps.length+' produto(s) fora dos destaques'):ps.filter(p=>CAT_ORIG[p.id]).length+' produto(s) voltaram aos valores originais');
 }
 function catDrawer(){
   let d=document.getElementById('catDrw'); if(d) return d;
@@ -4403,28 +4415,26 @@ function catDrawer(){
   return document.getElementById('catDrw');
 }
 function catAbrir(id){
-  const p=prodOf(id); if(!p) return; catEd=id; const d=catDrawer(), a=CAT_ORIG[id];
+  const p=prodOf(id); if(!p) return; catEd=id; const d=catDrawer(), a=CAT_ORIG[id]||{tabela:p.tabela,estoque:p.estoque};
   d.innerHTML=`<div class="hd"><h3 id="catDrwT">Editar produto</h3><button type="button" aria-label="Fechar" onclick="catFechar()">${I('x')}</button></div>
     <form class="bd" id="catForm" onsubmit="catSalvar();return false">
       <div class="pv"><span class="ft">${arte(p,56)}</span><div><b>${oesc(p.nome)}</b><span>${oesc(p.cod||'')} · ${oesc(p.marca||'')} · ${oesc(catOf(p.cat).nome)}</span><span>Vendido por ${oesc(p.un)}${p.mult>1?', de '+p.mult+' em '+p.mult:''}${p.orc?' · sob orçamento':''}</span></div></div>
       <label for="catPreco">Preço de tabela (R$ por ${oesc(p.un)})</label>
       <input id="catPreco" type="number" inputmode="decimal" min="0.01" step="0.01" required value="${p.tabela}" oninput="catPrevia()">
-      <div class="hint">Original: ${BRL(a.tabela)}</div>
+      <div class="hint">${p.novo?'Produto criado pela equipe.':'Original: '+BRL(a.tabela)}</div>
       <label for="catEst">Estoque (${oesc(p.un)})</label>
       <input id="catEst" type="number" inputmode="numeric" min="0" step="1" required value="${p.estoque}">
-      <div class="hint">Original: ${a.estoque.toLocaleString('pt-BR')} ${oesc(p.un)}. Com zero, o produto fica indisponível na loja.${p.mult>1?' Vendido em múltiplos de '+p.mult+'.':''}</div>
+      <div class="hint">${p.novo?'':'Original: '+a.estoque.toLocaleString('pt-BR')+' '+oesc(p.un)+'. '}Com zero, o produto fica indisponível na loja.${p.mult>1?' Vendido em múltiplos de '+p.mult+'.':''}</div>
       <div style="margin-top:14px">${switchHTML('catDestSw','Mostrar na vitrine de destaques',!!p.dest,'v=>{}')}</div>
       <div class="tp" id="catPrev"></div>
     </form>
     <div class="ft2">
-      <button type="button" class="btn outline" onclick="catRestaurar()" ${catAlterado(p)?'':'disabled'}>Restaurar original</button>
+      <button type="button" class="btn outline" style="color:var(--critical);flex:0 0 auto" onclick="catExcluirPedir([${p.id}])">${I('trash')} Excluir</button>
+      ${p.novo?'':`<button type="button" class="btn outline" onclick="catRestaurar()" ${catAlterado(p)?'':'disabled'}>Restaurar original</button>`}
       <button type="submit" form="catForm" class="btn default">Salvar</button>
     </div>`;
   catPrevia();
-  const sb=document.getElementById('statusbar'), t=sb&&sb.offsetParent!==null?sb.offsetHeight:0;   // abaixo da barra de status do celular
-  d.style.top=t+'px'; document.getElementById('catScrim').style.top=t+'px';
-  d.classList.add('open'); d.setAttribute('aria-hidden','false'); document.getElementById('catScrim').classList.add('open');
-  setTimeout(()=>{ const i=document.getElementById('catPreco'); if(i) i.focus({preventScroll:true}); },60);
+  catMostrar('catPreco');
 }
 function catPrevia(){
   const p=prodOf(catEd), v=+document.getElementById('catPreco').value||0, c=catOf(p.cat);
@@ -4447,10 +4457,102 @@ function catRestaurar(){
   const p=prodOf(catEd), a=CAT_ORIG[catEd]; if(!p) return;
   p.tabela=a.tabela; p.estoque=a.estoque; p.dest=a.dest?1:0; salvarEstado(); catFechar(); rEquipe(); toast('Valores originais restaurados: '+p.nome);
 }
+function catMostrar(focoId){
+  const d=catDrawer(), sb=document.getElementById('statusbar'), t=sb&&sb.offsetParent!==null?sb.offsetHeight:0;   // abaixo da barra de status do celular
+  d.style.top=t+'px'; document.getElementById('catScrim').style.top=t+'px';
+  d.classList.add('open'); d.setAttribute('aria-hidden','false'); document.getElementById('catScrim').classList.add('open');
+  setTimeout(()=>{ const i=document.getElementById(focoId); if(i) i.focus({preventScroll:true}); },60);
+}
+/* Novo produto (drawer "Add new product" do Flowbite) */
+const CAT_UNS = ['un','cx','pct','kit','par','jogo','rolo','barra','galão','sc 50 kg','saco','fardo','balde','lata','conj'];
+function catNovo(){
+  catEd=null; const d=catDrawer();
+  const cats=CATEGORIAS.map(c=>`<option value="${c.id}">${oesc(c.nome)} · ${c.perfis?c.perfis.map(k=>PERFIS[k]?PERFIS[k].nome:k).join(', '):'todos os tipos'}</option>`).join('');
+  d.innerHTML=`<div class="hd"><h3 id="catDrwT">Novo produto</h3><button type="button" aria-label="Fechar" onclick="catFechar()">${I('x')}</button></div>
+    <form class="bd" id="catNovoForm" onsubmit="catCriar();return false" novalidate>
+      <label for="cnNome">Nome do produto *</label><input id="cnNome" required maxlength="120" placeholder="Ex.: Bomba submersa 1 cv 220 V">
+      <div class="grid2"><div><label for="cnMarca">Marca *</label><input id="cnMarca" required maxlength="40"></div>
+        <div><label for="cnCod">Código *</label><input id="cnCod" required maxlength="20" placeholder="Ex.: IR-BS01" style="text-transform:uppercase"></div></div>
+      <label for="cnCat">Categoria *</label><select id="cnCat" onchange="catNovoSubs()">${cats}</select>
+      <div class="hint">A categoria define quais tipos de cliente veem o produto.</div>
+      <label for="cnSub">Subcategoria</label><input id="cnSub" list="cnSubs" maxlength="40" placeholder="Opcional"><datalist id="cnSubs"></datalist>
+      <div class="grid2"><div><label for="cnUn">Unidade de venda *</label><select id="cnUn">${CAT_UNS.map(u=>`<option>${u}</option>`).join('')}</select></div>
+        <div><label for="cnMult">Múltiplo de venda *</label><input id="cnMult" type="number" inputmode="numeric" min="1" step="1" value="1" required></div></div>
+      <div class="grid2"><div><label for="cnPreco">Preço de tabela (R$) *</label><input id="cnPreco" type="number" inputmode="decimal" min="0.01" step="0.01" required oninput="catNovoPrevia()"></div>
+        <div><label for="cnEst">Estoque *</label><input id="cnEst" type="number" inputmode="numeric" min="0" step="1" value="0" required></div></div>
+      <label for="cnSpecs">Especificações</label><textarea id="cnSpecs" rows="4" placeholder="Uma por linha, no formato Nome: valor&#10;Potência: 1 cv&#10;Tensão: 220 V"></textarea>
+      <div style="margin-top:14px">${switchHTML('cnOrc','Vender sob orçamento (sem compra direta)',false,'v=>{}')}</div>
+      <div style="margin-top:8px">${switchHTML('cnDest','Mostrar na vitrine de destaques',false,'v=>{}')}</div>
+      <div class="tp" id="cnPrev"></div>
+    </form>
+    <div class="ft2"><button type="button" class="btn outline" onclick="catFechar()">Cancelar</button><button type="submit" form="catNovoForm" class="btn default">Criar produto</button></div>`;
+  catNovoSubs(); catNovoPrevia(); catMostrar('cnNome');
+}
+function catNovoSubs(){
+  const c=document.getElementById('cnCat').value;
+  document.getElementById('cnSubs').innerHTML=[...new Set(PRODUTOS.filter(p=>p.cat===c&&p.sub).map(p=>p.sub))].map(x=>`<option value="${oesc(x)}">`).join('');
+  catNovoPrevia();
+}
+function catNovoPrevia(){
+  const el=document.getElementById('cnPrev'); if(!el) return;
+  const v=+document.getElementById('cnPreco').value||0, c=catOf(document.getElementById('cnCat').value);
+  const tipos=Object.entries(PERFIS).filter(([k])=>!c.perfis||c.perfis.includes(k));
+  el.innerHTML=`<div><span>Preço na loja por tipo de cliente</span><span>Desconto</span></div>`+
+    tipos.map(([k,t])=>`<div><span>${t.nome}</span><b>${v?BRL(v*(1-t.desc)):'—'} <span class="muted" style="font-weight:400">−${Math.round(t.desc*100)}%</span></b></div>`).join('');
+}
+function catCriar(){
+  const g=id=>document.getElementById(id), val=id=>(g(id).value||'').trim();
+  const erro=(id,m)=>{ toast(m); g(id).classList.add('err'); g(id).focus(); g(id).addEventListener('input',()=>g(id).classList.remove('err'),{once:true}); };
+  const nome=val('cnNome'), marca=val('cnMarca'), cod=val('cnCod').toUpperCase(), cat=g('cnCat').value, sub=val('cnSub');
+  const mult=+g('cnMult').value, preco=Math.round((+g('cnPreco').value||0)*100)/100, est=+g('cnEst').value;
+  if(nome.length<3) return erro('cnNome','Informe o nome do produto');
+  if(!marca) return erro('cnMarca','Informe a marca');
+  if(!cod) return erro('cnCod','Informe o código');
+  if(PRODUTOS.some(p=>normCod(p.cod)===normCod(cod))) return erro('cnCod','Já existe um produto com o código '+cod);
+  if(!(mult>=1)||!Number.isInteger(mult)) return erro('cnMult','O múltiplo de venda é um número inteiro (1 ou mais)');
+  if(!(preco>0)) return erro('cnPreco','Informe um preço maior que zero');
+  if(!(est>=0)||!Number.isInteger(est)) return erro('cnEst','Informe o estoque em unidades inteiras (zero ou mais)');
+  const specs=val('cnSpecs').split(/\n/).map(l=>l.split(':')).filter(x=>x.length>1&&x[0].trim()&&x.slice(1).join(':').trim()).map(x=>[x[0].trim(),x.slice(1).join(':').trim()]).slice(0,12);
+  const un=g('cnUn').value, sp=specs.slice(0,3).map(x=>x[0]+': '+x[1]).join(' · ');
+  const p={id:Math.max(90000,...PRODUTOS.map(x=>x.id))+1, cat, nome, marca, cod, un, mult, tabela:preco, estoque:est,
+    orc:g('cnOrc').getAttribute('aria-checked')==='true', dest:g('cnDest').getAttribute('aria-checked')==='true'?1:0, specs, novo:true, criadoEm:fmtD(new Date())};
+  if(sub) p.sub=sub;
+  p.desc=(sub?sub+' — ':'')+nome+'. Marca '+marca+(sp?'. '+sp:'')+'. Venda por '+un+(mult>1?' (múltiplo de '+mult+')':'')+'.';
+  PRODUTOS.push(p); salvarEstado();
+  catFechar(); catQ=''; catCat=''; catPerf=''; catFil='novo'; catPg=0; rEquipe();
+  toast('Produto criado: '+nome+' · já aparece na loja para '+catPublico(p).toLowerCase());
+}
+/* Excluir (modal "Delete item" do Flowbite) e restaurar */
+function catExcluirPedir(ids){
+  const ps=ids.map(prodOf).filter(p=>p&&!p.excluido); if(!ps.length) return;
+  catFechar();
+  const usados=ps.filter(p=>pedidos.some(o=>o.itens.some(i=>i.pid===p.id))||orcamentos.some(o=>o.pid===p.id)).length;
+  const noCarr=ps.filter(p=>carrinho.some(i=>i.pid===p.id)).length;
+  openSheet(`<h2>Excluir ${ps.length===1?'este produto':ps.length+' produtos'}?</h2>
+    <div class="muted" style="margin-bottom:10px">${ps.length===1?'<b>'+oesc(ps[0].nome)+'</b> sai':'Os produtos saem'} da loja, das buscas e do pedido rápido na hora.</div>
+    <ul class="muted" style="margin:0 0 12px;padding-left:18px;font-size:.8rem;line-height:1.6">
+      ${usados?`<li>${ps.length===1?'Ele já aparece':usados===1?'1 deles já aparece':usados+' deles já aparecem'} em pedidos ou orçamentos, que continuam como estão.</li>`:''}
+      ${noCarr?`<li>${ps.length===1?'Ele está no carrinho e será retirado.':noCarr===1?'1 deles está no carrinho e será retirado.':noCarr+' deles estão no carrinho e serão retirados.'}</li>`:''}
+      <li>Dá para desfazer: no filtro <b>Excluídos</b>, toque em Restaurar.</li></ul>
+    <div style="display:flex;gap:8px"><button class="btn outline" style="flex:1" onclick="closeSheet()">Cancelar</button>
+      <button class="btn default" style="flex:1;background:var(--destructive);color:#fff" onclick="closeSheet();catExcluir([${ps.map(p=>p.id).join(',')}])">Sim, excluir</button></div>`);
+}
+function catExcluir(ids){
+  const ps=ids.map(prodOf).filter(Boolean);
+  ps.forEach(p=>{ p.excluido=true; catSel.delete(p.id); });
+  const set=new Set(ids);
+  carrinho=carrinho.filter(i=>!set.has(i.pid)); favoritos=favoritos.filter(id=>!set.has(id)); recentes=recentes.filter(id=>!set.has(id));
+  badges(); salvarEstado(); rEquipe();
+  toast(ps.length===1?'Produto excluído: '+ps[0].nome:ps.length+' produtos excluídos');
+}
+function catVolta(ids){
+  const ps=ids.map(prodOf).filter(Boolean); ps.forEach(p=>{ delete p.excluido; catSel.delete(p.id); });
+  salvarEstado(); rEquipe(); toast(ps.length===1?'Produto de volta à loja: '+ps[0].nome:ps.length+' produtos de volta à loja');
+}
 function catFechar(){
   const d=document.getElementById('catDrw'); if(!d||!d.classList.contains('open')) return;
   d.classList.remove('open'); d.setAttribute('aria-hidden','true'); document.getElementById('catScrim').classList.remove('open');
-  const b=document.querySelector(`.cat-tbl .ed[onclick="catAbrir(${catEd})"]`); if(b) b.focus({preventScroll:true});
+  const b=catEd!=null&&document.querySelector(`.cat-tbl .ed[onclick="catAbrir(${catEd})"]`); if(b) b.focus({preventScroll:true});
 }
 document.addEventListener('keydown',e=>{ const d=document.getElementById('catDrw'); if(e.key==='Escape' && d && d.classList.contains('open')){ e.preventDefault(); catFechar(); } });
 
@@ -5909,7 +6011,7 @@ function lsGet(){ try{ return localStorage.getItem(LS_KEY); }catch(e){ return nu
 function lsSet(v){ try{ localStorage.setItem(LS_KEY,v); return true; }catch(e){ return false; } }
 function lsDel(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
 function estadoJSON(){
-  return JSON.stringify({v:1,cfg,carrinho,qtdSel,recebSel,recentes,favoritos,pedidos,orcamentos,ordens,contatos,cad,cadStatus,cadStep,parcelas,orc,politica,prodEd:catEdicoes(),
+  return JSON.stringify({v:1,cfg,carrinho,qtdSel,recebSel,recentes,favoritos,pedidos,orcamentos,ordens,contatos,cad,cadStatus,cadStep,parcelas,orc,politica,prodEd:catEdicoes(),prodNovos:PRODUTOS.filter(p=>p.novo),prodExcl:PRODUTOS.filter(p=>p.excluido&&!p.novo).map(p=>p.id),
     ui:{perfilDemo:!!cfg.perfil}}, function(k,v){ return (this[k] instanceof Date)?{$d:this[k].toISOString()}:v; });
 }
 let _ultimoSalvo='';
@@ -5929,6 +6031,8 @@ function restaurarEstado(){
     favoritos=d.favoritos||[]; pedidos=d.pedidos||[]; orcamentos=d.orcamentos||[]; ordens=d.ordens||[];
     contatos=d.contatos||[]; cad=d.cad||{tipo:'',docs:{}}; cadStatus=d.cadStatus||null; cadStep=d.cadStep||1;
     parcelas=d.parcelas||[]; orc=d.orc||null;
+    (d.prodNovos||[]).forEach(n=>{ if(n&&n.id&&!prodOf(n.id)) PRODUTOS.push(n); });
+    (d.prodExcl||[]).forEach(id=>{ const p=prodOf(id); if(p) p.excluido=true; });
     if(d.prodEd) catAplicar(d.prodEd);
     if(d.politica){ const pv=d.politica; if((pv.ver||1)<2){ delete pv.cartaoSemJurosAte; pv.ver=2; } Object.assign(politica,pv); }
     if(cfg.perfil && !PERFIS[cfg.perfil]) cfg.perfil=null;
