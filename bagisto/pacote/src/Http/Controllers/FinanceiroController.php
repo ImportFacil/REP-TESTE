@@ -15,10 +15,11 @@ class FinanceiroController extends Controller
         $empresa = Regras::empresaId($cliente);
 
         $parcelas = DB::table('importfacil_parcelas as p')
-            ->join('orders as o', 'o.id', '=', 'p.order_id')
+            ->leftJoin('orders as o', 'o.id', '=', 'p.order_id')
+            ->leftJoin('importfacil_ordens_importacao as oi', 'oi.id', '=', 'p.ordem_importacao_id')
             ->when($empresa, fn ($q) => $q->where('p.company_id', $empresa), fn ($q) => $q->where('p.customer_id', $cliente->id))
             ->orderBy('p.vencimento')
-            ->get(['p.*', 'o.increment_id']);
+            ->get(['p.*', 'o.increment_id', 'oi.numero as ordem_importacao', 'oi.id as ordem_importacao_id']);
 
         $hoje = now()->toDateString();
         foreach ($parcelas as $p) {

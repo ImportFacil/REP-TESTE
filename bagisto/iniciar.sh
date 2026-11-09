@@ -75,6 +75,9 @@ fi
 
 b2b_ligar
 php artisan migrate --force >/dev/null   # tabelas novas do pacote ImportFácil em bancos já instalados
+if [ "$(consulta "select count(*) from importfacil_ncm")" = "0" ]; then
+  php artisan importfacil:ncm /opt/demo/ncm.json
+fi
 php artisan storage:link >/dev/null 2>&1 || true
 php artisan optimize:clear >/dev/null
 

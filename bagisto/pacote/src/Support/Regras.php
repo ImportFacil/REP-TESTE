@@ -19,6 +19,13 @@ class Regras
 
     const PRAZOS = [30, 60, 90, 120];
 
+    /** Importação: prazo de recebimento e valores da conta e ordem (% da mercadoria), como na política do protótipo. */
+    const PRAZO_IMPORTACAO = 45;
+
+    const CO_TRIB_PCT = 40;
+
+    const CO_SERV_PCT = 3;
+
     protected static array $multiplos = [];
 
     /** Tipo de cliente (cooperativa, distribuidora…) do grupo de clientes, ou null. */
@@ -61,6 +68,35 @@ class Regras
     public static function empresa(?int $empresaId): ?object
     {
         return $empresaId ? DB::table('importfacil_empresas')->where('company_id', $empresaId)->first() : null;
+    }
+
+    /** Razão social da empresa (perfil da B2B Suite) ou o nome da conta. */
+    public static function nomeEmpresa(?int $empresaId): string
+    {
+        if (! $empresaId) {
+            return '—';
+        }
+        $nome = DB::table('b2b_company_flat')->where('customer_id', $empresaId)->value('business_name');
+        if (! $nome) {
+            $c = DB::table('customers')->where('id', $empresaId)->first(['first_name', 'last_name']);
+            $nome = $c ? trim($c->first_name.' '.$c->last_name) : '—';
+        }
+
+        return trim(str_replace('(demonstração)', '', $nome));
+    }
+
+    /** Crédito disponível da empresa na B2B Suite (limite − saldo devedor), ou null sem linha de crédito. */
+    public static function creditoDisponivel(?int $empresaId): ?float
+    {
+        $c = $empresaId ? DB::table('b2b_company_credits')->where('company_id', $empresaId)->where('status', 1)->first() : null;
+
+        return $c ? (float) $c->credit_limit - (float) $c->outstanding_balance : null;
+    }
+
+    /** A empresa pode importar por conta e ordem (decisão da equipe; no protótipo, clientes faixa A). */
+    public static function contaEOrdem(?int $empresaId): bool
+    {
+        return (bool) (self::empresa($empresaId)->conta_e_ordem ?? false);
     }
 
     public static function maxBoletos(?int $empresaId): int

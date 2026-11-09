@@ -36,8 +36,8 @@
                 <tbody>
                     @forelse ($parcelas as $p)
                         <tr class="border-t border-zinc-200">
-                            <td class="px-4 py-3">#{{ $p->increment_id }}</td>
-                            <td class="px-4 py-3">{{ $p->numero }}/{{ $p->de }}</td>
+                            <td class="px-4 py-3">@if ($p->ordem_importacao)<a href="{{ route('importfacil.importacao.ver', $p->ordem_importacao_id) }}" style="color:#1D4ED8;text-decoration:underline">{{ $p->ordem_importacao }}</a>@else #{{ $p->increment_id }} @endif</td>
+                            <td class="px-4 py-3">{{ $p->rotulo ?: $p->numero.'/'.$p->de }}</td>
                             <td class="px-4 py-3">{{ $p->forma }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') }}</td>
                             <td class="px-4 py-3">{{ core()->formatBasePrice((float) $p->valor) }}</td>

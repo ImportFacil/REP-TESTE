@@ -19,6 +19,10 @@ const prodMult = cat.produtos.find(p => p.multiplo > 1 && p.estoque >= p.multipl
   && !catPerfis[p.categoria]
   && p.precoTabela * p.multiplo * (1 - coop.desconto / 100) < coop.pedidoMinimo / 2);
 const urlMult = '/' + slug(prodMult.nome + '-' + prodMult.codigo);
+// item da linha de importação visível para a cooperativa (encomenda pela página do produto)
+const prodImp = cat.produtos.find(p => p.codigo === 'ITM001') || cat.produtos.find(p => p.importado && !p.sobOrcamento);
+const urlImp = '/' + slug(prodImp.nome + '-' + prodImp.codigo);
+const NCM_ITEM = { [prodMult.codigo]: '8525.89.29', [prodImp.codigo]: '8203.20.10' };
 
 const relatorio = [];
 const erros = [];
@@ -112,8 +116,42 @@ try {
   checar('regra-multiplo', add.ok() && item && Number(item.quantity) === prodMult.multiplo,
     `pediu 1 de ${prodMult.codigo} (múltiplo ${prodMult.multiplo}) → ${add.status()}, carrinho com ${item?.quantity}`);
 } catch (e) { checar('regra-multiplo', false, e.message.split('\n')[0]); }
+const sessaoCoop = { ctx, page };
 await visitar(page, '13d-empresa-carrinho', '/checkout/cart', { espera: 'Pedido mínimo para Cooperativa' });
-await ctx.close();
+checar('importacao-no-carrinho', (await page.locator('body').innerText()).includes('Encomendar pela importação'), 'aviso da linha de importação no carrinho');
+
+// 3b) Importação: a cooperativa (faixa A, conta e ordem liberada) pede duas ordens
+async function enviarOrdem(nome, { modalidade, forma }) {
+  await page.check(`input[name="modalidade"][value="${modalidade}"]`);
+  await page.check(`input[name="forma_pagamento"][value="${forma}"]`);
+  await page.fill('#if-cargo', 'Gerente de compras');
+  await page.fill('#if-obs', 'Teste automático: ' + nome);
+  await page.check('input[name="aceite"]');
+  await Promise.all([page.waitForURL(/\/customer\/account\/importacao\/\d+/, { timeout: 60000 }), page.click('button:has-text("Confirmar e enviar")')]);
+  await page.waitForLoadState('networkidle').catch(() => {});
+  const id = Number(page.url().match(/importacao\/(\d+)/)[1]);
+  const texto = await page.locator('body').innerText();
+  await page.screenshot({ path: `${saida}/${nome}.png`, fullPage: true });
+  return { id, texto, numero: (texto.match(/OI-\d+/) || [''])[0] };
+}
+let ordemCO = null, ordemEnc = null, idProdImp = null;
+try {
+  await visitar(page, '21-cliente-importacao-nova', '/customer/account/importacao/nova', { espera: 'Por conta e ordem', cheia: true });
+  ordemCO = await enviarOrdem('22-cliente-ordem-conta-e-ordem', { modalidade: 'contaordem', forma: 'Pix' });
+  checar('importacao-conta-e-ordem', /Enviada à importação/.test(ordemCO.texto) && /Numerário da mercadoria/.test(ordemCO.texto) && ordemCO.numero,
+    `${ordemCO.numero} criada com o numerário da mercadoria (Pix)`);
+  const carrinho = await (await page.request.get(base + '/api/checkout/cart', { headers: { Accept: 'application/json' } })).json();
+  checar('importacao-esvazia-carrinho', !carrinho.data || !(carrinho.data.items || []).length, 'carrinho vazio depois da ordem');
+
+  await visitar(page, '23-cliente-produto-importacao', urlImp, { espera: 'Encomendar pela importação' });
+  idProdImp = await page.locator('input[name="product_id"]').first().inputValue();
+  await Promise.all([page.waitForURL(/importacao\/nova/), page.click('a:has-text("Encomendar pela importação")')]);
+  await page.waitForLoadState('networkidle').catch(() => {});
+  ordemEnc = await enviarOrdem('24-cliente-ordem-encomenda', { modalidade: 'encomenda', forma: 'Boleto' });
+  checar('importacao-encomenda', /Sob encomenda/.test(ordemEnc.texto) && ordemEnc.texto.includes(prodImp.nome) && ordemEnc.numero,
+    `${ordemEnc.numero} sob encomenda, boleto, ${prodImp.codigo} em múltiplos de ${prodImp.multiplo}`);
+  await visitar(page, '25-cliente-importacao-lista', '/customer/account/importacao', { espera: ordemCO.numero });
+} catch (e) { checar('importacao-cliente', false, e.message.split('\n')[0]); }
 
 // 4) Painel administrativo
 ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'pt-BR' });
@@ -132,6 +170,86 @@ await visitar(page, '17-admin-catalogos', '/admin/b2b/company-catalogs');
 await visitar(page, '18-admin-credito', '/admin/b2b/company-credits');
 await visitar(page, '19-admin-cotacoes', '/admin/b2b/quotes');
 await visitar(page, '20-admin-regra-pix', '/admin/marketing/promotions/cart-rules', { espera: 'Pix' });
+
+// 4b) Setor de Importação: andamento, numerário, NCM, faturamento, calculadora e tabela NCM
+async function botao(texto) {
+  await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle', timeout: 60000 }), page.click(`button:has-text("${texto}")`)]);
+  await page.waitForTimeout(300);
+  return page.locator('body').innerText();
+}
+async function avancarAte(id, etapa, { pix = {} } = {}) {
+  for (let i = 0; i < 6; i++) {
+    await page.goto(`${base}/admin/importacao/ordens/${id}`, { waitUntil: 'networkidle' });
+    const t = await page.locator('body').innerText();
+    if (new RegExp(`Ordem OI-\\d+ ${etapa}`).test(t.replace(/\s+/g, ' '))) return t;
+    if (/Aguardando o numerário/.test(t)) {
+      const etapaPix = /mercadoria para fechar/.test(t) ? 'cambio' : 'tributos';
+      pix[etapaPix] = true;
+      await botao('Confirmar Pix recebido');
+      continue;
+    }
+    await botao('Avançar para');
+  }
+  return page.locator('body').innerText();
+}
+await visitar(page, '26-admin-importacao-ordens', '/admin/importacao/ordens', { espera: 'Ordens de importação' });
+try {
+  if (ordemCO) {
+    await page.goto(`${base}/admin/importacao/ordens/${ordemCO.id}`, { waitUntil: 'networkidle' });
+    await botao('Avançar para');                         // Recebida pelo setor
+    const bloqueada = await page.locator('body').innerText();
+    checar('importacao-trava-numerario', /Aguardando o numerário da mercadoria/.test(bloqueada) && await page.locator('button:has-text("Avançar para")').isDisabled(),
+      'conta e ordem não avança sem o Pix do numerário');
+    await page.screenshot({ path: `${saida}/27-admin-ordem-aguardando-numerario.png`, fullPage: true });
+    await page.fill(`input[name^="ncm"]`, NCM_ITEM[prodMult.codigo]);
+    const tNcm = await botao('Salvar NCM');
+    checar('importacao-ncm-item', /Classificação fiscal \(NCM\) salva/.test(tNcm), `NCM ${NCM_ITEM[prodMult.codigo]} no item`);
+    const pix = {};
+    const fim = await avancarAte(ordemCO.id, 'Entregue', { pix });
+    await page.screenshot({ path: `${saida}/28-admin-ordem-conta-e-ordem-entregue.png`, fullPage: true });
+    checar('importacao-conta-e-ordem-entregue', /Prestação de contas/.test(fim) && /Taxa de serviço/.test(fim) && pix.cambio && pix.tributos,
+      'Pix da mercadoria e dos tributos confirmados, entregue com prestação de contas e taxa de serviço');
+  }
+  if (ordemEnc) {
+    const fim = await avancarAte(ordemEnc.id, 'Entregue');
+    await page.screenshot({ path: `${saida}/29-admin-ordem-encomenda-entregue.png`, fullPage: true });
+    const boletos = (fim.match(/Venda OI-\d+ \d\/4/g) || []).length;
+    checar('importacao-encomenda-faturada', /NF-e de venda/.test(fim) && boletos === 4, `entregue, NF-e e ${boletos} boletos (faixa A: 4×)`);
+  }
+} catch (e) { checar('importacao-painel', false, e.message.split('\n')[0]); }
+await visitar(page, '30-admin-calculadora', '/admin/importacao/calculadora', { espera: 'R$ 3.978.913,88', cheia: true });
+if (ordemEnc) await visitar(page, '31-admin-calculadora-da-ordem', `/admin/importacao/calculadora?ordem=${ordemEnc.id}`, { espera: 'Alicates' });
+await visitar(page, '32-admin-tabela-ncm', '/admin/importacao/ncm?q=' + encodeURIComponent('veículos aéreos'), { espera: '8806' });
+try {
+  const r = await page.request.get(base + '/admin/importacao/ncm/buscar?q=8806', { headers: { Accept: 'application/json' } });
+  const j = await r.json();
+  checar('ncm-busca-json', r.ok() && j.length > 0 && j.every(n => n.codigo.startsWith('8806')), `/ncm/buscar?q=8806 → ${j.length} códigos`);
+} catch (e) { checar('ncm-busca-json', false, e.message.split('\n')[0]); }
+await visitar(page, '33-admin-empresas-conta-e-ordem', '/admin/importacao/empresas', { espera: 'Liberar conta e ordem' });
+await ctx.close();
+
+// 5) De volta à cooperativa: andamento e cobranças no Financeiro
+ctx = sessaoCoop.ctx; page = sessaoCoop.page;
+if (ordemCO) await visitar(page, '34-cliente-ordem-entregue', `/customer/account/importacao/${ordemCO.id}`, { espera: 'Prestação de contas', cheia: true });
+await visitar(page, '35-cliente-financeiro-importacao', '/customer/account/financeiro', { espera: 'OI-' });
+await ctx.close();
+
+// 6) Hospital (faixa C): não pode usar boleto
+ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'pt-BR' });
+page = await ctx.newPage();
+try {
+  await page.goto(base + '/customer/login', { waitUntil: 'networkidle' });
+  await page.fill('input[name="email"]', 'hospital@demo.importfacil.com.br');
+  await page.fill('input[name="password"]', 'demo1234');
+  await page.press('input[name="password"]', 'Enter');
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(1500);
+  if (idProdImp) {
+    await visitar(page, '36-hospital-importacao-nova', `/customer/account/importacao/nova?produto=${idProdImp}`, { espera: 'não permite boleto' });
+    checar('importacao-faixa-c-sem-boleto', await page.locator('input[name="forma_pagamento"][value="Boleto"]').isDisabled()
+      && (await page.locator('input[name="modalidade"][value="contaordem"]').count()) === 0, 'faixa C: boleto bloqueado e sem conta e ordem');
+  }
+} catch (e) { checar('importacao-faixa-c', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 await browser.close();

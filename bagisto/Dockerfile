@@ -29,6 +29,7 @@ RUN git clone --depth 1 --branch ${BAGISTO_VERSAO} https://github.com/bagisto/ba
  && mkdir -p app/Console/Commands
 
 COPY catalogo-importfacil.json /opt/demo/
+COPY dados/ncm.json /opt/demo/ncm.json
 COPY scripts /opt/demo/scripts
 COPY marca /opt/demo/marca
 RUN python3 /opt/demo/scripts/gerar-imagens.py /opt/demo/catalogo-importfacil.json /opt/demo/imagens \
