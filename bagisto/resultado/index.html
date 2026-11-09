@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demo Bagisto + B2B Suite · ImportFácil</title>
-<meta name="description" content="O que foi executado na demonstração Bagisto 2.5 + B2B Suite com o catálogo da ImportFácil e como a loja ficou.">
+<title>Loja Bagisto ImportFácil</title>
+<meta name="description" content="A loja ImportFácil refeita no Bagisto 2.5 + B2B Suite, com as regras em PHP e o app instalável: o que foi feito, os testes e as capturas.">
 <link rel="icon" href="../../prototipo-globo-192.png">
 <style>
   :root{--fundo:#F6F5F2;--cartao:#fff;--tinta:#18181B;--tinta2:#52525B;--borda:#E4E2DC;--azul:#1D4ED8;--azul-claro:#E8EEFC;--ok:#15803D;--ok-fundo:#DCFCE7;--pend:#92400E;--pend-fundo:#FEF3C7}
@@ -48,40 +48,47 @@
 <div class="wrap">
   <header>
     <img src="../../prototipo-globo-192.png" alt="">
-    <div><h1>Demo Bagisto 2.5 + B2B Suite com o catálogo da ImportFácil</h1></div>
+    <div><h1>Loja ImportFácil refeita no Bagisto 2.5 + B2B Suite</h1></div>
   </header>
-  <p class="sub">O que foi executado e como a loja ficou. Capturas do teste automático de 09/11/2026, versão <code>32e21a2</code>.</p>
+  <p class="sub">O que foi executado e como a loja ficou. Capturas do teste automático de 09/11/2026, versão <code>a227187</code>. O servidor Node.js e a loja Next.js foram substituídos e estão guardados no ramo <code>legado-node</code>.</p>
 
   <div class="status">
-    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Loja montada e testada</h3><p>Instalada do zero no GitHub Actions: 19 de 19 páginas abriram sem erro (visitante, empresa e painel).</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Loja montada e testada</h3><p>Instalada do zero no GitHub Actions: 30 de 30 verificações passaram (páginas do visitante, da empresa e do painel, regras e app).</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Regras reescritas em PHP</h3><p>Pedido mínimo por tipo, múltiplo de venda, faixas de crédito, Pix com 3%, boleto 30/60/90/120 pelo crédito, cartão em até 12×, parcelas e Financeiro.</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>App para celular</h3><p>App instalável (PWA) com o ícone do globo. A página <code>/app</code> mostra o QR e o passo a passo para Android e iPhone.</p></div>
     <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Catálogo da ImportFácil</h3><p>446 produtos, 31 categorias e 5 empresas de demonstração, uma por tipo de cliente, com desconto e crédito.</p></div>
-    <div class="cartao"><span class="selo pend">⏳ Pendente</span><h3>Homologação na AWS</h3><p>Precisa da conta AWS. Enquanto isso, a loja roda no Codespaces ou no computador com Docker.</p></div>
+    <div class="cartao"><span class="selo pend">⏳ Pendente</span><h3>Homologação na AWS</h3><p>Precisa da conta AWS, para ter um endereço fixo. Enquanto isso, a loja e o app rodam no Codespaces ou no computador com Docker.</p></div>
+    <div class="cartao"><span class="selo pend">⏳ Próxima fase</span><h3>Importação e Asaas</h3><p>Sob encomenda, conta e ordem, calculadora e NCM ainda estão só no protótipo. Pix, boleto e cartão ainda são simulados.</p></div>
   </div>
 
   <h2>Links</h2>
   <div class="links">
-    <a href="https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json"><b>Abrir a loja para navegar →</b><span>Cria um Codespace com a demo; a primeira abertura leva de 10 a 20 minutos</span></a>
-    <a href="https://github.com/ImportFacil/REP-TESTE/actions/runs/42668409087"><b>Execução do teste →</b><span>Passo a passo do GitHub Actions: montagem, instalação e navegação</span></a>
-    <a href="https://github.com/ImportFacil/REP-TESTE/tree/main/bagisto"><b>Código da demo →</b><span>Dockerfile, instalação, importação do catálogo e instruções</span></a>
+    <a href="https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json"><b>Abrir a loja e o app →</b><span>Cria um Codespace com a loja (de 10 a 20 minutos na primeira vez). Depois, abra <code>/app</code> e leia o QR com o celular</span></a>
+    <a href="https://github.com/ImportFacil/REP-TESTE/actions/runs/42681246457"><b>Execução do teste →</b><span>Passo a passo do GitHub Actions: montagem, instalação e navegação</span></a>
+    <a href="https://github.com/ImportFacil/REP-TESTE/tree/main/bagisto"><b>Código da loja →</b><span>Pacote de regras em PHP, Dockerfile, instalação e instruções</span></a>
     <a href="https://importfacil.github.io/REP-TESTE/"><b>Protótipo atual →</b><span>Para comparar lado a lado</span></a>
   </div>
 
   <h2>O que foi executado</h2>
   <div class="cartao">
     <ol class="passos">
-      <li>Exportação do catálogo do protótipo: produtos, categorias, tipos de cliente, fotos e ilustrações.</li>
-      <li>Montagem da imagem Docker com PHP 8.4, Bagisto 2.5.1 e B2B Suite 3.0.1.</li>
-      <li>Instalação em português do Brasil e em reais, com MySQL 8.</li>
-      <li>Carga da ImportFácil:
-        <ul>
-          <li>categorias com ícones e os 446 produtos, com preço, estoque, destaques e especificações;</li>
-          <li>frete grátis;</li>
-          <li>página inicial com banners, avisos, carrosséis e tipos de cliente.</li>
-        </ul>
-      </li>
-      <li>Criação das 5 empresas de demonstração. Cada uma tem catálogo próprio (só as categorias do seu tipo, com o desconto do tipo) e crédito de 2× o pedido mínimo.</li>
-      <li>Navegação automática como visitante, como empresa logada e como administrador, com as capturas abaixo.</li>
+      <li>O código anterior (NestJS, Next.js e Terraform) foi guardado no ramo <code>legado-node</code> e retirado do <code>main</code>.</li>
+      <li>A imagem Docker foi montada com PHP 8.4, Bagisto 2.5.1, B2B Suite 3.0.1 e o pacote <code>ImportFacil\Loja</code>.</li>
+      <li>A loja foi instalada em português do Brasil e em reais, com MySQL 8, e o catálogo foi carregado: 446 produtos com preço, estoque, múltiplo e unidade de venda.</li>
+      <li>Foram criadas 5 empresas, uma por tipo de cliente. Cada uma tem o catálogo e o desconto do seu tipo, a faixa de crédito (A, B ou C) e a linha de crédito.</li>
+      <li>Os pagamentos foram configurados: Pix com 3% de desconto, boleto 30/60/90/120 pelo crédito da empresa e cartão em até 12×.</li>
+      <li>O app instalável foi ligado: manifesto, service worker, ícones do globo e a página <code>/app</code> com o QR.</li>
+      <li>O teste automático navegou como visitante, como empresa e como administrador. Ele também conferiu o app, o múltiplo de venda (pediu 1 câmera e o carrinho foi para 4) e o aviso de pedido mínimo.</li>
     </ol>
+  </div>
+
+  <h2>Regras da ImportFácil e app</h2>
+  <div class="galeria">
+    <figure class="alto"><a href="06b-app-instalar.jpg"><img src="06b-app-instalar.jpg" alt="Página do app com QR" loading="lazy"></a><figcaption><b>App no celular (/app)</b>QR, Android e iPhone</figcaption></figure>
+    <figure><a href="13c-empresa-produto-multiplo.jpg"><img src="13c-empresa-produto-multiplo.jpg" alt="Produto com múltiplo e preço do tipo" loading="lazy"></a><figcaption><b>Múltiplo de venda e preço do tipo</b>Câmera vendida de 4 em 4, −18% para a cooperativa</figcaption></figure>
+    <figure><a href="13d-empresa-carrinho.jpg"><img src="13d-empresa-carrinho.jpg" alt="Carrinho com pedido mínimo" loading="lazy"></a><figcaption><b>Pedido mínimo por tipo</b>Pediu 1, o carrinho ajustou para 4. Aviso: faltam R$ 22.740,08</figcaption></figure>
+    <figure><a href="13b-empresa-financeiro.jpg"><img src="13b-empresa-financeiro.jpg" alt="Financeiro" loading="lazy"></a><figcaption><b>Financeiro da empresa</b>Faixa A: boleto em até 4×. As parcelas aparecem a cada pedido</figcaption></figure>
+    <figure><a href="20-admin-regra-pix.jpg"><img src="20-admin-regra-pix.jpg" alt="Regra de carrinho Pix" loading="lazy"></a><figcaption><b>Regra “Pix: 3% de desconto”</b>No painel, em Marketing → Regras de Carrinho</figcaption></figure>
   </div>
 
   <h2>Loja (visitante)</h2>
@@ -116,32 +123,30 @@
 
   <h2>Comparação com o protótipo</h2>
   <div class="tabela"><table>
-    <thead><tr><th>Recurso</th><th>Protótipo</th><th>Bagisto + B2B Suite</th></tr></thead>
+    <thead><tr><th>Recurso</th><th>Protótipo</th><th>Loja Bagisto</th></tr></thead>
     <tbody>
-      <tr><td>Preço por tipo de cliente</td><td>Sim</td><td>Sim, por catálogo da empresa (desconto e faixas por quantidade)</td></tr>
-      <tr><td>Categorias por tipo de cliente</td><td>Sim</td><td>Sim, pelo catálogo da empresa</td></tr>
-      <tr><td>Pedido rápido por código</td><td>Sim</td><td>Sim, também com planilha CSV</td></tr>
-      <tr><td>Orçamento / cotação</td><td>Orçamento em PDF e ordem de compra</td><td>Cotação negociada, com mensagens e anexos, e ordem de compra</td></tr>
-      <tr><td>Crédito da empresa</td><td>Análise por faixa e boleto parcelado</td><td>Limite de crédito com extrato e pagamento “no crédito”</td></tr>
-      <tr><td>Usuários da empresa</td><td>Não</td><td>Sim, com papéis e permissões</td></tr>
-      <tr><td>Múltiplo de venda</td><td>Sim</td><td>Não (aparece só na descrição)</td></tr>
-      <tr><td>Pedido mínimo por tipo</td><td>Sim</td><td>Não (um mínimo único para a loja)</td></tr>
-      <tr><td>Pix e boleto (Asaas)</td><td>Sim (simulado)</td><td>Não; precisa de um módulo de pagamento</td></tr>
-      <tr><td>Importação, calculadora e NCM</td><td>Sim</td><td>Não; precisa ser programado</td></tr>
-      <tr><td>App instalável no celular</td><td>Sim</td><td>Loja adaptada ao celular (sem app instalável nesta demo)</td></tr>
+      <tr><td>Preço e categorias por tipo de cliente</td><td>Sim</td><td>Sim, pelo catálogo da empresa (B2B Suite)</td></tr>
+      <tr><td>Pedido mínimo por tipo</td><td>Sim</td><td>Sim (pacote ImportFácil): aviso no carrinho e bloqueio no checkout</td></tr>
+      <tr><td>Múltiplo de venda</td><td>Sim</td><td>Sim (pacote ImportFácil): arredonda a quantidade no carrinho</td></tr>
+      <tr><td>Faixas de crédito A/B/C</td><td>Sim</td><td>Sim: limite da B2B Suite e número de boletos pela faixa</td></tr>
+      <tr><td>Pix 3%, boleto 30/60/90/120, cartão 12×</td><td>Sim (simulado)</td><td>Sim (simulado até o Asaas), com parcelas no Financeiro</td></tr>
+      <tr><td>Pedido rápido, cotação, usuários da empresa</td><td>Parcial</td><td>Sim (B2B Suite)</td></tr>
+      <tr><td>App instalável no celular</td><td>Sim</td><td>Sim: PWA com o ícone do globo e a página /app</td></tr>
+      <tr><td>Importação, calculadora e NCM</td><td>Sim</td><td>Ainda não (próxima fase)</td></tr>
+      <tr><td>Painel de decisão de crédito e recebíveis</td><td>Sim</td><td>Ainda não; o crédito é ajustado em B2B → Crédito</td></tr>
     </tbody>
   </table></div>
 
-  <h2>Acessos da demonstração</h2>
+  <h2>Acessos de teste</h2>
   <div class="cartao">
-    <p>Valem só dentro da demo, no Codespaces ou no computador.</p>
+    <p>Valem só no ambiente de teste, no Codespaces ou no computador.</p>
     <ul>
       <li>Painel: <code>/admin</code>, com admin@example.com e a senha admin123.</li>
       <li>Empresas: <code>/customer/login</code>, com cooperativa@, distribuidora@, revendedor@, construtora@ ou hospital@demo.importfacil.com.br e a senha demo1234.</li>
     </ul>
   </div>
 
-  <footer>Empresas e dados de demonstração fictícios · Bagisto e B2B Suite (licença MIT) · ImportFácil, 2026</footer>
+  <footer>Empresas e dados de teste fictícios · Bagisto e B2B Suite (licença MIT) · ImportFácil, 2026</footer>
 </div>
 </body>
 </html>

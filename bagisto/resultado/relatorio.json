@@ -1,152 +1,237 @@
 {
- "base": "http://localhost:8000",
- "urlProduto": "/ensiladeira-de-forragem-1-linha-mq-en01",
- "urlCategoria": "/monitoramento-e-seguranca",
- "paginas": [
-  {
-   "nome": "01-inicio",
-   "caminho": "/",
-   "status": 200,
-   "ok": true,
-   "espera": "ImportFácil",
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar V"
-  },
-  {
-   "nome": "02-categoria",
-   "caminho": "/monitoramento-e-seguranca",
-   "status": 200,
-   "ok": true,
-   "espera": "Monitoramento e Segurança",
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar M"
-  },
-  {
-   "nome": "03-produto",
-   "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
-   "status": 200,
-   "ok": true,
-   "espera": "MQ-EN01",
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
-  },
-  {
-   "nome": "04-busca",
-   "caminho": "/search?query=furadeira",
-   "status": 200,
-   "ok": true,
-   "espera": "Furadeira",
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar E"
-  },
-  {
-   "nome": "05-celular-inicio",
-   "caminho": "/",
-   "status": 200,
-   "ok": true,
-   "espera": "Frete grátis",
-   "trecho": "Skip to main content Pesquisar Venda exclusiva para pessoa jurídica Frete grátis em todos os pedidos Pix com 3% de desconto Boleto 30/60/90/120 após a aprovação de crédito Maquinário Peças para Reposição Sistemas de Irri"
-  },
-  {
-   "nome": "06-celular-produto",
-   "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
-   "status": 200,
-   "ok": true,
-   "espera": "MQ-EN01",
-   "trecho": "Skip to main content Pesquisar Ensiladeira de forragem 1 linha R$ 38.900,00 CampoMax · código MQ-EN01. Venda por un. 1 Adicionar ao Carrinho Comparar Descrição Ensiladeira de forragem 1 linha. Marca CampoMax. Produção: 1"
-  },
-  {
-   "nome": "08-empresa-produto",
-   "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
-   "status": 200,
-   "ok": true,
-   "espera": "MQ-EN01",
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
-  },
-  {
-   "nome": "09-empresa-categoria",
-   "caminho": "/maquinario",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar M"
-  },
-  {
-   "nome": "10-empresa-credito",
-   "caminho": "/customer/account/company-credit",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
-  },
-  {
-   "nome": "11-empresa-pedido-rapido",
-   "caminho": "/customer/account/quick-orders",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
-  },
-  {
-   "nome": "12-empresa-cotacoes",
-   "caminho": "/customer/account/quotes",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
-  },
-  {
-   "nome": "13-empresa-perfil",
-   "caminho": "/customer/account/company-profile",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
-  },
-  {
-   "nome": "14-admin-painel",
-   "caminho": "/admin/dashboard",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Oi, Admin! Revise rapidamente o que está acontecendo em sua loja 10 de out. de 2"
-  },
-  {
-   "nome": "15-admin-produtos",
-   "caminho": "/admin/catalog/products",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Produtos Categorias Atributos Famílias de Atributos Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Produtos Exportar Criar Prod"
-  },
-  {
-   "nome": "16-admin-empresas",
-   "caminho": "/admin/b2b/companies",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
-  },
-  {
-   "nome": "17-admin-catalogos",
-   "caminho": "/admin/b2b/company-catalogs",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
-  },
-  {
-   "nome": "18-admin-credito",
-   "caminho": "/admin/b2b/company-credits",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
-  },
-  {
-   "nome": "19-admin-cotacoes",
-   "caminho": "/admin/b2b/quotes",
-   "status": 200,
-   "ok": true,
-   "espera": null,
-   "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
-  }
- ],
- "erros": []
+  "base": "http://localhost:8000",
+  "urlProduto": "/ensiladeira-de-forragem-1-linha-mq-en01",
+  "urlCategoria": "/monitoramento-e-seguranca",
+  "urlMult": "/camera-bullet-ip-4-mp-ir-50-m-sg-cb04",
+  "paginas": [
+    {
+      "nome": "01-inicio",
+      "caminho": "/",
+      "status": 200,
+      "ok": true,
+      "espera": "ImportFácil",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar V"
+    },
+    {
+      "nome": "02-categoria",
+      "caminho": "/monitoramento-e-seguranca",
+      "status": 200,
+      "ok": true,
+      "espera": "Monitoramento e Segurança",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar M"
+    },
+    {
+      "nome": "03-produto",
+      "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
+      "status": 200,
+      "ok": true,
+      "espera": "MQ-EN01",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "04-busca",
+      "caminho": "/search?query=furadeira",
+      "status": 200,
+      "ok": true,
+      "espera": "Furadeira",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar E"
+    },
+    {
+      "nome": "04b-produto-multiplo",
+      "caminho": "/camera-bullet-ip-4-mp-ir-50-m-sg-cb04",
+      "status": 200,
+      "ok": true,
+      "espera": "em múltiplos de 4",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "pwa-manifesto",
+      "caminho": "/manifest.webmanifest → 200 ImportFácil — Loja B2B",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "pwa-service-worker",
+      "caminho": "/sw.js → 200 application/javascript; charset=utf-8",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "pwa-icone",
+      "caminho": "/importfacil/icone-512.png → 200",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "pwa-na-loja",
+      "caminho": "link manifest=1 service worker=true",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "06b-app-instalar",
+      "caminho": "/app",
+      "status": 200,
+      "ok": true,
+      "espera": "Instalar",
+      "trecho": "Skip to main content Pesquisar App ImportFácil no celular A loja inteira, com o ícone do globo na tela inicial. Instala pelo navegador, sem loja de aplicativos. Aponte a câmera do celular para o QR code http://localhost:"
+    },
+    {
+      "nome": "pwa-qr",
+      "caminho": "/app com QR (svg=1)",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "05-celular-inicio",
+      "caminho": "/",
+      "status": 200,
+      "ok": true,
+      "espera": "Frete grátis",
+      "trecho": "Skip to main content Pesquisar Venda exclusiva para pessoa jurídica Frete grátis em todos os pedidos Pix com 3% de desconto Boleto 30/60/90/120 após a aprovação de crédito Maquinário Peças para Reposição Sistemas de Irri"
+    },
+    {
+      "nome": "06-celular-produto",
+      "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
+      "status": 200,
+      "ok": true,
+      "espera": "MQ-EN01",
+      "trecho": "Skip to main content Pesquisar Ensiladeira de forragem 1 linha R$ 38.900,00 Venda por un Entre com a conta da empresa para ver o seu preço CampoMax · código MQ-EN01. Venda por un. 1 Adicionar ao Carrinho Comparar Descriç"
+    },
+    {
+      "nome": "08-empresa-produto",
+      "caminho": "/ensiladeira-de-forragem-1-linha-mq-en01",
+      "status": 200,
+      "ok": true,
+      "espera": "MQ-EN01",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "09-empresa-categoria",
+      "caminho": "/maquinario",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar M"
+    },
+    {
+      "nome": "10-empresa-credito",
+      "caminho": "/customer/account/company-credit",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
+    },
+    {
+      "nome": "11-empresa-pedido-rapido",
+      "caminho": "/customer/account/quick-orders",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "12-empresa-cotacoes",
+      "caminho": "/customer/account/quotes",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "13-empresa-perfil",
+      "caminho": "/customer/account/company-profile",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "13b-empresa-financeiro",
+      "caminho": "/customer/account/financeiro",
+      "status": 200,
+      "ok": true,
+      "espera": "Financeiro",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
+    },
+    {
+      "nome": "13c-empresa-produto-multiplo",
+      "caminho": "/camera-bullet-ip-4-mp-ir-50-m-sg-cb04",
+      "status": 200,
+      "ok": true,
+      "espera": "pedido mínimo",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "regra-multiplo",
+      "caminho": "pediu 1 de SG-CB04 (múltiplo 4) → 200, carrinho com 4",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "13d-empresa-carrinho",
+      "caminho": "/checkout/cart",
+      "status": 200,
+      "ok": true,
+      "espera": "Pedido mínimo para Cooperativa",
+      "trecho": "Skip to main content Página Inicial Carrinho Pedido mínimo para Cooperativa (faltam R$ 22.740,08): R$ 25.000,00 0 Itens Selecionados Câmera bullet IP 4 MP IR 50 m 4 R$ 2.259,92 Remover Adicionar à Lista de Requisição Con"
+    },
+    {
+      "nome": "14-admin-painel",
+      "caminho": "/admin/dashboard",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Oi, Admin! Revise rapidamente o que está acontecendo em sua loja 10 de out. de 2"
+    },
+    {
+      "nome": "15-admin-produtos",
+      "caminho": "/admin/catalog/products",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Produtos Categorias Atributos Famílias de Atributos Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Produtos Exportar Criar Prod"
+    },
+    {
+      "nome": "16-admin-empresas",
+      "caminho": "/admin/b2b/companies",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+    },
+    {
+      "nome": "17-admin-catalogos",
+      "caminho": "/admin/b2b/company-catalogs",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+    },
+    {
+      "nome": "18-admin-credito",
+      "caminho": "/admin/b2b/company-credits",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+    },
+    {
+      "nome": "19-admin-cotacoes",
+      "caminho": "/admin/b2b/quotes",
+      "status": 200,
+      "ok": true,
+      "espera": null,
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+    },
+    {
+      "nome": "20-admin-regra-pix",
+      "caminho": "/admin/marketing/promotions/cart-rules",
+      "status": 200,
+      "ok": true,
+      "espera": "Pix",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Marketing Promoções Regras de Catálogo Regras de Carrinho Comunicações Modelos de E-mail Eventos Campanhas Inscrições na Newsletter Busca & SEO Reescrita"
+    }
+  ],
+  "erros": []
 }
