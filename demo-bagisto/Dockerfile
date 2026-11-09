@@ -34,6 +34,7 @@ RUN python3 /opt/demo/scripts/gerar-imagens.py /opt/demo/catalogo-importfacil.js
  && python3 /opt/demo/scripts/gerar-marca.py /opt/demo/marca
 
 COPY app/ImportfacilDemo.php /var/www/bagisto/app/Console/Commands/ImportfacilDemo.php
+COPY lang/shop/pt_BR/app.php /var/www/bagisto/lang/vendor/shop/pt_BR/app.php
 COPY iniciar.sh /opt/demo/iniciar.sh
 
 WORKDIR /var/www/bagisto

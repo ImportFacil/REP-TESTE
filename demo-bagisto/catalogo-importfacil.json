@@ -49,7 +49,8 @@
    "subcategorias": [
     "Colheita e Pós-colheita",
     "Máquinas e Equipamentos"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M2 20h20\"/><rect x=\"3\" y=\"11\" width=\"9\" height=\"6\" rx=\"1\"/><path d=\"M12 13h3l2-5h3\"/><circle cx=\"6.5\" cy=\"20\" r=\"1.6\"/><circle cx=\"16.5\" cy=\"20\" r=\"1.6\"/></svg>"
   },
   {
    "id": "pecas",
@@ -58,7 +59,8 @@
     "cooperativa"
    ],
    "posicao": 2,
-   "subcategorias": []
+   "subcategorias": [],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z\"/></svg>"
   },
   {
    "id": "irrigacao",
@@ -70,7 +72,8 @@
    "subcategorias": [
     "Aplicação, Irrigação e Viveiro",
     "Infraestrutura"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 2.7l5.7 5.7a8 8 0 1 1-11.4 0z\"/></svg>"
   },
   {
    "id": "epis",
@@ -81,7 +84,8 @@
    "posicao": 4,
    "subcategorias": [
     "EPI - Equipamento de Proteção"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M2 19h20\"/><path d=\"M5 19v-5a7 7 0 0 1 14 0v5\"/><path d=\"M10 7.6V5a2 2 0 0 1 4 0v2.6\"/></svg>"
   },
   {
    "id": "roupas",
@@ -90,7 +94,8 @@
     "cooperativa"
    ],
    "posicao": 5,
-   "subcategorias": []
+   "subcategorias": [],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M16 3l5 3-2.5 4L17 9v12H7V9l-1.5 1L3 6l5-3a4 4 0 0 0 8 0z\"/></svg>"
   },
   {
    "id": "acessorios",
@@ -103,7 +108,8 @@
     "Medição e Marcação",
     "Colheita e Pós-colheita",
     "Infraestrutura"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z\"/><path d=\"m3.3 7 8.7 5 8.7-5\"/><path d=\"M12 22V12\"/></svg>"
   },
   {
    "id": "ferramentas",
@@ -116,7 +122,8 @@
     "Ferramentas Manuais",
     "Poda e Corte",
     "Oficina e Manutenção"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></svg>"
   },
   {
    "id": "solar",
@@ -125,7 +132,8 @@
     "cooperativa"
    ],
    "posicao": 8,
-   "subcategorias": []
+   "subcategorias": [],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4\"/></svg>"
   },
   {
    "id": "seguranca",
@@ -137,7 +145,8 @@
     "Gravação",
     "Alarmes",
     "Controle de acesso"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/><circle cx=\"12\" cy=\"11\" r=\"2.5\"/></svg>"
   },
   {
    "id": "tratores",
@@ -146,7 +155,8 @@
     "cooperativa"
    ],
    "posicao": 10,
-   "subcategorias": []
+   "subcategorias": [],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><circle cx=\"7\" cy=\"17\" r=\"4\"/><circle cx=\"18\" cy=\"18\" r=\"3\"/><path d=\"M7 13V8h5l2.2 5.5\"/><path d=\"M12 8V5h4v3\"/></svg>"
   },
   {
    "id": "fertilizantes",
@@ -155,7 +165,8 @@
     "cooperativa"
    ],
    "posicao": 11,
-   "subcategorias": []
+   "subcategorias": [],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 22V10\"/><path d=\"M12 14C9 14 5 12 5 7c5 0 7 3 7 7z\"/><path d=\"M12 12c0-4 2-7 7-7 0 5-4 7-7 7z\"/></svg>"
   },
   {
    "id": "d-ferr",
@@ -169,7 +180,8 @@
     "Manuais",
     "Medição",
     "Acessórios"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></svg>"
   },
   {
    "id": "d-eletr",
@@ -183,7 +195,8 @@
     "Condutores",
     "Proteção",
     "Tomadas"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M13 2 4 14h7l-1 8 9-12h-7z\"/></svg>"
   },
   {
    "id": "d-hidr",
@@ -199,7 +212,8 @@
     "Conexões",
     "Bombas",
     "Acessórios"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z\"/></svg>"
   },
   {
    "id": "d-fix",
@@ -213,7 +227,8 @@
     "Buchas",
     "Ferragens",
     "Adesivos"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 3 4.5 7.5v9L12 21l7.5-4.5v-9z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>"
   },
   {
    "id": "d-util",
@@ -225,7 +240,8 @@
    "subcategorias": [
     "Limpeza",
     "Descartáveis"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 3v4M12 17v4M3 12h4M17 12h4\"/><path d=\"m6 6 2 2M16 16l2 2M18 6l-2 2M8 16l-2 2\"/></svg>"
   },
   {
    "id": "r-ferr",
@@ -239,7 +255,8 @@
     "Elétricas",
     "Medição",
     "Acessórios"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></svg>"
   },
   {
    "id": "r-casa",
@@ -251,7 +268,8 @@
    "subcategorias": [
     "Jardim",
     "Casa"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/></svg>"
   },
   {
    "id": "r-tint",
@@ -263,7 +281,8 @@
    "subcategorias": [
     "Pintura",
     "Acabamento"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><rect x=\"4\" y=\"3\" width=\"14\" height=\"6\" rx=\"1\"/><path d=\"M18 6h2v5H11v3\"/><rect x=\"9\" y=\"14\" width=\"4\" height=\"7\" rx=\"1\"/></svg>"
   },
   {
    "id": "r-luz",
@@ -276,7 +295,8 @@
     "Elétrica",
     "Lanternas",
     "Pilhas"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M9 18h6M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z\"/></svg>"
   },
   {
    "id": "r-auto",
@@ -290,7 +310,8 @@
     "Elétrica",
     "Acessórios",
     "Ferramentas"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M5 17h14v-5l-2-5H7l-2 5z\"/><circle cx=\"8\" cy=\"17\" r=\"2\"/><circle cx=\"16\" cy=\"17\" r=\"2\"/></svg>"
   },
   {
    "id": "c-epi",
@@ -306,7 +327,8 @@
     "Mãos",
     "Proteção",
     "Vestuário"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M2 19h20\"/><path d=\"M5 19v-5a7 7 0 0 1 14 0v5\"/><path d=\"M10 7.6V5a2 2 0 0 1 4 0v2.6\"/></svg>"
   },
   {
    "id": "c-eq",
@@ -323,7 +345,8 @@
     "Ferramentas",
     "Mistura",
     "Elevação"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M2 20h20\"/><rect x=\"3\" y=\"11\" width=\"9\" height=\"6\" rx=\"1\"/><path d=\"M12 13h3l2-5h3\"/><circle cx=\"6.5\" cy=\"20\" r=\"1.6\"/><circle cx=\"16.5\" cy=\"20\" r=\"1.6\"/></svg>"
   },
   {
    "id": "c-and",
@@ -337,7 +360,8 @@
     "Escoramento",
     "Acesso",
     "Proteção"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"1\"/><path d=\"M3 9.3h18M3 14.7h18M9 4v5.3M15 9.3v5.4M9 14.7V20\"/></svg>"
   },
   {
    "id": "c-ene",
@@ -352,7 +376,8 @@
     "Iluminação",
     "Condutores",
     "Proteção"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M13 2 4 14h7l-1 8 9-12h-7z\"/></svg>"
   },
   {
    "id": "c-hid",
@@ -366,7 +391,8 @@
     "Reservatórios",
     "Bombas",
     "Água"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z\"/></svg>"
   },
   {
    "id": "h-con",
@@ -387,7 +413,8 @@
     "Antissepsia e Higiene",
     "Instrumental e Acessórios",
     "Resgate e Imobilização"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"m18 2 4 4M17 7l3-3M19 9 8.7 19.3a2.4 2.4 0 0 1-3.4 0l-.6-.6a2.4 2.4 0 0 1 0-3.4L15 5\"/><path d=\"m9 11 4 4M5 19l-3 3M14 4l6 6\"/></svg>"
   },
   {
    "id": "h-eq",
@@ -401,7 +428,8 @@
     "Infusão",
     "Emergência",
     "Esterilização"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z\"/></svg>"
   },
   {
    "id": "h-mob",
@@ -415,7 +443,8 @@
     "Transporte",
     "Apoio",
     "Ambulância e Resgate"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M3 20V6M3 12h18v8M21 12V9a2 2 0 0 0-2-2h-8v5\"/><circle cx=\"7\" cy=\"9.5\" r=\"1.8\"/></svg>"
   },
   {
    "id": "h-hig",
@@ -429,7 +458,8 @@
     "Resíduos",
     "Dispensadores",
     "Limpeza"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M12 3v4M12 17v4M3 12h4M17 12h4\"/><path d=\"m6 6 2 2M16 16l2 2M18 6l-2 2M8 16l-2 2\"/></svg>"
   },
   {
    "id": "h-lab",
@@ -442,7 +472,8 @@
     "Diagnóstico",
     "Refrigeração",
     "Instrumental"
-   ]
+   ],
+   "svg": "<svg  viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" ><path d=\"M9 3h6M10 3v6l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3\"/><path d=\"M7.5 15h9\"/></svg>"
   }
  ],
  "produtos": [

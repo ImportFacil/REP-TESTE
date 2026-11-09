@@ -42,7 +42,10 @@ def main(arq, saida):
                 print('foto indisponível', p['codigo'], e, file=sys.stderr)
         if p.get('svg'):
             desenhar(p['svg'], base + '.png'); ok_desenho += 1
-    print(f'{ok_foto} fotos baixadas, {ok_desenho} desenhos gerados')
+    for c in d.get('categorias', []):
+        if c.get('svg'):
+            desenhar(c['svg'], os.path.join(saida, f"cat-{c['id']}.png"))
+    print(f'{ok_foto} fotos baixadas, {ok_desenho} desenhos gerados, ícones das categorias gerados')
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2])

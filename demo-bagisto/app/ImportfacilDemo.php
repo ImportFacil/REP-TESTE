@@ -60,6 +60,13 @@ class ImportfacilDemo extends Command
 
         $this->components->info('Categorias');
         [$catIds, $subIds] = $this->criarCategorias($categorias, $d['categorias']);
+        foreach ($d['categorias'] as $c) {   // ícone da categoria (o mesmo do protótipo) no carrossel e na página
+            $arq = $dirImg.'/cat-'.$c['id'].'.png';
+            if (is_file($arq) && isset($catIds[$c['id']])) {
+                $caminho = Storage::disk('public')->putFileAs('category/'.$catIds[$c['id']], new \Illuminate\Http\File($arq), 'logo.png');
+                DB::table('categories')->where('id', $catIds[$c['id']])->update(['logo_path' => $caminho]);
+            }
+        }
 
         $this->components->info('Produtos ('.count($d['produtos']).')');
         $prodIds = $this->criarProdutos($produtos, $d['produtos'], $catIds, $subIds, $dirImg);
@@ -118,6 +125,10 @@ class ImportfacilDemo extends Command
         $this->config('b2b.credit.settings.active', 1);
 
         $this->config('general.general.locale_options.weight_unit', 'kgs');
+
+        // sem o convite de newsletter do tema padrão
+        $this->config('customer.settings.newsletter.subscription', 0);
+        $this->config('customer.settings.newsletter.subscription', 0, null);
     }
 
     /* ------------------------------------------------------------ Categorias */

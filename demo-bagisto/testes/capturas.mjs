@@ -43,7 +43,7 @@ await ctx.close();
 // 2) Visitante, celular
 ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'pt-BR' });
 page = await ctx.newPage();
-await visitar(page, '05-celular-inicio', '/', { espera: 'ImportFácil' });
+await visitar(page, '05-celular-inicio', '/', { espera: 'Frete grátis' });
 await visitar(page, '06-celular-produto', urlProduto, { espera: prodFoto.codigo });
 await ctx.close();
 
