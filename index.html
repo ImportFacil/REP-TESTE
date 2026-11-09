@@ -90,17 +90,28 @@
   .burger-btn[aria-expanded="true"] .burger i:nth-child(1){top:3.95px;transform:rotate(45deg)}
   .burger-btn[aria-expanded="true"] .burger i:nth-child(2){opacity:0}
   .burger-btn[aria-expanded="true"] .burger i:nth-child(3){top:3.95px;transform:rotate(-45deg)}
-  .menu-scrim{position:absolute;inset:0;z-index:64;background:rgba(20,18,16,.32);opacity:0;pointer-events:none;transition:opacity .2s}
+  /* Menu lateral no padrão do ion-menu (Ionic): gaveta que entra pela esquerda, com cabeçalho próprio e fundo escurecido */
+  .menu-scrim{position:absolute;left:0;right:0;bottom:0;top:0;z-index:84;background:rgba(0,0,0,.32);opacity:0;pointer-events:none;transition:opacity .28s ease}
   .menu-scrim.open{opacity:1;pointer-events:auto}
-  .menu-panel{position:absolute;z-index:65;right:12px;width:min(300px,calc(100% - 24px));
-    background:var(--popover);color:var(--popover-foreground);border:1px solid var(--border);border-radius:var(--radius-xl);
-    box-shadow:0 24px 50px -20px rgba(0,0,0,.45);padding:8px;overflow-y:auto;
-    opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top right;pointer-events:none;visibility:hidden;
-    transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}
-  .menu-panel.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .18s ease,transform .18s ease}
+  .menu-panel{position:absolute;z-index:85;left:0;top:0;bottom:0;width:min(304px,86%);
+    background:var(--popover);color:var(--popover-foreground);border-right:1px solid var(--border);
+    box-shadow:4px 0 16px rgba(0,0,0,.18);display:flex;flex-direction:column;
+    transform:translateX(-102%);visibility:hidden;
+    transition:transform .28s cubic-bezier(0,0,.2,1),visibility 0s linear .28s}
+  .menu-panel.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(0,0,.2,1)}
+  .menu-panel.arrastando,.menu-scrim.arrastando{transition:none}
+  .menu-hd{flex:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 8px 8px 16px;border-bottom:1px solid var(--border)}
+  .menu-hd .brandmark{width:32px;height:32px;display:inline-block}
+  .menu-hd .tt{flex:1;min-width:0}
+  .menu-hd .tt b{display:block;font-size:1.05rem;font-weight:600;line-height:1.2}
+  .menu-hd .tt span{display:block;font-size:.72rem;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .menu-hd .x{width:40px;height:40px;border-radius:999px;border:0;background:none;color:var(--muted-foreground);cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .menu-hd .x:hover{background:var(--accent);color:var(--foreground)}
+  .menu-hd .x .svgi{width:20px;height:20px}
+  .menu-ct{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 8px 16px}
   .menu-group + .menu-group{border-top:1px solid var(--border);margin-top:6px;padding-top:6px}
   .menu-label{font-size:.66rem;font-weight:500;color:var(--muted-foreground);padding:6px 10px 4px}
-  .menu-item{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border:none;background:none;
+  .menu-item{display:flex;align-items:center;gap:12px;width:100%;height:44px;padding:0 12px;border:none;background:none;
     border-radius:var(--radius-md);font:inherit;font-size:.84rem;font-weight:500;color:inherit;cursor:pointer;text-align:left}
   .menu-item:hover,.menu-item:focus-visible{background:var(--accent);color:var(--accent-foreground);outline:none}
   .menu-item[aria-current="page"]{background:var(--accent);font-weight:600}
@@ -293,7 +304,7 @@
   }
   body[data-theme="dark"] #statusbar, body[data-theme="dark"] header{background:#10233c}
   header{background:var(--primary); color:#fff; padding:8px 12px 10px 14px; flex:none}
-  header .top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  header .top{display:flex;align-items:center;justify-content:flex-start;gap:12px}   /* botão do menu no início da barra (ion-buttons slot="start") */
   header .brand{display:flex;align-items:center;gap:9px;min-width:0}
   header .logo{width:32px;height:32px;border-radius:9px;flex:none}
   header h1{font-size:1rem;font-weight:700;letter-spacing:.2px}
@@ -1053,13 +1064,13 @@
   <header>
     <div class="top">
       <button class="hbtn sb-trigger" onclick="toggleSidebar()" title="Alternar menu (Ctrl+B)"><span data-ic="panel"></span></button>
+      <button class="hbtn burger-btn" id="burgerBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuPanel" onclick="toggleMenu()">
+        <span class="burger" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
       <div class="brand">
         <div class="logo brandmark" role="img" aria-label="ImportFácil"></div>
         <div><h1>ImportFácil</h1><div class="sub" id="subGreet">Entre para ver seus preços</div></div>
       </div>
-      <button class="hbtn burger-btn" id="burgerBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuPanel" onclick="toggleMenu()">
-        <span class="burger" aria-hidden="true"><i></i><i></i><i></i></span>
-      </button>
     </div>
     <div class="searchbar" onclick="go('busca')">
       <span data-ic="search"></span><span>Buscar por produto, marca ou código…</span>
@@ -1108,7 +1119,7 @@
   </div>
 
   <div class="menu-scrim" id="menuScrim" onclick="fecharMenu()"></div>
-  <div class="menu-panel" id="menuPanel" role="menu" aria-label="Menu principal"></div>
+  <div class="menu-panel" id="menuPanel" role="dialog" aria-modal="true" aria-label="Menu principal" aria-hidden="true"></div>
   <div class="fullscr open" id="loginscr"></div>
   <div class="fullscr" id="perfilscr"></div>
   <div id="toast"></div>
@@ -4730,54 +4741,92 @@ const NAV = [
     {s:'equipe',     ic:'bank',   t:'Painel da equipe', badge:()=>(cadStatus&&cadStatus!=='Aprovado'&&cadStatus!=='Reprovado'?1:0)+nAtrasoBloq(), warn:true},
   ]},
 ];
-/* ---------- Menu hambúrguer ---------- */
+/* ---------- Menu lateral (padrão ion-menu do Ionic: overlay, abre pelo início, fecha no fundo, Esc ou arrastando) ---------- */
 function menuAberto(){ return document.getElementById('menuPanel').classList.contains('open'); }
 function posicionarMenu(){
-  const ph=document.getElementById('phone').getBoundingClientRect();
-  const hd=document.querySelector('header').getBoundingClientRect();
-  const am=document.querySelector('.app-main').getBoundingClientRect();
-  const top=hd.bottom-ph.top;
-  const pn=document.getElementById('menuPanel'), sc=document.getElementById('menuScrim');
-  pn.style.top=(top+8)+'px'; pn.style.maxHeight=(ph.height-top-24)+'px';
-  // ancora o painel no próprio botão: abre para a esquerda se houver espaço, senão para a direita
-  const br=document.getElementById('burgerBtn').getBoundingClientRect(), pw=pn.offsetWidth||300;
-  if(br.right-pw>=am.left+12){ pn.style.right=Math.max(12,ph.right-br.right)+'px'; pn.style.left='auto'; pn.style.transformOrigin='top right'; }
-  else { pn.style.left=Math.max(12,br.left-ph.left)+'px'; pn.style.right='auto'; pn.style.transformOrigin='top left'; }
-  sc.style.top=top+'px'; sc.style.left=(am.left-ph.left)+'px';
+  // a gaveta e o fundo começam abaixo da barra de status do celular (no desktop ela não existe)
+  const sb=document.getElementById('statusbar'), t=sb&&sb.offsetParent!==null?sb.offsetHeight:0;
+  document.getElementById('menuPanel').style.top=t+'px';
+  document.getElementById('menuScrim').style.top=t+'px';
 }
 function renderMenu(){
-  document.getElementById('menuPanel').innerHTML = NAV.map(g=>`
-    <div class="menu-group" role="group" aria-label="${g.label}">
-      <div class="menu-label">${g.label}</div>
-      ${g.items.map(it=>{
-        const n=it.badge?it.badge():0;
-        return `<button class="menu-item" role="menuitem" ${cur===it.s?'aria-current="page"':''} onclick="go('${it.s}')">
-          ${I(it.ic)}<span>${it.t}</span>${n?`<b class="menu-badge ${it.warn?'warn':''}">${n}</b>`:''}</button>`;
-      }).join('')}
-    </div>`).join('');
+  document.getElementById('menuPanel').innerHTML = `
+    <div class="menu-hd">
+      <span class="brandmark" role="img" aria-label=""></span>
+      <div class="tt"><b>ImportFácil</b><span>${oesc(cfg.empresa||(P()?P().nome:'Menu'))}</span></div>
+      <button type="button" class="x" aria-label="Fechar menu" onclick="fecharMenu(true)">${I('x')}</button>
+    </div>
+    <div class="menu-ct">${NAV.map(g=>`
+      <div class="menu-group" role="group" aria-label="${g.label}">
+        <div class="menu-label">${g.label}</div>
+        ${g.items.map(it=>{
+          const n=it.badge?it.badge():0;
+          return `<button class="menu-item" ${cur===it.s?'aria-current="page"':''} onclick="go('${it.s}')">
+            ${I(it.ic)}<span>${it.t}</span>${n?`<b class="menu-badge ${it.warn?'warn':''}">${n}</b>`:''}</button>`;
+        }).join('')}
+      </div>`).join('')}</div>`;
 }
 function abrirMenu(){
   renderMenu(); posicionarMenu();
-  document.getElementById('menuPanel').classList.add('open');
+  const pn=document.getElementById('menuPanel');
+  pn.style.transform=''; document.getElementById('menuScrim').style.opacity='';
+  pn.classList.add('open'); pn.setAttribute('aria-hidden','false');
   document.getElementById('menuScrim').classList.add('open');
   const b=document.getElementById('burgerBtn'); b.setAttribute('aria-expanded','true'); b.setAttribute('aria-label','Fechar menu');
-  const first=document.querySelector('#menuPanel .menu-item'); if(first) first.focus({preventScroll:true});
+  const first=pn.querySelector('.menu-item[aria-current="page"]')||pn.querySelector('.menu-item'); if(first) first.focus({preventScroll:true});
 }
 function fecharMenu(devolverFoco){
   if(!menuAberto()) return;
-  document.getElementById('menuPanel').classList.remove('open');
+  const pn=document.getElementById('menuPanel');
+  pn.style.transform=''; document.getElementById('menuScrim').style.opacity='';
+  pn.classList.remove('open'); pn.setAttribute('aria-hidden','true');
   document.getElementById('menuScrim').classList.remove('open');
   const b=document.getElementById('burgerBtn'); b.setAttribute('aria-expanded','false'); b.setAttribute('aria-label','Abrir menu');
   if(devolverFoco) b.focus();
 }
 function toggleMenu(){ menuAberto() ? fecharMenu(true) : abrirMenu(); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape' && menuAberto()){ e.preventDefault(); fecharMenu(true); } });
-document.addEventListener('pointerdown',e=>{
+document.addEventListener('keydown',e=>{
   if(!menuAberto()) return;
-  if(e.target.closest('#menuPanel, #burgerBtn')) return;   // o próprio botão já alterna
-  fecharMenu();
+  if(e.key==='Escape'){ e.preventDefault(); fecharMenu(true); return; }
+  if(e.key==='Tab'){   // mantém o foco dentro do menu aberto
+    const f=[...document.querySelectorAll('#menuPanel button')]; if(!f.length) return;
+    if(e.shiftKey && document.activeElement===f[0]){ e.preventDefault(); f[f.length-1].focus(); }
+    else if(!e.shiftKey && document.activeElement===f[f.length-1]){ e.preventDefault(); f[0].focus(); }
+  }
 });
 window.addEventListener('resize',()=>{ if(menuAberto()) posicionarMenu(); });
+/* Gesto de arrastar, como no ion-menu: da borda esquerda para abrir, para a esquerda para fechar */
+(function(){
+  const ph=document.getElementById('phone'); let ini=null;
+  const pn=()=>document.getElementById('menuPanel'), sc=()=>document.getElementById('menuScrim');
+  ph.addEventListener('touchstart',e=>{
+    if(document.getElementById('loginscr').classList.contains('open')||document.getElementById('perfilscr').classList.contains('open')) return;
+    if(document.getElementById('overlay').classList.contains('open')) return;
+    const t=e.touches[0], x=t.clientX-ph.getBoundingClientRect().left, aberto=menuAberto();
+    if(!aberto && x>32) return;   // faixa da borda esquerda, como o maxEdgeStart do ion-menu
+    if(aberto && !e.target.closest('#menuPanel,#menuScrim')) return;
+    ini={x:t.clientX,y:t.clientY,aberto,w:0,mov:false};
+    if(!aberto){ renderMenu(); posicionarMenu(); }
+    ini.w=pn().offsetWidth||300;
+  },{passive:true});
+  ph.addEventListener('touchmove',e=>{
+    if(!ini) return;
+    const t=e.touches[0], dx=t.clientX-ini.x, dy=t.clientY-ini.y;
+    if(!ini.mov){ if(Math.abs(dx)<8) return; if(Math.abs(dy)>Math.abs(dx)){ ini=null; return; } ini.mov=true;
+      pn().classList.add('arrastando'); sc().classList.add('arrastando'); pn().style.visibility='visible'; }
+    if(e.cancelable) e.preventDefault();   // o arrasto é do menu: não rola a página nem aciona o "voltar" do navegador
+    const pos=Math.max(0,Math.min(ini.w, (ini.aberto?ini.w:0)+dx));
+    pn().style.transform=`translateX(${pos-ini.w}px)`; sc().style.opacity=String(pos/ini.w); sc().style.pointerEvents='auto';
+  },{passive:false});
+  ph.addEventListener('touchend',e=>{
+    if(!ini) return; const s=ini; ini=null;
+    pn().classList.remove('arrastando'); sc().classList.remove('arrastando'); pn().style.visibility=''; sc().style.pointerEvents='';
+    if(!s.mov) return;
+    const dx=(e.changedTouches[0]||{}).clientX-s.x, pos=(s.aberto?s.w:0)+dx;
+    if(pos>s.w*0.5){ if(s.aberto){ pn().style.transform=''; sc().style.opacity=''; } else abrirMenu(); }
+    else { if(s.aberto) fecharMenu(); else { pn().style.transform=''; sc().style.opacity=''; } }
+  });
+})();
 
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
