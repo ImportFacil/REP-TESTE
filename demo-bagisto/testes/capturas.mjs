@@ -17,6 +17,7 @@ const erros = [];
 const browser = await chromium.launch();
 
 async function visitar(page, nome, caminho, { espera = null, cheia = false } = {}) {
+  try {
   const r = await page.goto(base + caminho, { waitUntil: 'networkidle', timeout: 120000 }).catch(e => ({ status: () => 0, erro: e }));
   const status = r.status ? r.status() : 0;
   await page.waitForTimeout(800);
@@ -27,6 +28,7 @@ async function visitar(page, nome, caminho, { espera = null, cheia = false } = {
   relatorio.push({ nome, caminho, status, ok: !ruim && achou, espera, trecho: texto.replace(/\s+/g, ' ').slice(0, 220) });
   if (ruim || !achou) erros.push(`${nome} (${caminho}): status ${status}${achou ? '' : `, sem o texto "${espera}"`}`);
   return texto;
+  } catch (e) { erros.push(`${nome} (${caminho}): ${e.message.split('\n')[0]}`); relatorio.push({ nome, caminho, status: 0, ok: false }); return ''; }
 }
 
 // 1) Visitante, computador
@@ -51,8 +53,9 @@ page = await ctx.newPage();
 await page.goto(base + '/customer/login', { waitUntil: 'networkidle' });
 await page.fill('input[name="email"]', 'cooperativa@demo.importfacil.com.br');
 await page.fill('input[name="password"]', 'demo1234');
-await Promise.all([page.waitForLoadState('networkidle'), page.locator('form button[type="submit"]').first().click()]);
-await page.waitForTimeout(1500);
+await page.press('input[name="password"]', 'Enter');
+await page.waitForLoadState('networkidle').catch(() => {});
+await page.waitForTimeout(2000);
 await page.screenshot({ path: `${saida}/07-empresa-depois-do-login.png` });
 await visitar(page, '08-empresa-produto', urlProduto, { espera: prodFoto.codigo });
 await visitar(page, '09-empresa-categoria', '/' + slug((cat.categorias.find(c => c.id === 'maquinario') || catSeg).nome));
@@ -66,10 +69,12 @@ await ctx.close();
 ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'pt-BR' });
 page = await ctx.newPage();
 await page.goto(base + '/admin/login', { waitUntil: 'networkidle' });
+await page.screenshot({ path: `${saida}/14a-admin-login.png` });
 await page.fill('input[name="email"]', 'admin@example.com');
 await page.fill('input[name="password"]', 'admin123');
-await Promise.all([page.waitForLoadState('networkidle'), page.locator('button[type="submit"], .primary-button').first().click()]);
-await page.waitForTimeout(1500);
+await page.press('input[name="password"]', 'Enter');
+await page.waitForLoadState('networkidle').catch(() => {});
+await page.waitForTimeout(2000);
 await visitar(page, '14-admin-painel', '/admin/dashboard');
 await visitar(page, '15-admin-produtos', '/admin/catalog/products');
 await visitar(page, '16-admin-empresas', '/admin/b2b/companies');

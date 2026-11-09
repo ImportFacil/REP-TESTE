@@ -12,7 +12,7 @@ on:
       - '.github/workflows/bagisto-demo.yml'
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 concurrency:
@@ -56,6 +56,16 @@ jobs:
           npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
           node capturas.mjs http://localhost:8000 ../catalogo-importfacil.json capturas
+
+      - name: Publicar capturas no ramo demo-bagisto-capturas
+        if: always()
+        run: |
+          [ -d demo-bagisto/testes/capturas ] || exit 0
+          cd demo-bagisto/testes/capturas
+          git init -q -b demo-bagisto-capturas
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Capturas da demo Bagisto (${{ github.sha }})"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" demo-bagisto-capturas
 
       - name: Guardar capturas e relatório
         if: always()
