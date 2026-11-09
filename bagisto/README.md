@@ -32,6 +32,10 @@ servidor Node.js e a loja Next.js, que ficaram guardados no ramo `legado-node`.
 | **Cartão até 12×** | Forma de pagamento `importfacil_cartao` (`Payment/Cartao.php`) |
 | **Financeiro do cliente** | Página `/customer/account/financeiro` na conta da empresa: parcelas, vencimentos, situação e totais |
 | **App para celular** | App instalável (PWA): `/manifest.webmanifest`, `/sw.js` (funciona sem rede) e a página `/app` com QR e o passo a passo |
+| **Importação sob encomenda** | `Importacao/Ordens.php`: o cliente pede a ordem pelo carrinho ou pela página do produto, e a equipe avança as etapas (enviada, recebida, em processo, em trânsito, entregue). Na entrega, sai a NF-e de venda e a cobrança na forma escolhida |
+| **Importação por conta e ordem** | Só para empresas liberadas (faixa A). O cliente paga o numerário por Pix: a mercadoria antes do câmbio e os tributos antes da DUIMP. A ordem não avança sem o pagamento. Na entrega, prestação de contas e cobrança só da taxa de serviço |
+| **Calculadora de importação** | `Importacao/Calculadora.php`: o mesmo cálculo do protótipo (planilha FINAL IMPORT COSTS DRONES), no Painel → Importação. Também abre com os itens de uma ordem |
+| **Tabela NCM** | `Importacao/Ncm.php`: a tabela vigente da Receita, carregada a cada início (`dados/ncm.json`, atualizado toda semana pelo workflow "Tabela NCM"), com busca por código ou descrição |
 
 Pix, boleto e cartão ainda são simulados: a cobrança de verdade entra com o Asaas.
 
@@ -84,8 +88,7 @@ O workflow `.github/workflows/bagisto.yml` faz cinco coisas:
 
 ## Ainda falta
 
-- **Importação:** sob encomenda e conta e ordem, ordens de importação, calculadora de importação e NCM. Hoje isso está só no protótipo.
-- **Asaas de verdade** para Pix, boleto e cartão, com a baixa automática das parcelas.
-- **Painel da equipe:** a tela de decisão de crédito e faixa e a de recebíveis. Hoje o crédito é ajustado em B2B → Crédito da empresa.
-- **NF-e** pelo ERP.
+- **Asaas de verdade** para Pix, boleto, cartão e numerário, com a baixa automática. Hoje a equipe confirma o Pix no painel.
+- **Painel da equipe:** a tela de decisão de crédito e faixa e a de recebíveis. Hoje o crédito é ajustado em B2B → Crédito da empresa e a faixa em Importação → Empresas.
+- **NF-e** pelo ERP. Hoje o número da nota é simulado.
 - **Homologação na AWS** com endereço fixo.

@@ -9,11 +9,11 @@ Plataforma B2B da ImportFácil: loja para clientes empresariais, crédito, pedid
 
 | Pasta | Conteúdo |
 | --- | --- |
-| `bagisto/` | **A loja**: Bagisto 2.5 + B2B Suite, com as regras da ImportFácil em PHP (tipos de cliente, pedido mínimo, múltiplo de venda, crédito por faixa, Pix, boleto pelo crédito, cartão, parcelas, Financeiro) e o app instalável. Veja [`bagisto/README.md`](bagisto/README.md) |
+| `bagisto/` | **A loja**: Bagisto 2.5 + B2B Suite, com as regras da ImportFácil em PHP (tipos de cliente, pedido mínimo, múltiplo de venda, crédito por faixa, Pix, boleto pelo crédito, cartão, parcelas, Financeiro, importação sob encomenda e por conta e ordem, calculadora e NCM) e o app instalável. Veja [`bagisto/README.md`](bagisto/README.md) |
 | `.devcontainer/bagisto/` | Configuração para abrir a loja no GitHub Codespaces |
-| `index.html` | Protótipo de todas as telas, incluindo as que ainda não foram para o Bagisto (importação, calculadora, NCM, Painel da equipe) |
+| `index.html` | Protótipo de todas as telas, incluindo as que ainda não foram para o Bagisto (decisão de crédito e recebíveis do Painel da equipe) |
 | `.github/workflows/bagisto.yml` | Monta a loja, testa as regras, tira as capturas e publica a imagem |
-| `.github/workflows/ncm.yml` | Atualiza a tabela NCM do protótipo toda semana |
+| `.github/workflows/ncm.yml` | Atualiza a tabela NCM do protótipo e da loja toda semana |
 | `docs/` | Guia da conta AWS e marca |
 
 O servidor anterior (NestJS + PostgreSQL), a loja Next.js e o Terraform da AWS ficaram guardados no ramo
@@ -27,8 +27,7 @@ O servidor anterior (NestJS + PostgreSQL), a loja Next.js e o Terraform da AWS f
 
 ## Próximas fases
 
-1. **Importação no Bagisto:** sob encomenda, conta e ordem, ordens de importação, calculadora e NCM.
-2. **Pagamentos reais** pelo Asaas (Pix, boleto e cartão), com baixa das parcelas.
-3. **Painel da equipe:** decisão de crédito e faixa, e recebíveis.
-4. **NF-e** pelo ERP.
-5. **Homologação na AWS** com endereço fixo (depois que a conta for criada).
+1. **Pagamentos reais** pelo Asaas (Pix, boleto, cartão e numerário), com baixa automática.
+2. **Painel da equipe:** decisão de crédito e faixa, e recebíveis.
+3. **NF-e** pelo ERP.
+4. **Homologação na AWS** com endereço fixo (depois que a conta for criada).

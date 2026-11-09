@@ -174,7 +174,55 @@
       "status": 200,
       "ok": true,
       "espera": "Pedido mínimo para Cooperativa",
-      "trecho": "Skip to main content Página Inicial Carrinho Pedido mínimo para Cooperativa (faltam R$ 22.740,08): R$ 25.000,00 0 Itens Selecionados Câmera bullet IP 4 MP IR 50 m 4 R$ 2.259,92 Remover Adicionar à Lista de Requisição Con"
+      "trecho": "Skip to main content Página Inicial Carrinho Linha de importação · recebimento em 45 dias. Encomende os itens deste carrinho pelo Setor de Importação, sob encomenda ou por conta e ordem. Encomendar pela importação Pedido"
+    },
+    {
+      "nome": "importacao-no-carrinho",
+      "caminho": "aviso da linha de importação no carrinho",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "21-cliente-importacao-nova",
+      "caminho": "/customer/account/importacao/nova",
+      "status": 200,
+      "ok": true,
+      "espera": "Por conta e ordem",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar 1"
+    },
+    {
+      "nome": "importacao-conta-e-ordem",
+      "caminho": "OI-5001 criada com o numerário da mercadoria (Pix)",
+      "status": 200,
+      "ok": "OI-5001"
+    },
+    {
+      "nome": "importacao-esvazia-carrinho",
+      "caminho": "carrinho vazio depois da ordem",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "23-cliente-produto-importacao",
+      "caminho": "/alicate-de-cerca-itm001",
+      "status": 200,
+      "ok": true,
+      "espera": "Encomendar pela importação",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar P"
+    },
+    {
+      "nome": "importacao-encomenda",
+      "caminho": "OI-5002 sob encomenda, boleto, ITM001 em múltiplos de 6",
+      "status": 200,
+      "ok": "OI-5002"
+    },
+    {
+      "nome": "25-cliente-importacao-lista",
+      "caminho": "/customer/account/importacao",
+      "status": 200,
+      "ok": true,
+      "espera": "OI-5001",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
     },
     {
       "nome": "14-admin-painel",
@@ -182,7 +230,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Oi, Admin! Revise rapidamente o que está acontecendo em sua loja 10 de out. de 2"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Oi, Admin! Revise rapidamente o que está acontecendo em sua loja 10 d"
     },
     {
       "nome": "15-admin-produtos",
@@ -190,7 +238,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Produtos Categorias Atributos Famílias de Atributos Clientes B2B Suite CMS Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Produtos Exportar Criar Prod"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Produtos Categorias Atributos Famílias de Atributos Clientes B2B Suite CMS Importação Marketing Relatórios Aparência Configurações Configurar Ajuda e Recursos Produtos Exportar"
     },
     {
       "nome": "16-admin-empresas",
@@ -198,7 +246,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Importação Marketing Relatórios Aparência Configurações C"
     },
     {
       "nome": "17-admin-catalogos",
@@ -206,7 +254,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Importação Marketing Relatórios Aparência Configurações C"
     },
     {
       "nome": "18-admin-credito",
@@ -214,7 +262,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Importação Marketing Relatórios Aparência Configurações C"
     },
     {
       "nome": "19-admin-cotacoes",
@@ -222,7 +270,7 @@
       "status": 200,
       "ok": true,
       "espera": null,
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Marketing Relatórios Aparência Configurações Configurar A"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite Empresas Atributos da Empresa Catálogos da Empresa Crédito da Empresa Cotações Ordens de Compra CMS Importação Marketing Relatórios Aparência Configurações C"
     },
     {
       "nome": "20-admin-regra-pix",
@@ -230,7 +278,113 @@
       "status": 200,
       "ok": true,
       "espera": "Pix",
-      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Marketing Promoções Regras de Catálogo Regras de Carrinho Comunicações Modelos de E-mail Eventos Campanhas Inscrições na Newsletter Busca & SEO Reescrita"
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Marketing Promoções Regras de Catálogo Regras de Carrinho Comunicações Modelos de E-mail Eventos Campanhas Inscrições na Newsletter Busca & SE"
+    },
+    {
+      "nome": "26-admin-importacao-ordens",
+      "caminho": "/admin/importacao/ordens",
+      "status": 200,
+      "ok": true,
+      "espera": "Ordens de importação",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Ordens de importação Calculadora de importação Tabela NCM Empresas: faixa e conta e ordem Marketing Relatórios Aparência Configurações Configu"
+    },
+    {
+      "nome": "importacao-trava-numerario",
+      "caminho": "conta e ordem não avança sem o Pix do numerário",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "importacao-ncm-item",
+      "caminho": "NCM 8525.89.29 no item",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "importacao-conta-e-ordem-entregue",
+      "caminho": "Pix da mercadoria e dos tributos confirmados, entregue com prestação de contas e taxa de serviço",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "importacao-encomenda-faturada",
+      "caminho": "entregue, NF-e e 4 boletos (faixa A: 4×)",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "30-admin-calculadora",
+      "caminho": "/admin/importacao/calculadora",
+      "status": 200,
+      "ok": true,
+      "espera": "R$ 3.978.913,88",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Ordens de importação Calculadora de importação Tabela NCM Empresas: faixa e conta e ordem Marketing Relatórios Aparência Configurações Configu"
+    },
+    {
+      "nome": "31-admin-calculadora-da-ordem",
+      "caminho": "/admin/importacao/calculadora?ordem=2",
+      "status": 200,
+      "ok": true,
+      "espera": "OI-5002",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Ordens de importação Calculadora de importação Tabela NCM Empresas: faixa e conta e ordem Marketing Relatórios Aparência Configurações Configu"
+    },
+    {
+      "nome": "calculadora-com-itens-da-ordem",
+      "caminho": "itens: Alicate de Cerca (itm001-2001)",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "32-admin-tabela-ncm",
+      "caminho": "/admin/importacao/ncm?q=ve%C3%ADculos%20a%C3%A9reos",
+      "status": 200,
+      "ok": true,
+      "espera": "8806",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Ordens de importação Calculadora de importação Tabela NCM Empresas: faixa e conta e ordem Marketing Relatórios Aparência Configurações Configu"
+    },
+    {
+      "nome": "ncm-busca-json",
+      "caminho": "/ncm/buscar?q=8806 → 11 códigos",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "33-admin-empresas-conta-e-ordem",
+      "caminho": "/admin/importacao/empresas",
+      "status": 200,
+      "ok": true,
+      "espera": "Liberar conta e ordem",
+      "trecho": "Ctrl K A Painel de Controle Vendas Catálogo Clientes B2B Suite CMS Importação Ordens de importação Calculadora de importação Tabela NCM Empresas: faixa e conta e ordem Marketing Relatórios Aparência Configurações Configu"
+    },
+    {
+      "nome": "34-cliente-ordem-entregue",
+      "caminho": "/customer/account/importacao/1",
+      "status": 200,
+      "ok": true,
+      "espera": "Prestação de contas",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
+    },
+    {
+      "nome": "35-cliente-financeiro-importacao",
+      "caminho": "/customer/account/financeiro",
+      "status": 200,
+      "ok": true,
+      "espera": "OI-",
+      "trecho": "Skip to main content TUDO MAQUINÁRIO Colheita e Pós-colheita Máquinas e Equipamentos PEÇAS PARA REPOSIÇÃO SISTEMAS DE IRRIGAÇÃO Aplicação, Irrigação e Viveiro Infraestrutura EPIS EPI - Equipamento de Proteção Pesquisar H"
+    },
+    {
+      "nome": "36-hospital-importacao-nova",
+      "caminho": "/customer/account/importacao/nova?produto=55",
+      "status": 200,
+      "ok": true,
+      "espera": "não permite boleto",
+      "trecho": "Skip to main content TUDO MONITORAMENTO E SEGURANÇA Câmeras Gravação Alarmes Controle de acesso DESCARTÁVEIS E MATERIAL DE CONSUMO Proteção Seringas Resíduos Lençóis e Descartáveis Gaze, Curativos e Fixação Agulhas e Pun"
+    },
+    {
+      "nome": "importacao-faixa-c-sem-boleto",
+      "caminho": "faixa C: boleto bloqueado e sem conta e ordem",
+      "status": 200,
+      "ok": true
     }
   ],
   "erros": []

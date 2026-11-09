@@ -50,21 +50,22 @@
     <img src="../../prototipo-globo-192.png" alt="">
     <div><h1>Loja ImportFácil refeita no Bagisto 2.5 + B2B Suite</h1></div>
   </header>
-  <p class="sub">O que foi executado e como a loja ficou. Capturas do teste automático de 09/11/2026, versão <code>a227187</code>. O servidor Node.js e a loja Next.js foram substituídos e estão guardados no ramo <code>legado-node</code>.</p>
+  <p class="sub">O que foi executado e como a loja ficou. Capturas do teste automático de 09/11/2026, versão <code>89ba854</code>. O servidor Node.js e a loja Next.js foram substituídos e estão guardados no ramo <code>legado-node</code>.</p>
 
   <div class="status">
-    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Loja montada e testada</h3><p>Instalada do zero no GitHub Actions: 30 de 30 verificações passaram (páginas do visitante, da empresa e do painel, regras e app).</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Loja montada e testada</h3><p>Instalada do zero no GitHub Actions: 52 de 52 verificações passaram: páginas do visitante, da empresa e do painel, regras, app e importação.</p></div>
     <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Regras reescritas em PHP</h3><p>Pedido mínimo por tipo, múltiplo de venda, faixas de crédito, Pix com 3%, boleto 30/60/90/120 pelo crédito, cartão em até 12×, parcelas e Financeiro.</p></div>
     <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>App para celular</h3><p>App instalável (PWA) com o ícone do globo. A página <code>/app</code> mostra o QR e o passo a passo para Android e iPhone.</p></div>
     <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Catálogo da ImportFácil</h3><p>446 produtos, 31 categorias e 5 empresas de demonstração, uma por tipo de cliente, com desconto e crédito.</p></div>
     <div class="cartao"><span class="selo pend">⏳ Pendente</span><h3>Homologação na AWS</h3><p>Precisa da conta AWS, para ter um endereço fixo. Enquanto isso, a loja e o app rodam no Codespaces ou no computador com Docker.</p></div>
-    <div class="cartao"><span class="selo pend">⏳ Próxima fase</span><h3>Importação e Asaas</h3><p>Sob encomenda, conta e ordem, calculadora e NCM ainda estão só no protótipo. Pix, boleto e cartão ainda são simulados.</p></div>
+    <div class="cartao"><span class="selo ok">✓ Concluído</span><h3>Importação</h3><p>Ordens sob encomenda e por conta e ordem, numerário por Pix, prestação de contas, calculadora de custos e tabela NCM vigente.</p></div>
+    <div class="cartao"><span class="selo pend">⏳ Próxima fase</span><h3>Asaas e NF-e</h3><p>Pix, boleto e cartão ainda são simulados; a NF-e ainda não sai pelo ERP.</p></div>
   </div>
 
   <h2>Links</h2>
   <div class="links">
     <a href="https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json"><b>Abrir a loja e o app →</b><span>Cria um Codespace com a loja (de 10 a 20 minutos na primeira vez). Depois, abra <code>/app</code> e leia o QR com o celular</span></a>
-    <a href="https://github.com/ImportFacil/REP-TESTE/actions/runs/42681246457"><b>Execução do teste →</b><span>Passo a passo do GitHub Actions: montagem, instalação e navegação</span></a>
+    <a href="https://github.com/ImportFacil/REP-TESTE/actions/runs/42687536837"><b>Execução do teste →</b><span>Passo a passo do GitHub Actions: montagem, instalação e navegação</span></a>
     <a href="https://github.com/ImportFacil/REP-TESTE/tree/main/bagisto"><b>Código da loja →</b><span>Pacote de regras em PHP, Dockerfile, instalação e instruções</span></a>
     <a href="https://importfacil.github.io/REP-TESTE/"><b>Protótipo atual →</b><span>Para comparar lado a lado</span></a>
   </div>
@@ -89,6 +90,19 @@
     <figure><a href="13d-empresa-carrinho.jpg"><img src="13d-empresa-carrinho.jpg" alt="Carrinho com pedido mínimo" loading="lazy"></a><figcaption><b>Pedido mínimo por tipo</b>Pediu 1, o carrinho ajustou para 4. Aviso: faltam R$ 22.740,08</figcaption></figure>
     <figure><a href="13b-empresa-financeiro.jpg"><img src="13b-empresa-financeiro.jpg" alt="Financeiro" loading="lazy"></a><figcaption><b>Financeiro da empresa</b>Faixa A: boleto em até 4×. As parcelas aparecem a cada pedido</figcaption></figure>
     <figure><a href="20-admin-regra-pix.jpg"><img src="20-admin-regra-pix.jpg" alt="Regra de carrinho Pix" loading="lazy"></a><figcaption><b>Regra “Pix: 3% de desconto”</b>No painel, em Marketing → Regras de Carrinho</figcaption></figure>
+  </div>
+
+  <h2>Importação</h2>
+  <div class="galeria">
+    <figure><a href="21-cliente-importacao-nova.jpg"><img src="21-cliente-importacao-nova.jpg" alt="Nova ordem de importação" loading="lazy"></a><figcaption><b>Cliente: nova ordem de importação</b>Itens do carrinho ou do produto, modalidade, pagamento e incoterm</figcaption></figure>
+    <figure><a href="22-cliente-ordem-conta-e-ordem.jpg"><img src="22-cliente-ordem-conta-e-ordem.jpg" alt="Ordem por conta e ordem" loading="lazy"></a><figcaption><b>Cliente: ordem por conta e ordem</b>Andamento, numerário da mercadoria por Pix e taxa de serviço</figcaption></figure>
+    <figure><a href="27-admin-ordem-aguardando-numerario.jpg"><img src="27-admin-ordem-aguardando-numerario.jpg" alt="Ordem aguardando numerário" loading="lazy"></a><figcaption><b>Painel: ordem travada sem numerário</b>Não avança para o câmbio antes do Pix da mercadoria</figcaption></figure>
+    <figure><a href="28-admin-ordem-conta-e-ordem-entregue.jpg"><img src="28-admin-ordem-conta-e-ordem-entregue.jpg" alt="Conta e ordem entregue" loading="lazy"></a><figcaption><b>Painel: conta e ordem entregue</b>Prestação de contas do numerário e cobrança do serviço</figcaption></figure>
+    <figure><a href="29-admin-ordem-encomenda-entregue.jpg"><img src="29-admin-ordem-encomenda-entregue.jpg" alt="Encomenda entregue" loading="lazy"></a><figcaption><b>Painel: encomenda entregue</b>NF-e de venda e 4 boletos (faixa A)</figcaption></figure>
+    <figure><a href="30-admin-calculadora.jpg"><img src="30-admin-calculadora.jpg" alt="Calculadora de importação" loading="lazy"></a><figcaption><b>Calculadora de importação</b>Mesmo cálculo do protótipo (planilha dos drones), agora em PHP</figcaption></figure>
+    <figure><a href="32-admin-tabela-ncm.jpg"><img src="32-admin-tabela-ncm.jpg" alt="Tabela NCM" loading="lazy"></a><figcaption><b>Tabela NCM vigente</b>Busca por código ou descrição</figcaption></figure>
+    <figure><a href="33-admin-empresas-conta-e-ordem.jpg"><img src="33-admin-empresas-conta-e-ordem.jpg" alt="Empresas e conta e ordem" loading="lazy"></a><figcaption><b>Faixa e conta e ordem por empresa</b>Liberação só para a faixa A</figcaption></figure>
+    <figure><a href="35-cliente-financeiro-importacao.jpg"><img src="35-cliente-financeiro-importacao.jpg" alt="Financeiro com importação" loading="lazy"></a><figcaption><b>Cliente: Financeiro</b>Numerário, serviço e boletos das ordens de importação</figcaption></figure>
   </div>
 
   <h2>Loja (visitante)</h2>
@@ -132,7 +146,8 @@
       <tr><td>Pix 3%, boleto 30/60/90/120, cartão 12×</td><td>Sim (simulado)</td><td>Sim (simulado até o Asaas), com parcelas no Financeiro</td></tr>
       <tr><td>Pedido rápido, cotação, usuários da empresa</td><td>Parcial</td><td>Sim (B2B Suite)</td></tr>
       <tr><td>App instalável no celular</td><td>Sim</td><td>Sim: PWA com o ícone do globo e a página /app</td></tr>
-      <tr><td>Importação, calculadora e NCM</td><td>Sim</td><td>Ainda não (próxima fase)</td></tr>
+      <tr><td>Importação sob encomenda e por conta e ordem</td><td>Sim</td><td>Sim (pacote ImportFácil): ordens, etapas, numerário por Pix e prestação de contas</td></tr>
+      <tr><td>Calculadora de importação e NCM</td><td>Sim</td><td>Sim, no Painel → Importação, com a tabela NCM vigente</td></tr>
       <tr><td>Painel de decisão de crédito e recebíveis</td><td>Sim</td><td>Ainda não; o crédito é ajustado em B2B → Crédito</td></tr>
     </tbody>
   </table></div>
