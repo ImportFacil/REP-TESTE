@@ -2,6 +2,8 @@
 # Configura o .env, instala o Bagisto + B2B Suite e o catálogo da ImportFácil na primeira vez
 # (o banco guarda a marca "importfacil.demo.instalado") e sobe a loja na porta 8000.
 set -euo pipefail
+trap 'echo "[iniciar.sh] falhou na linha $LINENO: $BASH_COMMAND" >&2' ERR
+echo "[iniciar.sh] começando $(date -Is)"
 cd /var/www/bagisto
 
 : "${DB_HOST:=db}" "${DB_PORT:=3306}" "${DB_DATABASE:=bagisto}" "${DB_USERNAME:=bagisto}" "${DB_PASSWORD:=bagisto}"
@@ -36,7 +38,7 @@ env_set DB_PASSWORD "$DB_PASSWORD"
 env_set MAIL_MAILER log
 env_set QUEUE_CONNECTION sync
 env_set CACHE_STORE file
-grep -q '^APP_KEY=base64' .env || php artisan key:generate --force >/dev/null
+grep -q '^APP_KEY=base64' .env || php artisan key:generate --force
 
 consulta() { # imprime o resultado de uma consulta de uma coluna, ou ERRO
   php -r '

@@ -36,16 +36,19 @@ jobs:
         run: |
           for i in $(seq 1 240); do
             if curl -sf -o /dev/null http://localhost:8000/; then echo "Loja no ar depois de $((i*10)) s"; exit 0; fi
-            if [ "$(docker inspect -f '{{.State.Running}}' "$(docker compose -f demo-bagisto/docker-compose.yml ps -q app)")" != "true" ]; then
-              echo "O contêiner da loja parou"; docker compose -f demo-bagisto/docker-compose.yml logs app | tail -200; exit 1
+            if [ "$(docker inspect -f '{{.State.Running}}' demo-bagisto-app-1 2>/dev/null)" != "true" ]; then
+              echo "O contêiner da loja parou"; exit 1
             fi
             sleep 10
           done
-          echo "Tempo esgotado"; docker compose -f demo-bagisto/docker-compose.yml logs app | tail -200; exit 1
+          echo "Tempo esgotado"; exit 1
 
       - name: Resumo da instalação
         if: always()
-        run: docker compose -f demo-bagisto/docker-compose.yml logs app | grep -v "^\s*$" | tail -80
+        run: |
+          docker compose -f demo-bagisto/docker-compose.yml ps -a
+          for c in $(docker ps -aq); do echo "== $(docker inspect -f '{{.Name}} saída={{.State.ExitCode}} erro={{.State.Error}}' $c)"; done
+          docker logs demo-bagisto-app-1 2>&1 | grep -v "^\s*$" | tail -150
 
       - name: Navegar e tirar capturas
         working-directory: demo-bagisto/testes
