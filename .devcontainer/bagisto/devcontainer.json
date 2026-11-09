@@ -15,7 +15,7 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postStartCommand": "gh codespace ports visibility 8000:public -c \"$CODESPACE_NAME\" >/tmp/porta-publica.log 2>&1 || true; bash \"${containerWorkspaceFolder}/.devcontainer/bagisto/publicar-endereco.sh\" >/tmp/publicar-endereco.log 2>&1 || true; nohup bash /opt/demo/iniciar.sh > /tmp/loja-bagisto.log 2>&1 &",
+  "postStartCommand": "bash \"${containerWorkspaceFolder}/.devcontainer/bagisto/publicar-endereco.sh\" >/tmp/publicar-endereco.log 2>&1 || true; nohup bash /opt/demo/iniciar.sh > /tmp/loja-bagisto.log 2>&1 & nohup bash \"${containerWorkspaceFolder}/.devcontainer/bagisto/porta-publica.sh\" > /tmp/porta-publica.log 2>&1 &",
   "forwardPorts": [
     8000
   ],
