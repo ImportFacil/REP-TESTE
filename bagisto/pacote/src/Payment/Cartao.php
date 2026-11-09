@@ -13,7 +13,7 @@ class Cartao extends Payment
 
     public function getImage()
     {
-        return url('importfacil/cartao.svg');
+        return '/importfacil/cartao.svg';
     }
 
     public function getAdditionalDetails()

@@ -46,7 +46,8 @@ class AppController extends Controller
     /** Página "Baixar o app": QR code do endereço atual e passo a passo para Android e iPhone. */
     public function instalar()
     {
-        $url = url('/').'/?app=bagisto';
+        // endereço público da loja (no Codespaces, o iniciar.sh põe o do Codespace em APP_URL)
+        $url = rtrim(config('app.url') ?: url('/'), '/').'/?app=bagisto';
         $qr = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(260)->margin(1)->errorCorrection('M')->generate($url);
 
         return view('importfacil::app.instalar', ['url' => $url, 'qr' => $qr]);

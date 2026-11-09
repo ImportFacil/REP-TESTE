@@ -14,7 +14,7 @@ return [
         'class' => \ImportFacil\Loja\Payment\Cartao::class,
         'code' => 'importfacil_cartao',
         'title' => 'Cartão de crédito em até 12×',
-        'description' => 'Sem juros até 10×.',
+        'description' => 'Sem juros até 10×; 11× e 12× com 1,99% a.m.',
         'active' => true,
         'generate_invoice' => true,
         'sort' => 3,

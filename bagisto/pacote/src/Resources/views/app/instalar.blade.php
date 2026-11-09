@@ -3,7 +3,7 @@
 
     <div style="max-width:980px;margin:32px auto;padding:0 16px">
         <div style="display:flex;gap:16px;align-items:center;margin-bottom:8px">
-            <img src="{{ url('importfacil/icone-192.png') }}" alt="" width="64" height="64" style="border-radius:16px;border:1px solid #E4E4E7">
+            <img src="/importfacil/icone-192.png" alt="" width="64" height="64" style="border-radius:16px;border:1px solid #E4E4E7">
             <div>
                 <h1 style="font-size:28px;font-weight:600;margin:0">App ImportFácil no celular</h1>
                 <p style="margin:4px 0 0;color:#52525B">A loja inteira, com o ícone do globo na tela inicial. Instala pelo navegador, sem loja de aplicativos.</p>

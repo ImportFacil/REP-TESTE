@@ -27,7 +27,7 @@ class ImportFacilServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(dirname(__DIR__).'/Routes/web.php');
         $this->mergeConfigFrom(dirname(__DIR__).'/Config/menu.php', 'menu.customer');
 
-        Event::listen('checkout.cart.collect.totals.before', [MultiploDeVenda::class, 'handle']);
+        Event::listen('checkout.cart.validate.items.before', [MultiploDeVenda::class, 'handle']);
         Event::listen('checkout.order.save.after', [GerarParcelas::class, 'handle']);
 
         Event::listen('bagisto.shop.layout.head.after', fn ($e) => $e->addTemplate('importfacil::pwa.head'));

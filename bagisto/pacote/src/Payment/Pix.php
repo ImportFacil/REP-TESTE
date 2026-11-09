@@ -13,7 +13,7 @@ class Pix extends Payment
 
     public function getImage()
     {
-        return url('importfacil/pix.svg');
+        return '/importfacil/pix.svg';
     }
 
     public function getAdditionalDetails()
