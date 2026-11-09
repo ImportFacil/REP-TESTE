@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baixar o app ImportFácil</title>
+<meta name="description" content="Instale o app ImportFácil no celular: leia o QR code ou abra este endereço no Chrome (Android) ou no Safari (iPhone).">
+<meta name="theme-color" content="#1D4ED8">
+<link rel="icon" href="../prototipo-globo-192.png">
+<link rel="apple-touch-icon" href="../prototipo-globo-apple.png">
+<style>
+  :root{--fundo:#F6F5F2;--cartao:#fff;--tinta:#18181B;--tinta2:#52525B;--borda:#E4E2DC;--azul:#1D4ED8;--azul-claro:#E8EEFC;--ok:#15803D;--ok-fundo:#DCFCE7;--pend:#92400E;--pend-fundo:#FEF3C7}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fundo:#141414;--cartao:#1F1F1E;--tinta:#F2F1EE;--tinta2:#B8B6B0;--borda:#34332F;--azul:#7AA2F7;--azul-claro:#1E2A44;--ok:#86EFAC;--ok-fundo:#14301F;--pend:#FCD34D;--pend-fundo:#3A2E10}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--tinta);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--azul)}
+  .wrap{max-width:880px;margin:0 auto;padding:28px 16px 56px}
+  header{display:flex;gap:14px;align-items:center}
+  header img{width:56px;height:56px;border-radius:14px;border:1px solid var(--borda);background:#fff}
+  h1{font-size:clamp(24px,4vw,32px);line-height:1.15;margin:0}
+  .sub{color:var(--tinta2);margin:4px 0 0}
+  .grade{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;margin-top:22px;align-items:start}
+  @media (max-width:700px){.grade{grid-template-columns:1fr}}
+  .cartao{background:var(--cartao);border:1px solid var(--borda);border-radius:16px;padding:18px}
+  .qr{text-align:center}
+  .qr img{width:100%;max-width:260px;height:auto;display:block;margin:0 auto;border-radius:10px;background:#fff;padding:8px}
+  .qr p{margin:10px 0 0;font-size:14px;color:var(--tinta2)}
+  .qr code{font-size:13px;word-break:break-all}
+  .selo{display:inline-block;font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px;margin-bottom:8px;background:var(--azul-claro);color:var(--azul)}
+  .selo.ok{background:var(--ok-fundo);color:var(--ok)} .selo.pend{background:var(--pend-fundo);color:var(--pend)}
+  h2{font-size:18px;margin:0 0 6px}
+  h3{font-size:16px;margin:16px 0 4px}
+  .estado p{margin:0 0 10px;color:var(--tinta2)}
+  .botao{display:inline-block;background:var(--azul);color:#fff;text-decoration:none;font-weight:600;border-radius:10px;padding:10px 16px;margin:4px 8px 4px 0}
+  .botao.sec{background:transparent;color:var(--azul);border:1px solid var(--azul)}
+  ol{margin:4px 0 0;padding-left:22px} li{margin:4px 0}
+  footer{margin-top:28px;color:var(--tinta2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="../prototipo-globo-192.png" alt="">
+    <div>
+      <h1>App ImportFácil no celular</h1>
+      <p class="sub">A loja inteira, com o ícone do globo na tela inicial. Instala pelo navegador, sem loja de aplicativos.</p>
+    </div>
+  </header>
+
+  <div class="grade">
+    <div class="cartao qr">
+      <img src="qr-app.png" alt="QR code do endereço importfacil.github.io/REP-TESTE/app" width="300" height="300">
+      <p><b>Aponte a câmera do celular para o QR code</b></p>
+      <p><code>importfacil.github.io/REP-TESTE/app</code></p>
+    </div>
+
+    <div class="cartao estado" id="estado" aria-live="polite">
+      <span class="selo">Procurando a loja…</span>
+      <h2>Verificando se a loja está ligada</h2>
+      <p>Isso leva alguns segundos.</p>
+    </div>
+  </div>
+
+  <div class="cartao" style="margin-top:16px">
+    <h2>Como instalar</h2>
+    <h3>Android (Chrome)</h3>
+    <ol><li>Leia o QR code ou abra este endereço no Chrome.</li><li>Na loja, toque em <b>Instalar app</b> (ou no menu ⋮ → <b>Adicionar à tela inicial</b>).</li></ol>
+    <h3>iPhone (Safari)</h3>
+    <ol><li>Leia o QR code com a câmera e abra no Safari.</li><li>Toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>.</li></ol>
+  </div>
+
+  <footer>Loja Bagisto da ImportFácil, em teste. Enquanto não há homologação na AWS, a loja roda no GitHub Codespaces e este endereço leva até ela.</footer>
+</div>
+
+<script>
+(function () {
+  var ENDERECO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/endereco.json';
+  var CODESPACES = 'https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json';
+  var PROTOTIPO = '../';
+  var caixa = document.getElementById('estado');
+  var celular = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900;
+  var semRedirecionar = /[?&]ficar\b/.test(location.search);
+
+  function mostrar(html) { caixa.innerHTML = html; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  function desligada(motivo) {
+    mostrar('<span class="selo pend">Loja desligada</span>'
+      + '<h2>A loja de teste não está ligada agora</h2>'
+      + '<p>' + motivo + '</p>'
+      + '<p>Para ligar: abra o Codespace da loja no computador (a primeira vez leva de 10 a 20 minutos). Quando ela estiver no ar, leia o QR de novo.</p>'
+      + '<a class="botao" href="' + CODESPACES + '">Ligar a loja no Codespaces</a>'
+      + '<a class="botao sec" href="https://github.com/codespaces">Meus Codespaces</a>'
+      + '<h3>Enquanto isso</h3><p>O app do protótipo funciona sempre e também instala no celular.</p>'
+      + '<a class="botao sec" href="' + PROTOTIPO + '">Abrir o app do protótipo</a>');
+  }
+
+  function ligada(url) {
+    var app = url.replace(/\/+$/, '') + '/app';
+    if (celular && !semRedirecionar) {
+      mostrar('<span class="selo ok">Loja no ar</span><h2>Abrindo a loja…</h2><p>Se não abrir sozinha, toque no botão.</p><a class="botao" href="' + esc(app) + '">Abrir e instalar o app</a>');
+      location.replace(app);
+      return;
+    }
+    mostrar('<span class="selo ok">Loja no ar</span>'
+      + '<h2>A loja de teste está ligada</h2>'
+      + '<p>Leia o QR code com o celular para instalar o app, ou abra a loja aqui.</p>'
+      + '<a class="botao" href="' + esc(app) + '">Abrir a página do app</a>'
+      + '<a class="botao sec" href="' + esc(url) + '">Abrir a loja</a>'
+      + '<p style="margin-top:10px;font-size:13px">Endereço atual: <code>' + esc(url) + '</code></p>');
+  }
+
+  function testar(url) {
+    // a loja responde com o ícone do app quando o Codespace está ligado e a porta 8000 é pública
+    var img = new Image(), fim = false;
+    var t = setTimeout(function () { if (!fim) { fim = true; desligada('O Codespace não respondeu (pode estar parado ou com a porta 8000 privada).'); } }, 9000);
+    img.onload = function () { if (!fim) { fim = true; clearTimeout(t); ligada(url); } };
+    img.onerror = function () { if (!fim) { fim = true; clearTimeout(t); desligada('O Codespace está parado ou a porta 8000 está privada.'); } };
+    img.src = url.replace(/\/+$/, '') + '/importfacil/icone-192.png?t=' + Date.now();
+  }
+
+  fetch(ENDERECO + '?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      if (!d || !/^https:\/\/[a-z0-9.-]+\.app\.github\.dev\/?$/i.test(d.url || '')) throw new Error('endereço inválido');
+      testar(d.url);
+    })
+    .catch(function () { desligada('Ainda não há um Codespace da loja registrado.'); });
+})();
+</script>
+</body>
+</html>

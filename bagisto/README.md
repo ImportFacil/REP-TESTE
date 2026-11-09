@@ -60,7 +60,7 @@ As empresas e os dados são fictícios. Não use estas senhas fora do ambiente d
 1. A primeira abertura leva de 10 a 20 minutos, porque o Bagisto é instalado e o catálogo é carregado. O andamento fica em `/tmp/loja-bagisto.log`.
 2. A porta 8000 fica pública, para o celular abrir sem login no GitHub. O endereço é
    `https://<nome-do-codespace>-8000.app.github.dev`. Se ela continuar privada, clique com o botão direito na porta 8000 → **Port Visibility → Public**.
-3. **App no celular:** no computador, abra `<endereço>/app` e leia o QR com o celular. No Android, toque em
+3. **App no celular:** leia o QR code da página fixa https://importfacil.github.io/REP-TESTE/app/. Ao ligar, o Codespace publica o seu endereço no ramo `app-endereco`, e a página leva o celular até a loja. Também dá para abrir `<endereço>/app` no computador e ler o QR de lá. No Android, toque em
    **Instalar app**. No iPhone, use o Safari: **Compartilhar → Adicionar à Tela de Início**.
 
 O endereço vale enquanto o Codespace estiver ligado. O endereço fixo vem com a homologação na AWS.

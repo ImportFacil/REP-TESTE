@@ -22,7 +22,7 @@ O servidor anterior (NestJS + PostgreSQL), a loja Next.js e o Terraform da AWS f
 ## Abrir a loja e o app
 
 - **Codespaces:** [abrir a loja](https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json). A primeira vez leva de 10 a 20 minutos.
-- **App no celular:** com a loja aberta, acesse `/app` e leia o QR. O endereço vale enquanto o Codespace estiver ligado.
+- **App no celular:** leia o QR code em **https://importfacil.github.io/REP-TESTE/app/**. Esse endereço é fixo: quando o Codespace da loja está ligado, ele leva o celular até a loja para instalar o app; quando está desligado, avisa e oferece o app do protótipo.
 - **Docker no computador:** `cd bagisto && docker compose up --build`, depois http://localhost:8000.
 
 ## Próximas fases
