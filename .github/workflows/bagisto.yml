@@ -1,0 +1,90 @@
+name: Loja Bagisto
+
+# Monta a loja ImportFácil (Bagisto 2.5 + B2B Suite + pacote ImportFacil\Loja) com o catálogo,
+# testa as páginas e as regras, tira capturas de tela e publica a imagem no GitHub Packages (ghcr.io).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'bagisto/**'
+      - '!bagisto/resultado/**'
+      - '!bagisto/README.md'
+      - '.devcontainer/bagisto/**'
+      - '.github/workflows/bagisto.yml'
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: bagisto
+  cancel-in-progress: true
+
+jobs:
+  loja:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir a imagem e subir MySQL + Bagisto
+        working-directory: bagisto
+        run: |
+          docker compose build
+          docker compose up -d
+
+      - name: Esperar a instalação e o catálogo
+        run: |
+          for i in $(seq 1 240); do
+            if curl -sf -o /dev/null http://localhost:8000/; then echo "Loja no ar depois de $((i*10)) s"; exit 0; fi
+            if [ "$(docker inspect -f '{{.State.Running}}' bagisto-app-1 2>/dev/null)" != "true" ]; then
+              echo "O contêiner da loja parou"; exit 1
+            fi
+            sleep 10
+          done
+          echo "Tempo esgotado"; exit 1
+
+      - name: Resumo da instalação
+        if: always()
+        run: |
+          docker compose -f bagisto/docker-compose.yml ps -a
+          docker logs bagisto-app-1 2>&1 | grep -v "^\s*$" | tail -150
+
+      - name: Navegar, testar as regras e tirar capturas
+        working-directory: bagisto/testes
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node capturas.mjs http://localhost:8000 ../catalogo-importfacil.json capturas
+
+      - name: Publicar capturas no ramo demo-bagisto-capturas
+        if: always()
+        run: |
+          [ -d bagisto/testes/capturas ] || exit 0
+          cd bagisto/testes/capturas
+          git init -q -b demo-bagisto-capturas
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Capturas da loja Bagisto (${{ github.sha }})"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" demo-bagisto-capturas
+
+      - name: Guardar capturas e relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-bagisto
+          path: bagisto/testes/capturas
+          if-no-files-found: ignore
+
+      - name: Log do Laravel em caso de erro
+        if: failure()
+        run: |
+          docker compose -f bagisto/docker-compose.yml exec -T app bash -c 'tail -n 200 storage/logs/laravel.log 2>/dev/null || true' || true
+
+      - name: Publicar a imagem no GitHub Packages
+        if: success()
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          dono=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker tag importfacil-bagisto "ghcr.io/$dono/importfacil-bagisto:latest"
+          docker push "ghcr.io/$dono/importfacil-bagisto:latest" || echo "Não foi possível publicar a imagem (permissão de pacotes da organização)."

@@ -1,5 +1,0 @@
-{
-  "ambiente": "local",
-  "api": "http://localhost:3000",
-  "auth": "dev"
-}

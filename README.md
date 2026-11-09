@@ -1,31 +1,34 @@
 # ImportFácil
 
-Plataforma B2B da ImportFácil: loja para clientes empresariais, orçamentos, ordens de importação, financeiro e Painel da equipe.
+Plataforma B2B da ImportFácil: loja para clientes empresariais, crédito, pedidos, pagamentos e app para celular.
 
-**▶ Abrir o protótipo: https://importfacil.github.io/REP-TESTE/**
+**▶ Protótipo navegável: https://importfacil.github.io/REP-TESTE/**
+**▶ Loja Bagisto (resultado dos testes e capturas): https://importfacil.github.io/REP-TESTE/bagisto/resultado/**
 
 ## O que tem neste repositório
 
-| Pasta | Conteúdo | Situação |
-| --- | --- | --- |
-| `index.html` | Protótipo navegável de todas as telas (dados ficam no navegador) | Pronto; é publicado como site de cada ambiente |
-| `frontend/` | Site em Next.js ligado à API (loja, Painel da equipe, app instalável) | **Pronto** |
-| `backend/` | API em NestJS + PostgreSQL, e o worker | **Fases 1 e 2 prontas:** login, empresas, catálogo e preços, crédito, pedidos, pagamentos (simulados até o Asaas), orçamentos, ordens de importação, régua de cobrança, auditoria |
-| `infra/` | Infraestrutura AWS em Terraform (São Paulo) | **Pronta:** dev, homologação e produção. Para começar só com a homologação na conta gratuita: [`docs/conta-aws-gratuita.md`](docs/conta-aws-gratuita.md) |
-| `.github/workflows/` | Testes, publicação da imagem e deploy | Pronto; o deploy liga quando a AWS for configurada |
-| `docs/` | Situação da fase 1 e próximos passos | — |
+| Pasta | Conteúdo |
+| --- | --- |
+| `bagisto/` | **A loja**: Bagisto 2.5 + B2B Suite, com as regras da ImportFácil em PHP (tipos de cliente, pedido mínimo, múltiplo de venda, crédito por faixa, Pix, boleto pelo crédito, cartão, parcelas, Financeiro) e o app instalável. Veja [`bagisto/README.md`](bagisto/README.md) |
+| `.devcontainer/bagisto/` | Configuração para abrir a loja no GitHub Codespaces |
+| `index.html` | Protótipo de todas as telas, incluindo as que ainda não foram para o Bagisto (importação, calculadora, NCM, Painel da equipe) |
+| `.github/workflows/bagisto.yml` | Monta a loja, testa as regras, tira as capturas e publica a imagem |
+| `.github/workflows/ncm.yml` | Atualiza a tabela NCM do protótipo toda semana |
+| `docs/` | Guia da conta AWS e marca |
 
-Comece por [`docs/fase-2.md`](docs/fase-2.md) (situação atual) e [`docs/fase-1.md`](docs/fase-1.md).
+O servidor anterior (NestJS + PostgreSQL), a loja Next.js e o Terraform da AWS ficaram guardados no ramo
+[`legado-node`](https://github.com/ImportFacil/REP-TESTE/tree/legado-node).
 
-## Protótipo
+## Abrir a loja e o app
 
-Está publicado em **https://importfacil.github.io/REP-TESTE/** (GitHub Pages, atualizado a cada commit no `main`). Também abre direto do arquivo `index.html` no navegador.
+- **Codespaces:** [abrir a loja](https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json). A primeira vez leva de 10 a 20 minutos.
+- **App no celular:** com a loja aberta, acesse `/app` e leia o QR. O endereço vale enquanto o Codespace estiver ligado.
+- **Docker no computador:** `cd bagisto && docker compose up --build`, depois http://localhost:8000.
 
-O protótipo cobre loja, checkout (Pix, boleto 30/60/90/120, cartão até 12×), pedidos, orçamentos e ordens de importação (encomenda ou conta e ordem), cadastro para crédito, Financeiro e o Painel da equipe (crédito, pedidos, recebíveis, condições e a **calculadora de importação**, baseada na planilha FINAL IMPORT COSTS DRONES, com os custos no exterior em dólar; aceita planilha anexada (.xlsx, .xls, .csv) e busca o NCM na tabela oficial da Receita, atualizada toda semana pelo workflow "Tabela NCM"). Login, boletos, Pix, NF-e, consulta de crédito e CEP são simulados.
+## Próximas fases
 
-## Fases de entrega
-
-1. **Base** ✅ infraestrutura nos três ambientes, login de clientes e equipe, empresas e usuários, catálogo e preços por tipo de cliente.
-2. **Venda e pagamento** ✅ (com gateway simulado até as chaves do Asaas): carrinho, pedido, Pix, boleto e cartão, webhooks, Financeiro do cliente, cadastro e aprovação de crédito.
-3. **Fiscal e operação:** NF-e pelo ERP, régua de cobrança, conciliação diária, orçamentos e ordens de importação.
-4. **Importação a fundo:** custos com câmbio, conta e ordem com numerário, documentos do processo, Siscomex e relatórios.
+1. **Importação no Bagisto:** sob encomenda, conta e ordem, ordens de importação, calculadora e NCM.
+2. **Pagamentos reais** pelo Asaas (Pix, boleto e cartão), com baixa das parcelas.
+3. **Painel da equipe:** decisão de crédito e faixa, e recebíveis.
+4. **NF-e** pelo ERP.
+5. **Homologação na AWS** com endereço fixo (depois que a conta for criada).

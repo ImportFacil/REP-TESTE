@@ -1,0 +1,7 @@
+{
+    "name": "importfacil/loja",
+    "description": "Regras da ImportFácil para o Bagisto 2.5 + B2B Suite: tipos de cliente, pedido mínimo, múltiplo de venda, Pix, boleto pelo crédito da empresa, cartão, parcelas e app instalável.",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": { "psr-4": { "ImportFacil\\Loja\\": "src/" } }
+}
