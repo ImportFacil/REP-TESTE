@@ -1,6 +1,6 @@
-# Ajustes para o GitHub Codespaces: monta o repositório e deixa o devcontainer iniciar a loja
-# (pelo postStartCommand, que já enxerga o endereço público do Codespace).
+# Ajustes para o GitHub Codespaces. Os caminhos são relativos à pasta demo-bagisto
+# (a do primeiro arquivo compose): ../.. é a pasta acima do repositório, montada em /workspaces.
 services:
   app:
     volumes:
-      - ../../..:/workspaces:cached
+      - ../..:/workspaces:cached
