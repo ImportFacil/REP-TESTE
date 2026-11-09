@@ -85,4 +85,4 @@ if [ "${SO_INSTALAR:-0}" = "1" ]; then echo "Instalação concluída."; exit 0; 
 
 echo "Loja: ${APP_URL}   Painel: ${APP_URL}/admin"
 export PHP_CLI_SERVER_WORKERS="${PHP_CLI_SERVER_WORKERS:-8}"
-exec php artisan serve --host=0.0.0.0 --port=8000
+exec php artisan serve --host=0.0.0.0 --port=8000 --no-reload   # --no-reload: atende vários pedidos ao mesmo tempo
