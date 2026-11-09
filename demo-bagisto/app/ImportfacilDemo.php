@@ -259,7 +259,7 @@ class ImportfacilDemo extends Command
         $catalogos = app(CompanyCatalogRepository::class);
         $catPerfis = collect($d['categorias'])->mapWithKeys(fn ($c) => [$c['id'] => $c['perfis']]);
 
-        foreach ($d['perfis'] as $perfil) {
+        foreach ($d['perfis'] as $n => $perfil) {
             [$razao, $nome, $sobrenome, $cidade, $uf, $cep] = self::EMPRESAS[$perfil['codigo']];
             $email = $perfil['codigo'].'@'.self::DOMINIO_DEMO;
 
@@ -268,7 +268,7 @@ class ImportfacilDemo extends Command
                 'last_name' => $sobrenome,
                 'email' => $email,
                 'type' => 'company',
-                'phone' => '+55 32 4000-12'.str_pad((string) (10 + count(self::EMPRESAS)), 2, '0'),
+                'phone' => '+55 32 4000-12'.str_pad((string) (10 + $n), 2, '0', STR_PAD_LEFT),
                 'status' => 1,
                 'password' => $senha,
                 'api_token' => Str::random(80),
@@ -303,7 +303,7 @@ class ImportfacilDemo extends Command
             DB::table('b2b_customer_companies')->insert(['customer_id' => $empresaId, 'company_id' => $empresaId]);
 
             $perfilEmpresa = [
-                'first_name' => $nome, 'last_name' => $sobrenome, 'email' => $email, 'phone' => '+55 (32) 4000-1200',
+                'first_name' => $nome, 'last_name' => $sobrenome, 'email' => $email, 'phone' => '+55 32 4000-12'.str_pad((string) (10 + $n), 2, '0', STR_PAD_LEFT),
                 'business_name' => $razao.' (demonstração)', 'website_url' => 'https://'.self::DOMINIO_DEMO,
                 'vat_tax_id' => '00.000.000/0001-'.str_pad((string) $empresaId, 2, '0', STR_PAD_LEFT),
                 'address' => 'Endereço de demonstração', 'city' => $cidade, 'country' => 'BR', 'state' => $uf, 'postcode' => $cep,
