@@ -1,0 +1,32 @@
+{
+  "name": "Loja ImportFácil (demonstração, padrão)",
+  "dockerComposeFile": [
+    "../demo/docker-compose.yml",
+    "importfacil/docker-compose.codespaces.yml"
+  ],
+  "service": "app",
+  "runServices": [
+    "db",
+    "app"
+  ],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
+  "overrideCommand": true,
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postStartCommand": "setsid nohup bash /opt/importfacil/demo/iniciar.sh > /tmp/importfacil.log 2>&1 < /dev/null & setsid nohup bash \"${containerWorkspaceFolder}/.devcontainer/importfacil/informar-estado.sh\" > /tmp/informar-estado.log 2>&1 < /dev/null & sleep 2",
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Loja ImportFácil",
+      "onAutoForward": "notify"
+    }
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  }
+}

@@ -1,0 +1,50 @@
+# Sobe o Codespace da demonstração do jeito que o GitHub Codespaces sobe (mesmo devcontainer.json,
+# mesma imagem e o mesmo postStartCommand) e confere que a loja responde na porta 8000.
+name: Codespace
+
+on:
+  push:
+    branches: [main]
+    paths: ['.devcontainer/**', 'demo/**', 'backend/**', 'frontend/**', '.github/workflows/codespace.yml']
+  pull_request:
+    paths: ['.devcontainer/**', 'demo/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  codespace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ['.devcontainer/importfacil/devcontainer.json', '.devcontainer/devcontainer.json']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configuração existe e é válida
+        run: |
+          test -f "${{ matrix.config }}" || { echo "::error::Falta ${{ matrix.config }} (sem ele o Codespace nasce sem a loja)"; exit 1; }
+          npx -y @devcontainers/cli@0.88.0 read-configuration --workspace-folder . --config "${{ matrix.config }}" > /dev/null
+
+      - name: Subir como o Codespaces sobe
+        run: npx -y @devcontainers/cli@0.88.0 up --workspace-folder . --config "${{ matrix.config }}" --remove-existing-container
+
+      - name: A loja responde na porta 8000
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sf -o /dev/null http://localhost:8000/api/saude && curl -sf -o /dev/null http://localhost:8000/globo-192.png; then
+              echo "Loja no ar depois de $((i*5)) s"; exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::A loja não subiu"; exit 1
+
+      - name: Registro da instalação
+        if: always()
+        run: |
+          id=$(docker ps -q --filter "label=devcontainer.config_file=$PWD/${{ matrix.config }}" | head -1)
+          [ -z "$id" ] && id=$(docker ps -q | head -1)
+          docker exec "$id" bash -c 'tail -n 80 /tmp/importfacil.log' 2>&1 | grep -viE "password|senha|secret|token|app_key|key=" || true
