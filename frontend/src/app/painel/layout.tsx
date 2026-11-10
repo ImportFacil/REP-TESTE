@@ -15,6 +15,8 @@ const MENU: ItemPainel[] = [
     { href: '/painel/notas/', rotulo: 'Notas fiscais' },
     { href: '/painel/envios/', rotulo: 'Envios' },
     { href: '/painel/reembolsos/', rotulo: 'Reembolsos' },
+    { href: '/painel/cotacoes/', rotulo: 'Cotações de preço' },
+    { href: '/painel/cotacao/', rotulo: 'Cotação', oculto: true },
     { href: '/painel/transacoes/', rotulo: 'Transações', papeis: FIN },
   ] },
   { href: '/painel/catalogo', rotulo: 'Catálogo', icone: 'catalogo', filhos: [

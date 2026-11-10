@@ -6,7 +6,7 @@ import { GuardarNaLista } from '@/components/GuardarNaLista';
 import { Passo } from '@/components/Produto';
 import { useEu } from '@/components/Shell';
 import { Aviso, Cabecalho, Carregando, Vazio } from '@/components/ui';
-import { api } from '@/lib/api';
+import { api, ErroApi } from '@/lib/api';
 import { definirQuantidade, esvaziar, useCarrinho } from '@/lib/carrinho';
 import { data, enderecoEmLinha, reais } from '@/lib/formato';
 import { useAcao, useDados } from '@/lib/hooks';
@@ -53,6 +53,9 @@ export default function Carrinho() {
   const [cupom, setCupom] = useState('');
   const enderecos = useDados<Array<{ id: number; apelido: string; padrao: boolean; endereco: { cep: string; logradouro: string; numero: string; complemento?: string; bairro: string; cidade: string; uf: string } }>>('/loja/enderecos');
   const [enderecoId, setEnderecoId] = useState<number | null>(null);
+  const [ordemCompra, setOrdemCompra] = useState('');
+  const [precisaAprovacao, setPrecisaAprovacao] = useState<string | null>(null);
+  const outro = useAcao();
   const fechar = useAcao();
   const chave = useMemo(() => JSON.stringify(itens.map((i) => [i.produto_id, i.quantidade])), [itens]);
 
@@ -96,22 +99,36 @@ export default function Carrinho() {
   const totalEscolhido =
     forma === 'pix' ? condicoes?.pix.total_centavos : forma === 'cartao' ? condicoes?.cartao[parcelas - 1]?.total_centavos : cotacao?.total_com_promocao_centavos;
 
+  const corpoPedido = () => ({
+    itens: itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade })),
+    forma_pagamento: forma,
+    parcelas,
+    ...(observacao.trim() && { observacao: observacao.trim() }),
+    ...(cupom && !cotacao?.cupom_erro && { cupom }),
+    ...(enderecoId && { endereco_id: enderecoId }),
+    ...(ordemCompra.trim() && { ordem_compra: ordemCompra.trim() }),
+  });
   const confirmar = () =>
     fechar.executar(async () => {
-      const p = await api<{ id: number }>('/pedidos', {
-        corpo: {
-          itens: itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade })),
-          forma_pagamento: forma,
-          parcelas,
-          ...(forma === 'cartao' && { token_cartao: recusar ? 'tok_recusado' : 'tok_teste' }),
-          ...(observacao.trim() && { observacao: observacao.trim() }),
-          ...(cupom && !cotacao?.cupom_erro && { cupom }),
-          ...(enderecoId && { endereco_id: enderecoId }),
-        },
-      });
-      esvaziar();
-      router.push(`/loja/pedido/?id=${p.id}`);
+      try {
+        const p = await api<{ id: number }>('/pedidos', { corpo: { ...corpoPedido(), ...(forma === 'cartao' && { token_cartao: recusar ? 'tok_recusado' : 'tok_teste' }) } });
+        esvaziar();
+        router.push(`/loja/pedido/?id=${p.id}`);
+      } catch (e) {
+        // acima do limite do comprador: oferece mandar para o aprovador
+        if (e instanceof ErroApi && (e.dados as { codigo?: string } | undefined)?.codigo === 'precisa_aprovacao') { setPrecisaAprovacao(e.message); return; }
+        throw e;
+      }
     });
+  const pedirAprovacao = () => outro.executar(async () => {
+    const r = await api<{ id: number }>('/empresa/requisicoes', { corpo: corpoPedido() });
+    esvaziar();
+    router.push(`/loja/aprovacao/?id=${r.id}`);
+  });
+  const pedirCotacao = () => outro.executar(async () => {
+    const r = await api<{ id: number }>('/empresa/cotacoes', { corpo: { itens: corpoPedido().itens, ...(observacao.trim() && { mensagem: observacao.trim() }) } });
+    router.push(`/loja/cotacao/?id=${r.id}`);
+  });
 
   return (
     <>
@@ -143,7 +160,10 @@ export default function Carrinho() {
             </table>
           </div>
           <div className="linha entre" style={{ marginTop: 10, flexWrap: 'wrap' }}>
-            <GuardarNaLista itens={itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade }))} rotulo="Guardar o carrinho numa lista" />
+            <span className="linha" style={{ gap: 6, flexWrap: 'wrap' }}>
+              <GuardarNaLista itens={itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade }))} rotulo="Guardar o carrinho numa lista" />
+              <button type="button" className="botao leve pequeno" disabled={outro.enviando} onClick={() => void pedirCotacao()} title="A equipe responde com o preço negociado para estas quantidades">Pedir preço negociado</button>
+            </span>
             <Link className="pequeno" href="/loja/pedido-rapido/">Pedido rápido por código ›</Link>
           </div>
         </div>
@@ -234,9 +254,18 @@ export default function Carrinho() {
                   </select>
                 ) : <span className="pequeno muted" style={{ fontWeight: 400 }}>Sem endereço cadastrado: a ImportFácil combina a entrega. <Link href="/loja/enderecos/">Cadastrar endereços</Link></span>}
               </label>
+              <label className="campo">Nº da ordem de compra (opcional)
+                <input value={ordemCompra} onChange={(e) => setOrdemCompra(e.target.value)} maxLength={60} placeholder="O número do pedido no sistema da sua empresa" />
+              </label>
               <textarea placeholder="Observação para a ImportFácil (opcional)" value={observacao} onChange={(e) => setObservacao(e.target.value)} maxLength={1000} />
               <div className="linha entre"><span>Total</span><b style={{ fontSize: '1.2rem' }} className="numero">{reais(totalEscolhido)}</b></div>
-              <Aviso tipo="erro">{fechar.erro}</Aviso>
+              <Aviso tipo="erro">{fechar.erro ?? outro.erro}</Aviso>
+              {precisaAprovacao && (
+                <Aviso tipo="atencao">
+                  {precisaAprovacao}
+                  <div style={{ marginTop: 8 }}><button className="botao" disabled={outro.enviando} onClick={() => void pedirAprovacao()}>Enviar para o aprovador</button></div>
+                </Aviso>
+              )}
               <button className="botao largo" disabled={fechar.enviando || eu.empresa?.situacao !== 'ativa'} onClick={() => void confirmar()}>
                 {fechar.enviando ? 'Fechando o pedido…' : 'Fechar pedido'}
               </button>

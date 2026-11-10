@@ -133,6 +133,22 @@ try {
   await page.screenshot({ path: `${saida}/34-loja-lista.png`, fullPage: true });
   checar('loja-lista', (await page.locator('table tbody tr').count()) === 5, 'lista com 5 produtos');
 } catch (e) { checar('loja-fase2', false, e.message.split('\n')[0]); }
+
+// Fase 3, B2B: aprovação de compras, cotações de preço negociado e limite dos compradores
+try {
+  await visitar(page, '35-loja-aprovacoes', '/loja/aprovacoes/', { espera: 'Esperando aprovação' });
+  await page.getByRole('link', { name: 'Decidir ›' }).first().click();
+  await page.getByRole('button', { name: 'Aprovar e fechar o pedido' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/36-loja-aprovacao.png`, fullPage: true });
+  checar('loja-aprovacao', (await page.getByLabel('Nº da ordem de compra').inputValue()) === 'OC-2026-0457', 'requisição com a ordem de compra, pronta para aprovar');
+  await visitar(page, '37-loja-cotacoes', '/loja/cotacoes/', { espera: 'Respondida' });
+  await page.locator('table tbody tr', { hasText: 'Respondida' }).first().getByRole('link').first().click();
+  await page.getByRole('button', { name: 'Aceitar e fechar o pedido' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/38-loja-cotacao.png`, fullPage: true });
+  checar('loja-cotacao-respondida', /Economia/.test(await page.locator('body').innerText()), 'cotação respondida com economia sobre a tabela');
+  const conta = await visitar(page, '39-loja-conta-limites', '/loja/conta/', { espera: 'Limite de compra dos compradores' });
+  checar('loja-limite-comprador', conta.includes('Marina Souza'), 'limite da compradora na conta');
+} catch (e) { checar('loja-fase3', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Páginas de conteúdo abertas, sem login
@@ -208,6 +224,7 @@ for (const [nome, caminho, espera] of [
   ['86-config-cambio', '/painel/cambio/', 'Dólar (USD)'],
   ['87-config-importar', '/painel/importar/', 'Importar produtos'],
   ['88-config-auditoria', '/painel/auditoria/', 'Auditoria'],
+  ['93-vendas-cotacoes', '/painel/cotacoes/', 'esperando resposta'],
 ]) await visitar(page, nome, caminho, { espera });
 try {
   await visitar(page, '89-produto-estoque-locais', '/painel/produtos/?busca=MQ-EN01', { espera: 'Produtos' });
@@ -223,6 +240,13 @@ try {
   await page.screenshot({ path: `${saida}/92-importar-previa.png`, fullPage: true });
   checar('importar-previa', true, (await page.getByText(/linha\(s\): 1 nova/).innerText()).slice(0, 100));
 } catch (e) { checar('configuracoes-entrega4', false, e.message.split('\n')[0]); }
+try {
+  await visitar(page, '94-cotacoes-lista', '/painel/cotacoes/?situacao=solicitada', { espera: 'Cotações de preço' });
+  await page.locator('.pn-tabela tbody tr').first().click();
+  await page.getByRole('button', { name: 'Enviar resposta' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/95-cotacao-responder.png`, fullPage: true });
+  checar('painel-cotacao-responder', (await page.locator('input[aria-label^="Preço proposto"]').count()) === 3, 'preço proposto para cada item');
+} catch (e) { checar('painel-cotacao', false, e.message.split('\n')[0]); }
 try {
   await visitar(page, '60-notas-lista', '/painel/notas/', { espera: 'Notas fiscais' });
   const notas = await page.locator('.pn-tabela tbody tr').count();

@@ -368,6 +368,42 @@ async function principal(): Promise<void> {
       for (const f of jaComprou.slice(0, 3)) await chamar('PUT', `/loja/favoritos/${f.produto_id}`, coopDemo.email, 'cliente').catch(() => undefined);
     }
 
+    // 6e) B2B: uma compradora com limite, uma compra esperando aprovação e cotações de preço em vários estágios
+    const MARINA = 'marina.souza@coop-demo.com.br';
+    const marina = await chamar<{ id: string }>('POST', '/empresa/usuarios', coopDemo.email, 'cliente', { nome: 'Marina Souza', email: MARINA, papel: 'comprador' }).catch(() => null);
+    if (marina) {
+      await chamar('PATCH', `/empresa/usuarios/${marina.id}`, coopDemo.email, 'cliente', { limite_pedido_centavos: 2_000_000 });
+      const caros = await db.selectFrom('produtos').select(['id', 'multiplo_venda']).where('categoria_id', 'in', ['irrigacao', 'pecas', 'maquinario']).where('ativo', '=', true)
+        .where('sob_orcamento', '=', false).where(sql<boolean>`estoque >= multiplo_venda * 3`).where('preco_tabela_centavos', '>', 1_500_000).orderBy('preco_tabela_centavos').limit(2).execute();
+      if (caros.length) {
+        await chamar('POST', '/empresa/requisicoes', MARINA, 'cliente', {
+          itens: caros.map((c) => ({ produto_id: c.id, quantidade: c.multiplo_venda })), forma_pagamento: 'boleto', parcelas: 2, ordem_compra: 'OC-2026-0457', observacao: 'Reposição para a safra.',
+        }).catch((e) => console.warn('Requisição de demonstração não registrada:', (e as Error).message));
+      }
+    }
+    const cotar = async (email: string, tipo: string, n: number) => {
+      const visiveis = await db.selectFrom('produtos as p').innerJoin('categorias as c', 'c.id', 'p.categoria_id').select(['p.id', 'p.multiplo_venda'])
+        .where('p.ativo', '=', true).where('p.sob_orcamento', '=', false).where(sql<boolean>`(c.tipos_cliente IS NULL OR ${tipo} = ANY(c.tipos_cliente))`)
+        .where(sql<boolean>`p.estoque >= p.multiplo_venda * 20`).orderBy('p.id').limit(n * 7).execute();
+      const itens = visiveis.filter((_, k) => k % 7 === 0).slice(0, n).map((p) => ({ produto_id: p.id, quantidade: p.multiplo_venda * 10 }));
+      return itens.length ? chamar<{ id: number; itens: Array<{ produto_id: number; preco_cliente_centavos: number }> }>('POST', '/empresa/cotacoes', email, 'cliente', { itens, mensagem: 'Compra recorrente: pedimos condição para estas quantidades.' }).catch(() => null) : null;
+    };
+    const responder = (c: { id: number; itens: Array<{ produto_id: number; preco_cliente_centavos: number }> }, bp: number, dias: number) =>
+      chamar('PUT', `/equipe/cotacoes/${c.id}/resposta`, ADMIN, 'equipe', {
+        itens: c.itens.map((i) => ({ produto_id: i.produto_id, preco_proposto_centavos: Math.round((i.preco_cliente_centavos * (10_000 - bp)) / 10_000) })),
+        resposta: 'Preço especial para o volume, frete CIF.', validade_dias: dias,
+      });
+    const porTipo = (t: string) => DEMONSTRACAO.find((d) => d.tipo === t)!;
+    await cotar(porTipo('construtora').email, 'construtora', 3);                                       // esperando resposta
+    const c2 = await cotar(coopDemo.email, 'cooperativa', 2);
+    if (c2) await responder(c2, 700, 15);                                                              // respondida, para o aprovador aceitar
+    const c3 = await cotar(porTipo('hospital').email, 'hospital', 3);
+    if (c3) {
+      await responder(c3, 900, 10);
+      await chamar('POST', `/empresa/cotacoes/${c3.id}/aceitar`, porTipo('hospital').email, 'cliente', { forma_pagamento: 'pix', ordem_compra: 'HSC-2026-1189' })
+        .catch((e) => console.warn('Aceite de cotação de demonstração não registrado:', (e as Error).message));
+    }
+
     // 7) importação: um orçamento aguardando proposta, um aceito (ordem em andamento) e um recusado
     const imp = DEMONSTRACAO.find((d) => d.tipo === 'cooperativa')!;
     await chamar('POST', '/orcamentos', imp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Drone pulverizador 40 L', quantidade: 4 }, { descricao: 'Baterias extras para drone', quantidade: 12 }] });

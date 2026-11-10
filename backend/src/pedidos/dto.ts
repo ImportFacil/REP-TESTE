@@ -15,6 +15,7 @@ export class NovoPedidoDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) observacao?: string;
   @ApiPropertyOptional({ description: 'Cupom de promoção' }) @IsOptional() @IsString() @MaxLength(30) cupom?: string;
   @ApiPropertyOptional({ description: 'Endereço de entrega cadastrado da empresa (sem ele, vale o padrão)' }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) endereco_id?: number;
+  @ApiPropertyOptional({ description: 'Número da ordem de compra da sua empresa' }) @IsOptional() @IsString() @MaxLength(60) ordem_compra?: string;
 }
 
 export class FiltroPedidos extends Paginacao {

@@ -73,6 +73,7 @@ export interface UsuariosTabela {
   ativo: Generated<boolean>;
   criado_em: Generated<Momento>;
   ultimo_acesso_em: Momento | null;
+  limite_pedido_centavos: number | null;
 }
 
 export interface CategoriasTabela {
@@ -213,6 +214,10 @@ export interface PedidosTabela {
   promocao_id: number | null;
   cupom: string | null;
   promocao_centavos: Generated<number>;
+  ordem_compra: string | null;
+  requisicao_id: number | null;
+  cotacao_id: number | null;
+  aprovado_por: string | null;
   criado_em: Generated<Momento>;
   atualizado_em: Generated<Momento>;
 }
@@ -614,6 +619,53 @@ export interface ListaItensTabela {
   quantidade: number;
 }
 
+export interface RequisicoesTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  solicitante_id: string;
+  itens: Json<Array<{ produto_id: number; quantidade: number }>>;
+  forma_pagamento: FormaPagamento;
+  parcelas: Generated<number>;
+  cupom: string | null;
+  endereco_id: number | null;
+  ordem_compra: string | null;
+  observacao: string | null;
+  total_estimado_centavos: number;
+  situacao: Generated<'pendente' | 'aprovada' | 'recusada' | 'cancelada'>;
+  decidida_por: string | null;
+  decidida_em: Momento | null;
+  motivo: string | null;
+  pedido_id: number | null;
+  criado_em: Generated<Momento>;
+}
+
+export type SituacaoCotacao = 'solicitada' | 'respondida' | 'aceita' | 'recusada' | 'expirada' | 'cancelada';
+export interface CotacoesTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  solicitante_id: string;
+  situacao: Generated<SituacaoCotacao>;
+  mensagem: string | null;
+  resposta: string | null;
+  validade: ColumnType<string, string, string> | null;
+  respondida_por: string | null;
+  respondida_em: Momento | null;
+  decidida_por: string | null;
+  decidida_em: Momento | null;
+  pedido_id: number | null;
+  criado_em: Generated<Momento>;
+  atualizado_em: Momento;
+}
+
+export interface CotacaoItensTabela {
+  id: Generated<number>;
+  cotacao_id: number;
+  produto_id: number;
+  quantidade: number;
+  preco_cliente_centavos: number;
+  preco_proposto_centavos: number | null;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -660,6 +712,9 @@ export interface Database {
   enderecos_entrega: EnderecosEntregaTabela;
   listas_compra: ListasCompraTabela;
   lista_itens: ListaItensTabela;
+  requisicoes: RequisicoesTabela;
+  cotacoes: CotacoesTabela;
+  cotacao_itens: CotacaoItensTabela;
 }
 
 export type Politica = Selectable<PoliticasPagamentoTabela>;

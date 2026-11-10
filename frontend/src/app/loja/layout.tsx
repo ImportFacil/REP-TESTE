@@ -14,7 +14,9 @@ const SECOES = [
   ] },
   { titulo: 'Compras', itens: [
     { href: '/loja/pedidos/', rotulo: 'Pedidos', icone: '📦' },
-    { href: '/loja/orcamentos/', rotulo: 'Orçamentos', icone: '📝' },
+    { href: '/loja/aprovacoes/', rotulo: 'Aprovações', icone: '✅' },
+    { href: '/loja/cotacoes/', rotulo: 'Cotações de preço', icone: '🤝' },
+    { href: '/loja/orcamentos/', rotulo: 'Orçamentos de importação', icone: '📝' },
     { href: '/loja/ordens/', rotulo: 'Ordens de importação', icone: '🚢' },
     { href: '/loja/financeiro/', rotulo: 'Financeiro', icone: '💳' },
   ] },

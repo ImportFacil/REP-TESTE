@@ -1,4 +1,5 @@
 'use client';
+import { LimitesDeCompra } from '@/components/LimitesDeCompra';
 import { useEu } from '@/components/Shell';
 import { Usuarios } from '@/components/Usuarios';
 import { Cabecalho, Situacao } from '@/components/ui';
@@ -25,6 +26,7 @@ export default function Conta() {
           <p className="pequeno muted">Compradores fecham pedidos até o limite da empresa; o aprovador também cuida do cadastro de crédito, aceita orçamentos e convida pessoas.</p>
         </div>
       </div>
+      {aprovador && <div style={{ marginBottom: 20 }}><LimitesDeCompra /></div>}
       <h2>Usuários da empresa</h2>
       {aprovador ? <Usuarios caminho="/empresa/usuarios" papeis={['comprador', 'aprovador']} euId={eu.usuario.id} podeEditar /> : <p className="muted">Só o aprovador vê e convida os usuários da empresa.</p>}
     </>

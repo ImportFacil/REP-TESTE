@@ -27,16 +27,26 @@ Ela serve de referência para o que está sendo trazido para cá, como o formato
 - **Docker no computador:** `cd demo && docker compose up --build`, depois http://localhost:8000.
 - **Entrar:** em `/entrar`, escolha uma das 5 empresas de demonstração ou "Equipe ImportFácil (administrador)". Não precisa de senha.
 
+## O que já está pronto
+
+1. **Painel no formato do Bagisto** (4 entregas):
+   - painel de controle com gráfico e pendências;
+   - vendas: pedidos, notas fiscais com valor aproximado dos tributos, envios, reembolsos, transações e cotações de preço;
+   - catálogo: produtos, categorias, atributos e famílias;
+   - clientes: empresas, usuários, grupos, avaliações e crédito;
+   - marketing: promoções e cupons, newsletter, modelos de e-mail e caixa de saída;
+   - conteúdo: páginas da loja;
+   - relatórios: vendas, produtos e clientes;
+   - configurações: equipe, papéis e permissões (lidos das rotas), impostos, locais de estoque, câmbio, importação de produtos por planilha e auditoria;
+   - todas as listas com filtros, exportação e ações em lote.
+2. **Loja:** filtros por atributo, ordenação, favoritos, comparação, avaliações, endereços de entrega, pedido rápido por código, listas de compra, cupom no carrinho e páginas abertas com newsletter.
+3. **B2B:** limite de compra por comprador com aprovação, cotações de preço negociado e número da ordem de compra no pedido.
+
 ## Próximas fases
 
-1. **Painel no formato do Bagisto:**
-   - vendas (notas, envios, reembolsos);
-   - catálogo (atributos e famílias);
-   - clientes e grupos;
-   - marketing (promoções e cupons);
-   - conteúdo e relatórios;
-   - configurações (usuários, permissões, impostos, estoque);
-   - tabelas com filtros, exportação e ações em lote.
-2. **Loja:** comparar, favoritos, avaliações, filtros por atributo, endereços, pedido rápido e listas de compra.
-3. **B2B:** usuários e permissões dentro da empresa, cotações negociadas e ordens de compra.
-4. **Pagamentos reais** pelo Asaas, **NF-e** e **homologação na AWS**.
+Dependem de contas e credenciais que só a ImportFácil pode criar:
+
+1. **Pagamentos reais pelo Asaas:** conta no Asaas (sandbox e produção) e a chave de API, guardada como segredo do GitHub/AWS. O sistema já fala com um gateway simulado pela mesma interface.
+2. **NF-e:** certificado digital A1 da empresa e um emissor (o ERP ou um serviço de NF-e). As notas de hoje são numeradas aqui, com chave simulada.
+3. **E-mails de verdade:** Amazon SES com o domínio verificado. Até lá os avisos ficam na Caixa de saída do Painel.
+4. **Homologação na AWS:** conta AWS criada pela ImportFácil; os workflows de entrega já estão prontos e esperam as credenciais.

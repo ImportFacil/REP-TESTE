@@ -15,6 +15,9 @@ export interface PedidoDetalhe {
   total_centavos: number;
   promocao_centavos?: number;
   cupom?: string | null;
+  ordem_compra?: string | null;
+  cotacao_id?: number | null;
+  requisicao_id?: number | null;
   situacao: string;
   situacao_pagamento: string;
   observacao: string | null;
@@ -73,6 +76,9 @@ export function CorpoPedido({ p, acoesParcela }: { p: PedidoDetalhe; acoesParcel
           {p.desconto_centavos > 0 && <div className="linha entre"><span>Desconto Pix</span><span className="numero">− {reais(p.desconto_centavos)}</span></div>}
           {p.juros_centavos > 0 && <div className="linha entre"><span>Juros do cartão</span><span className="numero">+ {reais(p.juros_centavos)}</span></div>}
           <div className="linha entre"><b>Total</b><b className="numero">{reais(p.total_centavos)}</b></div>
+          {p.ordem_compra && <p className="pequeno muted">Ordem de compra: <b>{p.ordem_compra}</b></p>}
+          {p.cotacao_id && <p className="pequeno muted">Preço negociado na cotação nº {p.cotacao_id}</p>}
+          {p.requisicao_id && <p className="pequeno muted">Aprovado pela requisição nº {p.requisicao_id}</p>}
           {p.endereco_entrega && <p className="pequeno muted">Entrega: {enderecoEmLinha(p.endereco_entrega)}</p>}
           {p.observacao && <p className="pequeno muted">Obs.: {p.observacao}</p>}
         </div>

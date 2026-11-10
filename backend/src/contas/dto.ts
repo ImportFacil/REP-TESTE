@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsBoolean, IsEmail, IsIn, IsOptional, IsString, Length, Matches, MaxLength, ValidateNested,
+  IsBoolean, IsEmail, IsIn, IsInt, IsOptional, IsString, Length, Matches, MaxLength, Min, ValidateNested,
   registerDecorator, type ValidationOptions,
 } from 'class-validator';
 import { cnpjValido, normalizarCnpj } from '../comum/cnpj';
@@ -69,6 +69,8 @@ export class NovoUsuarioEquipeDto {
 export class AlterarUsuarioClienteDto {
   @ApiPropertyOptional({ enum: PAPEIS_CLIENTE }) @IsOptional() @IsIn(PAPEIS_CLIENTE) papel?: PapelCliente;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() ativo?: boolean;
+  @ApiPropertyOptional({ nullable: true, description: 'Valor máximo por pedido sem aprovação (compradores); null = sem limite' })
+  @IsOptional() @Type(() => Number) @IsInt() @Min(100) limite_pedido_centavos?: number | null;
 }
 
 export class AlterarUsuarioEquipeDto {

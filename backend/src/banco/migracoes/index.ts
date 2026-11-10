@@ -5,6 +5,7 @@ import * as m0003 from './0003_painel_vendas_catalogo';
 import * as m0004 from './0004_clientes_marketing_conteudo';
 import * as m0005 from './0005_relatorios_configuracoes';
 import * as m0006 from './0006_loja';
+import * as m0007 from './0007_b2b';
 
 /**
  * Lista de migrações, em ordem. Cada nova migração ganha um arquivo
@@ -17,4 +18,5 @@ export const MIGRACOES: Record<string, Migration> = {
   '0004_clientes_marketing_conteudo': m0004,
   '0005_relatorios_configuracoes': m0005,
   '0006_loja': m0006,
+  '0007_b2b': m0007,
 };

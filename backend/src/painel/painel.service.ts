@@ -38,6 +38,7 @@ export class PainelService {
         (SELECT count(*) FROM pedidos WHERE situacao_pagamento = 'aguardando_faturamento' AND situacao <> 'cancelado')::int AS boletos_para_faturar,
         (SELECT count(*) FROM pedidos WHERE situacao = 'novo' AND situacao_pagamento = 'pago')::int AS pagos_para_separar,
         (SELECT count(*) FROM orcamentos WHERE situacao = 'solicitado')::int AS orcamentos_aguardando,
+        (SELECT count(*) FROM cotacoes WHERE situacao = 'solicitada')::int AS cotacoes_aguardando,
         (SELECT count(*) FROM ordens_importacao WHERE NOT concluida AND NOT cancelada)::int AS ordens_em_andamento,
         (SELECT count(*) FROM parcelas WHERE situacao = 'vencida')::int AS parcelas_vencidas,
         (SELECT coalesce(sum(valor_centavos), 0) FROM parcelas WHERE situacao = 'vencida')::bigint AS vencido_centavos`.execute(this.db);

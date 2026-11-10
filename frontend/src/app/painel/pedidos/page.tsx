@@ -7,11 +7,13 @@ import { api } from '@/lib/api';
 import { FORMA, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
-interface Linha { id: number; razao_social: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string }
+interface Linha { id: number; razao_social: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string; ordem_compra: string | null; cotacao_id: number | null }
 
 const COLUNAS: Coluna<Linha>[] = [
   { chave: 'id', titulo: 'Nº', ordenavel: true, render: (p) => <b>{p.id}</b> },
-  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'opcoes' },
+  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'opcoes',
+    render: (p) => <>{p.razao_social}{(p.ordem_compra || p.cotacao_id) && <div className="pequeno muted">{p.ordem_compra ? `OC ${p.ordem_compra}` : ''}{p.ordem_compra && p.cotacao_id ? ' · ' : ''}{p.cotacao_id ? `cotação ${p.cotacao_id}` : ''}</div>}</> },
+  { chave: 'ordem_compra', titulo: 'Ordem de compra', filtro: 'texto', oculta: true },
   { chave: 'criado_em', titulo: 'Data', ordenavel: true, filtro: 'data', render: (p) => data(p.criado_em), valorCsv: (p) => data(p.criado_em) },
   { chave: 'forma_pagamento', titulo: 'Pagamento', filtro: 'opcoes', opcoes: FORMA,
     render: (p) => <>{FORMA[p.forma_pagamento]}{p.forma_pagamento !== 'pix' ? ` ${p.parcelas}×` : ''}</>, valorCsv: (p) => `${FORMA[p.forma_pagamento]} ${p.parcelas}x` },

@@ -21,6 +21,27 @@ export interface NovoPedido {
   observacao?: string;
   cupom?: string;
   endereco_id?: number;
+  ordem_compra?: string;
+}
+
+/** Como o pedido nasce: direto, de uma requisição aprovada ou de uma cotação aceita. */
+export interface OrigemPedido {
+  /** Quem montou a compra (na requisição, o comprador; quem aprovou fica em aprovadoPor). */
+  compradorId?: string;
+  compradorNome?: string;
+  aprovadoPor?: string;
+  requisicaoId?: number;
+  /** Preço combinado por produto (cotação aceita): substitui o da tabela, sem promoção e sem pedido mínimo. */
+  precosNegociados?: Map<number, number>;
+  cotacaoId?: number;
+}
+
+/** Acima do limite do comprador: o pedido vira requisição para o aprovador. */
+export class PrecisaAprovacao extends ForbiddenException {
+  constructor(limite: number, total: number) {
+    super({ message: `O pedido passa do seu limite de compra (R$ ${(limite / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}). Envie para o aprovador da empresa.`,
+      codigo: 'precisa_aprovacao', limite_centavos: limite, total_centavos: total });
+  }
 }
 
 /** Próximo passo permitido na logística do pedido. */
@@ -69,9 +90,21 @@ export class PedidosService {
     };
   }
 
-  async criar(u: UsuarioAutenticado, dto: NovoPedido, ip: string | null) {
+  /** Cotação dos itens; com preço negociado, troca o preço e não exige o pedido mínimo. */
+  async cotarParaPedido(u: UsuarioAutenticado, itens: NovoPedido['itens'], negociados?: Map<number, number>) {
+    const cot = await this.catalogo.cotar(u, { itens });
+    if (!negociados) return cot;
+    const cotados = cot.itens.map((i) => {
+      const unit = negociados.get(i.produto_id) ?? i.preco_unitario_centavos;
+      return { ...i, preco_unitario_centavos: unit, total_centavos: i.problema ? 0 : unit * i.quantidade };
+    });
+    return { ...cot, itens: cotados, subtotal_centavos: cotados.reduce((s, i) => s + i.total_centavos, 0), atinge_pedido_minimo: true, falta_para_minimo_centavos: 0,
+      pode_fechar: cotados.length > 0 && cotados.every((i) => i.problema === null) };
+  }
+
+  async criar(u: UsuarioAutenticado, dto: NovoPedido, ip: string | null, origem: OrigemPedido = {}) {
     if (u.situacaoEmpresa !== 'ativa') throw new ForbiddenException('A empresa está bloqueada para novos pedidos. Fale com a ImportFácil.');
-    const cot = await this.catalogo.cotar(u, { itens: dto.itens });
+    const cot = await this.cotarParaPedido(u, dto.itens, origem.precosNegociados);
     if (!cot.pode_fechar) {
       throw new BadRequestException({
         message: cot.atinge_pedido_minimo ? 'Há itens com problema (múltiplo de venda, estoque ou produto sob orçamento).' : 'O pedido não atinge o pedido mínimo do seu tipo de cliente.',
@@ -90,10 +123,18 @@ export class PedidosService {
       await trx.selectFrom('cadastros_credito').select('empresa_id').where('empresa_id', '=', u.empresaId!).forUpdate().execute();
       const pol = await this.politica.atual(trx);
       // Promoção: a do cupom ou a automática de maior desconto (linhas travadas: o limite de usos não estoura).
-      const promo = await this.marketing.avaliar(trx, { empresaId: u.empresaId!, tipoCliente: cot.tipo_cliente }, cot.itens, subtotal, dto.cupom, true);
+      // Preço negociado (cotação) não acumula com promoção.
+      const promo = origem.precosNegociados
+        ? { promocao: null, cupom_erro: null }
+        : await this.marketing.avaliar(trx, { empresaId: u.empresaId!, tipoCliente: cot.tipo_cliente }, cot.itens, subtotal, dto.cupom, true);
       if (dto.cupom?.trim() && promo.cupom_erro) throw new BadRequestException(promo.cupom_erro);
       const promocao = promo.promocao ? Math.min(promo.promocao.desconto_centavos, subtotal - 1) : 0;
       const base = subtotal - promocao;
+      // Limite do comprador: acima dele, só com o aprovador (pela requisição).
+      if (u.papel === 'comprador' && !origem.aprovadoPor) {
+        const { limite_pedido_centavos: limite } = await trx.selectFrom('usuarios').select('limite_pedido_centavos').where('id', '=', u.id).executeTakeFirstOrThrow();
+        if (limite !== null && base > limite) throw new PrecisaAprovacao(limite, base);
+      }
       let desconto = 0;
       let juros = 0;
       let total = base;
@@ -121,7 +162,8 @@ export class PedidosService {
       if (dto.forma_pagamento !== 'boleto') this.pagamentos.gw(); // 503 se pagamentos não estiverem habilitados
 
       const pedido = await trx.insertInto('pedidos').values({
-        empresa_id: u.empresaId!, comprador_id: u.id, tipo_cliente: cot.tipo_cliente, forma_pagamento: dto.forma_pagamento, parcelas,
+        empresa_id: u.empresaId!, comprador_id: origem.compradorId ?? u.id, tipo_cliente: cot.tipo_cliente, forma_pagamento: dto.forma_pagamento, parcelas,
+        ordem_compra: dto.ordem_compra?.trim() || null, requisicao_id: origem.requisicaoId ?? null, cotacao_id: origem.cotacaoId ?? null, aprovado_por: origem.aprovadoPor ?? null,
         subtotal_centavos: subtotal, desconto_centavos: desconto, juros_centavos: juros, total_centavos: total,
         situacao_pagamento: situacaoPagamento, politica_id: pol.id,
         promocao_id: promo.promocao?.id ?? null, cupom: promo.promocao?.cupom ?? null, promocao_centavos: promocao,
@@ -137,7 +179,14 @@ export class PedidosService {
         pedido_id: pedido.id, produto_id: i.produto_id, codigo: i.codigo, nome: i.nome, unidade: i.unidade, quantidade: i.quantidade,
         preco_tabela_centavos: i.preco_tabela_centavos, preco_unitario_centavos: i.preco_unitario_centavos, total_centavos: i.total_centavos,
       }))).execute();
-      await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'criado', usuario_id: u.id, descricao: `Pedido feito por ${u.nome} (${descreverPagamento(dto.forma_pagamento, parcelas)})${promo.promocao ? `, com a promoção ${promo.promocao.nome}` : ''}.` }).execute();
+      await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'criado', usuario_id: u.id, descricao: [
+        origem.aprovadoPor ? `Pedido de ${origem.compradorNome ?? 'comprador'} aprovado por ${u.nome} (requisição nº ${origem.requisicaoId})` : `Pedido feito por ${u.nome}`,
+        ` (${descreverPagamento(dto.forma_pagamento, parcelas)})`,
+        promo.promocao ? `, com a promoção ${promo.promocao.nome}` : '',
+        origem.cotacaoId ? `, com o preço negociado na cotação nº ${origem.cotacaoId}` : '',
+        dto.ordem_compra?.trim() ? `. Ordem de compra ${dto.ordem_compra.trim()}` : '',
+        '.',
+      ].join('') }).execute();
 
       if (dto.forma_pagamento === 'pix') {
         await this.pagamentos.criarPix(trx, { pedidoId: pedido.id }, total, `Pedido ${pedido.id} ImportFácil`);

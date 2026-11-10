@@ -5,7 +5,7 @@ import { BANCO, type Banco } from '../banco/banco.module';
 import type { OrigemUsuario, Papel, Usuario } from '../banco/tipos';
 import { PG_VIOLACAO_UNICA, codigoPg } from '../comum/erros';
 
-const CAMPOS_PUBLICOS = ['id', 'origem', 'empresa_id', 'nome', 'email', 'papel', 'ativo', 'criado_em', 'ultimo_acesso_em'] as const;
+const CAMPOS_PUBLICOS = ['id', 'origem', 'empresa_id', 'nome', 'email', 'papel', 'ativo', 'criado_em', 'ultimo_acesso_em', 'limite_pedido_centavos'] as const;
 export type UsuarioPublico = Pick<Usuario, (typeof CAMPOS_PUBLICOS)[number]>;
 
 @Injectable()
@@ -74,7 +74,7 @@ export class UsuariosService {
    */
   async alterar(
     id: string,
-    mudancas: { papel?: Papel; ativo?: boolean },
+    mudancas: { papel?: Papel; ativo?: boolean; limite_pedido_centavos?: number | null },
     autor: UsuarioAutenticado,
     ip: string | null,
     escopo: { origem: OrigemUsuario; empresaId?: string },
@@ -90,6 +90,8 @@ export class UsuariosService {
     const set = {
       ...(mudancas.papel !== undefined && { papel: mudancas.papel }),
       ...(mudancas.ativo !== undefined && { ativo: mudancas.ativo }),
+      // Limite de compra sem aprovação (só para compradores de empresas; null = sem limite).
+      ...(mudancas.limite_pedido_centavos !== undefined && escopo.origem === 'cliente' && { limite_pedido_centavos: mudancas.limite_pedido_centavos }),
     };
     if (!Object.keys(set).length) return pick(antes);
 
