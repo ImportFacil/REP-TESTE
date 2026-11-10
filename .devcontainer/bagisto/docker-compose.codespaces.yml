@@ -1,6 +1,0 @@
-# Ajustes para o GitHub Codespaces. Os caminhos são relativos à pasta bagisto
-# (a do primeiro arquivo compose): ../.. é a pasta acima do repositório, montada em /workspaces.
-services:
-  app:
-    volumes:
-      - ../..:/workspaces:cached

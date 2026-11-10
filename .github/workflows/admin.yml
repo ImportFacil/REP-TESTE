@@ -1,0 +1,61 @@
+# Cria um administrador da equipe (Painel) num ambiente: roda o script criar-admin numa tarefa avulsa do ECS.
+# A pessoa recebe por e-mail uma senha temporária; no primeiro login troca a senha e ativa a verificação em 2 etapas.
+name: Criar administrador
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: E-mail da pessoa
+        required: true
+        type: string
+      nome:
+        description: Nome completo
+        required: true
+        type: string
+      ambiente:
+        description: Ambiente
+        type: choice
+        options: [homolog, prod, dev]
+        default: homolog
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  criar:
+    name: Criar administrador em ${{ inputs.ambiente }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ambiente == 'prod' && 'producao' || inputs.ambiente }}
+    timeout-minutes: 30
+    env:
+      PREFIXO: /importfacil/${{ inputs.ambiente }}
+      EMAIL: ${{ inputs.email }}
+      NOME: ${{ inputs.nome }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PAPEL_DEPLOY }}
+          aws-region: sa-east-1
+      - name: Ligar o ambiente, se estiver pausado
+        if: inputs.ambiente != 'prod'
+        run: infra/scripts/pausar-retomar.sh retomar "${{ inputs.ambiente }}"
+      - name: Rodar criar-admin
+        run: |
+          ler() { aws ssm get-parameter --name "$PREFIXO/$1" --query Parameter.Value --output text; }
+          CLUSTER=$(ler ecs/cluster); FAMILIA=$(ler ecs/familia); CONTEINER=$(ler ecs/conteiner); LOG_GROUP=$(ler ecs/log-group)
+          # Usa a versão da API que está no ar.
+          TAREFA=$(aws ecs describe-services --cluster "$CLUSTER" --services "$(ler ecs/servico)" --query 'services[0].taskDefinition' --output text)
+          cmd=$(jq -cn --arg e "$EMAIL" --arg n "$NOME" '["node","dist/scripts/criar-admin.js","--email",$e,"--nome",$n]')
+          overrides=$(jq -cn --arg c "$CONTEINER" --argjson cmd "$cmd" '{containerOverrides:[{name:$c,command:$cmd}]}')
+          tarefa=$(aws ecs run-task --cluster "$CLUSTER" --task-definition "$TAREFA" --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$(ler ecs/subredes)],securityGroups=[$(ler ecs/grupo-seguranca)],assignPublicIp=$(ler ecs/ip-publico)}" \
+            --overrides "$overrides" --started-by github-criar-admin --query 'tasks[0].taskArn' --output text)
+          echo "Tarefa: $tarefa"
+          aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$tarefa"
+          codigo=$(aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$tarefa" --query 'tasks[0].containers[0].exitCode' --output text)
+          aws logs get-log-events --log-group-name "$LOG_GROUP" --log-stream-name "api/$CONTEINER/${tarefa##*/}" --query 'events[].message' --output text || true
+          if [ "$codigo" != "0" ]; then echo "::error::criar-admin falhou (código $codigo)"; exit 1; fi
+          echo "::notice::Administrador criado. A senha temporária foi enviada para o e-mail informado."

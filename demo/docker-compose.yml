@@ -1,0 +1,33 @@
+# Demonstração ImportFácil (API + site + banco). Na pasta demo:  docker compose up --build
+# Site: http://localhost:8000   Login de demonstração em /entrar (sem senha)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: importfacil
+      POSTGRES_PASSWORD: importfacil
+      POSTGRES_DB: importfacil
+    volumes:
+      - dados:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "importfacil"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+
+  app:
+    build:
+      context: ..
+      dockerfile: demo/Dockerfile
+    image: importfacil-demo
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://importfacil:importfacil@db:5432/importfacil
+      APP_URL: ${APP_URL:-}
+    ports:
+      - "8000:8000"
+
+volumes:
+  dados:

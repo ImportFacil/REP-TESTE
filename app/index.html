@@ -69,13 +69,13 @@
     <ol><li>Leia o QR code com a câmera e abra no Safari.</li><li>Toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>.</li></ol>
   </div>
 
-  <footer>Loja Bagisto da ImportFácil, em teste. Enquanto não há homologação na AWS, a loja roda no GitHub Codespaces e este endereço leva até ela.</footer>
+  <footer>Loja e Painel da ImportFácil, em teste. Enquanto não há homologação na AWS, a loja roda no GitHub Codespaces e este endereço leva até ela.</footer>
 </div>
 
 <script>
 (function () {
   var ENDERECO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/endereco.json';
-  var CODESPACES = 'https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fbagisto%2Fdevcontainer.json';
+  var CODESPACES = 'https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fimportfacil%2Fdevcontainer.json';
   var PROTOTIPO = '../';
   var caixa = document.getElementById('estado');
   var celular = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900;
@@ -102,7 +102,7 @@
   }
 
   function ligada(url) {
-    var app = url.replace(/\/+$/, '') + '/app';
+    var app = url.replace(/\/+$/, '') + '/app/';
     if (celular && !semRedirecionar) {
       mostrar('<span class="selo ok">Loja no ar</span><h2>Abrindo a loja…</h2><p>Se não abrir sozinha, toque no botão.</p><a class="botao" href="' + esc(app) + '">Abrir e instalar o app</a>');
       location.replace(app);
@@ -122,7 +122,7 @@
     var t = setTimeout(function () { if (!fim) { fim = true; desligada(motivoFalha || 'O Codespace não respondeu (pode estar parado ou com a porta 8000 privada).'); } }, 9000);
     img.onload = function () { if (!fim) { fim = true; clearTimeout(t); ligada(url); } };
     img.onerror = function () { if (!fim) { fim = true; clearTimeout(t); desligada(motivoFalha || 'O Codespace está parado ou a porta 8000 está privada.'); } };
-    img.src = url.replace(/\/+$/, '') + '/importfacil/icone-192.png?t=' + Date.now();
+    img.src = url.replace(/\/+$/, '') + '/globo-192.png?t=' + Date.now();
   }
 
   var ESTADO = ENDERECO.replace('endereco.json', 'estado.json');

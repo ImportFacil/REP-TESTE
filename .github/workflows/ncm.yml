@@ -1,4 +1,4 @@
-# Atualiza a tabela NCM usada pela calculadora de importação (prototipo-ncm.json no protótipo e bagisto/dados/ncm.json na loja).
+# Atualiza a tabela NCM usada pela calculadora de importação (prototipo-ncm.json, usada pelo protótipo e pela API).
 # Roda toda segunda-feira, quando este arquivo ou o script mudam, e à mão em Actions.
 name: Tabela NCM
 
@@ -31,7 +31,6 @@ jobs:
       - name: Baixar a NCM vigente do Siscomex
         run: |
           node scripts/ncm/atualizar.mjs prototipo-ncm.json
-          cp prototipo-ncm.json bagisto/dados/ncm.json   # a mesma tabela na loja Bagisto (calculadora e ordens de importação)
       - name: Gravar no repositório, se mudou
         run: |
           if git diff --quiet -- prototipo-ncm.json && git ls-files --error-unmatch prototipo-ncm.json >/dev/null 2>&1; then
@@ -39,7 +38,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add prototipo-ncm.json bagisto/dados/ncm.json
+          git add prototipo-ncm.json
           git commit -m "Tabela NCM atualizada pelo Siscomex"
           git pull --rebase origin main
           git push origin HEAD:main

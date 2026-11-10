@@ -1,0 +1,72 @@
+name: Demonstração
+
+# Monta a demonstração (API + site + banco) do zero, navega pela loja e pelo Painel,
+# confere cada página e publica as capturas no ramo demo-capturas.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'demo/**'
+      - '.devcontainer/importfacil/**'
+      - '.github/workflows/demo.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: demonstracao
+  cancel-in-progress: true
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir e subir (banco + API + site)
+        working-directory: demo
+        run: |
+          docker compose build
+          docker compose up -d
+
+      - name: Esperar a demonstração
+        run: |
+          for i in $(seq 1 120); do
+            if curl -sf -o /dev/null http://localhost:8000/api/saude; then echo "No ar depois de $((i*5)) s"; exit 0; fi
+            if [ "$(docker inspect -f '{{.State.Running}}' demo-app-1 2>/dev/null)" != "true" ]; then echo "O contêiner parou"; exit 1; fi
+            sleep 5
+          done
+          echo "Tempo esgotado"; exit 1
+
+      - name: Registro da inicialização
+        if: always()
+        run: docker logs demo-app-1 2>&1 | grep -v '^\s*$' | tail -80
+
+      - name: Navegar, conferir e tirar capturas
+        working-directory: demo/testes
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node capturas.mjs http://localhost:8000 capturas
+
+      - name: Publicar capturas no ramo demo-capturas
+        if: always()
+        run: |
+          [ -d demo/testes/capturas ] || exit 0
+          cd demo/testes/capturas
+          git init -q -b demo-capturas
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Capturas da demonstração (${{ github.sha }})"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" demo-capturas
+
+      - name: Guardar capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-demo
+          path: demo/testes/capturas
+          if-no-files-found: ignore

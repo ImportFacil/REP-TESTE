@@ -1,0 +1,153 @@
+# Deploy de uma versão já publicada no ECR em um ambiente:
+# 0. em dev e homologação, liga o ambiente se estiver pausado;
+# 1. registra a nova definição de tarefa com a imagem nova;
+# 2. aplica as migrações do banco e os dados de referência (tarefas avulsas);
+# 3. troca a versão da API (o ECS volta sozinho para a anterior se a nova falhar);
+# 4. publica o site e confere a saúde da API.
+name: _deploy
+
+on:
+  workflow_call:
+    inputs:
+      ambiente: { type: string, required: true }
+      environment: { type: string, required: true }
+      tag: { type: string, required: true }
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy em ${{ inputs.ambiente }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      AWS_REGION: sa-east-1
+      PREFIXO: /importfacil/${{ inputs.ambiente }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PAPEL_DEPLOY }}
+          aws-region: sa-east-1
+
+      - name: Ler parâmetros do ambiente
+        run: |
+          ler() { aws ssm get-parameter --name "$PREFIXO/$1" --query Parameter.Value --output text; }
+          {
+            echo "CLUSTER=$(ler ecs/cluster)"
+            echo "SERVICO=$(ler ecs/servico)"
+            echo "FAMILIA=$(ler ecs/familia)"
+            echo "CONTEINER=$(ler ecs/conteiner)"
+            echo "SERVICO_WORKER=$(ler ecs/servico-worker)"
+            echo "FAMILIA_WORKER=$(ler ecs/familia-worker)"
+            echo "SUBREDES=$(ler ecs/subredes)"
+            echo "GRUPO_SEG=$(ler ecs/grupo-seguranca)"
+            echo "IP_PUBLICO=$(ler ecs/ip-publico)"
+            echo "LOG_GROUP=$(ler ecs/log-group)"
+            echo "BUCKET_SITE=$(ler site/bucket)"
+            echo "DISTRIBUICAO=$(ler site/distribuicao)"
+            echo "URL_SITE=$(ler site/url)"
+            echo "COG_CLI_POOL=$(ler login/clientes/pool)"
+            echo "COG_CLI_CLIENT=$(ler login/clientes/client)"
+            echo "COG_CLI_DOMINIO=$(ler login/clientes/dominio)"
+            echo "COG_EQ_POOL=$(ler login/equipe/pool)"
+            echo "COG_EQ_CLIENT=$(ler login/equipe/client)"
+            echo "COG_EQ_DOMINIO=$(ler login/equipe/dominio)"
+          } >> "$GITHUB_ENV"
+
+      - name: Ligar o ambiente, se estiver pausado
+        if: inputs.ambiente != 'prod'
+        run: infra/scripts/pausar-retomar.sh retomar "${{ inputs.ambiente }}"
+
+      - name: Registrar definições de tarefa (API e worker) com a imagem ${{ inputs.tag }}
+        run: |
+          registrar() {
+            local familia="$1" conteiner="$2" atual imagem_base nova
+            atual=$(aws ecs describe-task-definition --task-definition "$familia" --query taskDefinition)
+            imagem_base=$(echo "$atual" | jq -r --arg c "$conteiner" '.containerDefinitions[] | select(.name==$c) | .image' | sed 's/:[^:]*$//')
+            nova=$(echo "$atual" | jq --arg c "$conteiner" --arg img "$imagem_base:${{ inputs.tag }}" '
+              .containerDefinitions |= map(if .name == $c then .image = $img else . end)
+              | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
+            aws ecs register-task-definition --cli-input-json "$nova" --query taskDefinition.taskDefinitionArn --output text
+          }
+          TAREFA=$(registrar "$FAMILIA" "$CONTEINER")
+          TAREFA_WORKER=$(registrar "$FAMILIA_WORKER" worker)
+          echo "TAREFA=$TAREFA" >> "$GITHUB_ENV"
+          echo "TAREFA_WORKER=$TAREFA_WORKER" >> "$GITHUB_ENV"
+          echo "API: $TAREFA"; echo "Worker: $TAREFA_WORKER"
+
+      - name: Migrar banco e dados de referência
+        run: |
+          rodar() {
+            local nome="$1"; shift
+            local cmd; cmd=$(jq -cn --args '$ARGS.positional' "$@")
+            local tarefa
+            tarefa=$(aws ecs run-task --cluster "$CLUSTER" --task-definition "$TAREFA" --launch-type FARGATE \
+              --network-configuration "awsvpcConfiguration={subnets=[$SUBREDES],securityGroups=[$GRUPO_SEG],assignPublicIp=$IP_PUBLICO}" \
+              --overrides "{\"containerOverrides\":[{\"name\":\"$CONTEINER\",\"command\":$cmd}]}" \
+              --started-by "github-$nome" --query 'tasks[0].taskArn' --output text)
+            echo "$nome: $tarefa"
+            aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$tarefa"
+            local codigo
+            codigo=$(aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$tarefa" --query 'tasks[0].containers[0].exitCode' --output text)
+            local id="${tarefa##*/}"
+            aws logs get-log-events --log-group-name "$LOG_GROUP" --log-stream-name "api/$CONTEINER/$id" --query 'events[].message' --output text || true
+            if [ "$codigo" != "0" ]; then echo "::error::$nome falhou (código $codigo)"; exit 1; fi
+          }
+          rodar migracao node dist/banco/migrar.js
+          rodar semear node dist/banco/semear.js
+
+      - name: Trocar a versão da API e do worker
+        run: |
+          aws ecs update-service --cluster "$CLUSTER" --service "$SERVICO" --task-definition "$TAREFA" >/dev/null
+          aws ecs update-service --cluster "$CLUSTER" --service "$SERVICO_WORKER" --task-definition "$TAREFA_WORKER" >/dev/null
+          aws ecs wait services-stable --cluster "$CLUSTER" --services "$SERVICO" "$SERVICO_WORKER"
+          em_uso=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICO" --query 'services[0].taskDefinition' --output text)
+          if [ "$em_uso" != "$TAREFA" ]; then
+            echo "::error::A nova versão não ficou saudável e o ECS voltou para a anterior ($em_uso)."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Montar o site (Next.js) e o protótipo em /prototipo
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          mkdir -p out/prototipo
+          cp ../index.html ../prototipo-*.webmanifest ../prototipo-sw.js ../prototipo-globo-*.png ../prototipo-ncm.json out/prototipo/
+          # Configuração lida pelo site ao abrir (login pelo Cognito deste ambiente).
+          jq -n --arg amb "${{ inputs.ambiente }}" --arg r "$AWS_REGION" --arg sentry "${{ vars.SENTRY_DSN_SITE }}" \
+            --arg cp "$COG_CLI_POOL" --arg cc "$COG_CLI_CLIENT" --arg cd "$COG_CLI_DOMINIO" \
+            --arg ep "$COG_EQ_POOL" --arg ec "$COG_EQ_CLIENT" --arg ed "$COG_EQ_DOMINIO" '{
+              ambiente: $amb, api: "/api", auth: "cognito",
+              clientes: { regiao: $r, pool: $cp, client: $cc, dominio: $cd },
+              equipe: { regiao: $r, pool: $ep, client: $ec, dominio: $ed }
+            } + (if $sentry != "" then { sentryDsn: $sentry } else {} end)' > out/config.json
+
+      - name: Publicar o site
+        run: |
+          # Arquivos com hash no nome ficam em cache por 1 ano; páginas e config.json, sem cache.
+          aws s3 sync frontend/out "s3://$BUCKET_SITE/" --delete --exclude "*.html" --exclude "config.json" --exclude "manifest.webmanifest" --exclude "sw.js" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync frontend/out "s3://$BUCKET_SITE/" --exclude "*" --include "*.html" --include "config.json" --include "manifest.webmanifest" --include "sw.js" \
+            --cache-control "no-cache"
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUICAO" --paths "/*" >/dev/null
+
+      - name: Conferir a saúde da API
+        run: |
+          for i in $(seq 1 12); do
+            if curl -fsS "$URL_SITE/api/saude"; then echo; exit 0; fi
+            sleep 10
+          done
+          echo "::error::A API não respondeu em $URL_SITE/api/saude"
+          exit 1
