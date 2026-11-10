@@ -113,6 +113,36 @@ try {
   checar('grade-selecao-em-lote', await page.locator('.pn-lote').isVisible(), 'barra de ações em lote ao marcar um pedido');
   await page.screenshot({ path: `${saida}/43-pedidos-selecao.png` });
 } catch (e) { checar('painel-bagisto', false, e.message.split('\n')[0]); }
+
+// Entrega 2: vendas (notas, envios, reembolsos, transações) e catálogo (produtos, categorias, atributos, famílias)
+for (const [nome, caminho, espera] of [
+  ['50-vendas-notas', '/painel/notas/', 'Notas fiscais'],
+  ['51-vendas-envios', '/painel/envios/', 'Envios'],
+  ['52-vendas-reembolsos', '/painel/reembolsos/', 'Reembolsos'],
+  ['53-vendas-transacoes', '/painel/transacoes/', 'Transações'],
+  ['54-catalogo-produtos', '/painel/produtos/', 'Produtos'],
+  ['55-catalogo-categorias', '/painel/categorias/', 'Categorias'],
+  ['56-catalogo-atributos', '/painel/atributos/', 'Atributos'],
+  ['57-catalogo-familias', '/painel/familias/', 'Famílias de atributos'],
+  ['58-clientes-grupos', '/painel/precos/', 'Grupos de clientes'],
+  ['59-catalogo-novo-produto', '/painel/produto/?novo=1', 'Criar produto'],
+]) await visitar(page, nome, caminho, { espera });
+try {
+  await visitar(page, '60-notas-lista', '/painel/notas/', { espera: 'Notas fiscais' });
+  const notas = await page.locator('.pn-tabela tbody tr').count();
+  checar('vendas-notas-emitidas', notas > 0, `${notas} nota(s) na primeira página`);
+  await page.locator('.pn-tabela tbody tr').first().click();
+  await page.getByRole('heading', { name: 'Nota fiscal' }).waitFor({ timeout: 15000 });
+  await page.getByRole('heading', { name: 'Envio' }).waitFor({ timeout: 5000 });
+  await page.screenshot({ path: `${saida}/61-pedido-vendas.png`, fullPage: true });
+  checar('pedido-bloco-de-vendas', /\d{4} \d{4}|\d{44}/.test(await page.locator('.codigo-copia').first().innerText()), 'pedido mostra nota com chave, envio e reembolsos');
+  await visitar(page, '62-produtos-lista', '/painel/produtos/', { espera: 'Produtos' });
+  await page.locator('.pn-tabela tbody tr').first().click();
+  await page.getByRole('heading', { name: 'Atributos' }).waitFor({ timeout: 15000 });
+  const campos = await page.locator('section:has(h2:text-is("Atributos")) label.campo').count();
+  await page.screenshot({ path: `${saida}/63-produto-atributos.png`, fullPage: true });
+  checar('produto-atributos-da-familia', campos >= 2, `${campos} campo(s) de atributo no produto`);
+} catch (e) { checar('vendas-catalogo', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Painel no celular: menu em gaveta e tabela em cartões

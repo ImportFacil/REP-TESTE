@@ -1,8 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-  ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsInt, IsOptional, IsString, Length, Matches, Max, MaxLength, Min, ValidateNested,
-} from 'class-validator';
+  ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsInt, IsOptional, IsString, Length, Matches, Max, MaxLength, Min, ValidateNested, IsObject } from 'class-validator';
 import { Paginacao } from '../comum/paginacao';
 
 const aparar = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
@@ -47,6 +46,8 @@ export class ProdutoDto {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() destaque?: boolean;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() importado?: boolean;
   @ApiPropertyOptional({ type: [EspecificacaoDto] }) @IsOptional() @IsArray() @ArrayMaxSize(40) @ValidateNested({ each: true }) @Type(() => EspecificacaoDto) especificacoes?: EspecificacaoDto[];
+  @ApiPropertyOptional({ description: 'Família de atributos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) familia_id?: number;
+  @ApiPropertyOptional({ description: 'Valores dos atributos da família: { codigo: valor }' }) @IsOptional() @IsObject() atributos?: Record<string, string>;
 }
 
 export class AlterarProdutoDto {
@@ -64,6 +65,8 @@ export class AlterarProdutoDto {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() destaque?: boolean;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() ativo?: boolean;
   @ApiPropertyOptional({ type: [EspecificacaoDto] }) @IsOptional() @IsArray() @ArrayMaxSize(40) @ValidateNested({ each: true }) @Type(() => EspecificacaoDto) especificacoes?: EspecificacaoDto[];
+  @ApiPropertyOptional({ description: 'Família de atributos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) familia_id?: number;
+  @ApiPropertyOptional({ description: 'Valores dos atributos da família: { codigo: valor }' }) @IsOptional() @IsObject() atributos?: Record<string, string>;
 }
 
 export class AlterarTabelaPrecoDto {

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { sql } from 'kysely';
 import { lerConfig } from '../config';
+import { classificarProdutosSemFamilia } from '../catalogo/familias';
 import { criarConexao } from './conexao';
 import type { Banco } from './banco.module';
 
@@ -94,7 +95,8 @@ async function principal(): Promise<void> {
     console.log(`Tipos de cliente: ${dados.tipos_cliente.length}`);
     if (config.ambiente !== 'prod' || args.has('--catalogo')) {
       await semearCatalogo(db, dados);
-      console.log(`Catálogo: ${dados.categorias.length} categorias, ${dados.produtos.length} produtos`);
+      const classificados = await classificarProdutosSemFamilia(db);
+      console.log(`Catálogo: ${dados.categorias.length} categorias, ${dados.produtos.length} produtos${classificados ? ` (${classificados} com família de atributos)` : ''}`);
     }
     if (args.has('--demonstracao')) {
       if (config.ambiente === 'prod') throw new Error('Dados de demonstração não entram em produção.');

@@ -11,6 +11,8 @@ import type { ColumnType, Generated, Insertable, Selectable, Updateable } from '
 
 type Momento = ColumnType<Date, Date | string | undefined, Date | string>;
 type Json<T> = ColumnType<T, string, string>;
+/** Atualização de jsonb feita com sql`...` (ex.: atributos || {…}). */
+type RawBuilderJson = import('kysely').RawBuilder<unknown>;
 
 export type TipoCliente = 'cooperativa' | 'distribuidora' | 'revendedor' | 'construtora' | 'hospital';
 export type SituacaoEmpresa = 'ativa' | 'bloqueada' | 'inativa';
@@ -100,6 +102,9 @@ export interface ProdutosTabela {
   destaque: Generated<boolean>;
   importado: Generated<boolean>;
   especificacoes: Json<Especificacao[]>;
+  familia_id: number | null;
+  /** Valores dos atributos da família ({ codigo: valor }). */
+  atributos: ColumnType<Record<string, string>, string | undefined, string | RawBuilderJson>;
   ativo: Generated<boolean>;
   criado_em: Generated<Momento>;
   atualizado_em: Generated<Momento>;
@@ -373,6 +378,76 @@ export interface RotinasExecucoesTabela {
   resultado: Json<unknown> | null;
 }
 
+
+export interface NotasFiscaisTabela {
+  id: Generated<number>;
+  pedido_id: number;
+  numero: Generated<number>;
+  serie: Generated<string>;
+  chave: string;
+  valor_centavos: number;
+  situacao: Generated<'emitida' | 'cancelada'>;
+  emitida_em: Generated<Momento>;
+  emitida_por: string | null;
+  cancelada_em: Momento | null;
+  motivo_cancelamento: string | null;
+}
+
+export interface EnviosTabela {
+  id: Generated<number>;
+  pedido_id: number;
+  transportadora: string;
+  codigo_rastreio: string | null;
+  volumes: Generated<number>;
+  peso_kg: string | null;
+  observacao: string | null;
+  enviado_em: Generated<Momento>;
+  entregue_em: Momento | null;
+  criado_por: string | null;
+}
+
+export interface ReembolsosTabela {
+  id: Generated<number>;
+  pedido_id: number;
+  valor_centavos: number;
+  meio: 'pix' | 'estorno_cartao' | 'abatimento_boleto';
+  motivo: string;
+  devolver_estoque: Generated<boolean>;
+  itens: Json<Array<{ produto_id: number; quantidade: number }>>;
+  criado_em: Generated<Momento>;
+  criado_por: string | null;
+}
+
+export type TipoAtributo = 'texto' | 'numero' | 'lista' | 'sim_nao';
+export interface AtributosTabela {
+  id: Generated<number>;
+  codigo: string;
+  nome: string;
+  tipo: TipoAtributo;
+  opcoes: Generated<string[]>;
+  unidade: string | null;
+  obrigatorio: Generated<boolean>;
+  filtravel: Generated<boolean>;
+  visivel_na_loja: Generated<boolean>;
+  ordem: Generated<number>;
+  ativo: Generated<boolean>;
+  criado_em: Generated<Momento>;
+}
+
+export interface FamiliasAtributosTabela {
+  id: Generated<number>;
+  codigo: string;
+  nome: string;
+  ativo: Generated<boolean>;
+  criado_em: Generated<Momento>;
+}
+
+export interface FamiliaAtributosTabela {
+  familia_id: number;
+  atributo_id: number;
+  ordem: Generated<number>;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -399,6 +474,12 @@ export interface Database {
   eventos_webhook: EventosWebhookTabela;
   notificacoes: NotificacoesTabela;
   rotinas_execucoes: RotinasExecucoesTabela;
+  notas_fiscais: NotasFiscaisTabela;
+  envios: EnviosTabela;
+  reembolsos: ReembolsosTabela;
+  atributos: AtributosTabela;
+  familias_atributos: FamiliasAtributosTabela;
+  familia_atributos: FamiliaAtributosTabela;
 }
 
 export type Politica = Selectable<PoliticasPagamentoTabela>;

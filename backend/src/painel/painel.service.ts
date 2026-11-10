@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 import { BANCO, type Banco } from '../banco/banco.module';
 import { hojeBrasil, somarDias } from '../pagamentos/regras';
@@ -15,8 +15,13 @@ export class PainelService {
 
   /** Período padrão: os últimos 30 dias, até hoje (datas no fuso de Brasília). */
   periodo(de?: string, ate?: string): Periodo {
+    const valida = (d: string) => { const t = new Date(`${d}T00:00:00Z`); return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d; };
+    for (const d of [de, ate]) if (d && !valida(d)) throw new BadRequestException(`Data inválida: ${d}`);
     const fim = ate ?? hojeBrasil();
-    return { de: de ?? somarDias(fim, -29), ate: fim };
+    const inicio = de ?? somarDias(fim, -29);
+    if (inicio > fim) throw new BadRequestException('A data inicial vem depois da final.');
+    if (Date.parse(fim) - Date.parse(inicio) > 366 * 86_400_000) throw new BadRequestException('O período vai até um ano.');
+    return { de: inicio, ate: fim };
   }
 
   private async totais(de: string, ate: string) {

@@ -14,6 +14,7 @@ import { DevTokenController } from './auth/dev-token.controller';
 import { ImportacaoModule } from './importacao/importacao.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
 import { PainelModule } from './painel/painel.module';
+import { VendasModule } from './vendas/vendas.module';
 import { PedidosModule } from './pedidos/pedidos.module';
 import { RotinasModule } from './rotinas/rotinas.module';
 import { SaudeController } from './saude/saude.controller';
@@ -51,6 +52,7 @@ export class AppModule {
         ImportacaoModule,
         RotinasModule,
         PainelModule,
+        VendasModule,
       ],
       controllers: [SaudeController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

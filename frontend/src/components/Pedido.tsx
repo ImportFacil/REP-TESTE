@@ -18,7 +18,7 @@ export interface PedidoDetalhe {
   observacao: string | null;
   criado_em: string;
   faturado_em: string | null;
-  itens: Array<{ id: number; codigo: string; nome: string; unidade: string; quantidade: number; preco_unitario_centavos: number; total_centavos: number }>;
+  itens: Array<{ id: number; produto_id: number; codigo: string; nome: string; unidade: string; quantidade: number; preco_unitario_centavos: number; total_centavos: number }>;
   eventos: Array<{ id: number; descricao: string; criado_em: string }>;
   cobrancas: Array<{
     id: number; meio: string; situacao: string; expira_em: string | null;

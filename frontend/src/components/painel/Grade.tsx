@@ -15,6 +15,8 @@ export interface Coluna<T> {
   direita?: boolean;
   /** false: não vai para o CSV (ex.: botões) */
   exportar?: boolean;
+  /** não aparece na tabela, mas filtra, busca e vai para o CSV */
+  oculta?: boolean;
   /** valor no CSV, quando diferente do `valor` (ex.: nome legível da situação) */
   valorCsv?: (l: T) => string | number | null | undefined;
 }
@@ -270,7 +272,7 @@ export function Grade<T>({
                       onChange={(e) => { const n = new Set(marcadas); chavesVisiveis.forEach((k) => (e.target.checked ? n.add(k) : n.delete(k))); setMarcadas(n); }} />
                   </th>
                 )}
-                {colunas.map((c) => (
+                {colunas.filter((c) => !c.oculta).map((c) => (
                   <th key={c.chave} className={c.direita ? 'direita' : undefined} aria-sort={ordem?.chave === c.chave ? (ordem.dir === 'asc' ? 'ascending' : 'descending') : undefined}>
                     {c.ordenavel ? (
                       <button onClick={() => alternarOrdem(c)}>
@@ -292,7 +294,7 @@ export function Grade<T>({
                           onChange={(e) => { const n = new Set(marcadas); if (e.target.checked) n.add(k); else n.delete(k); setMarcadas(n); }} />
                       </td>
                     )}
-                    {colunas.map((c) => (
+                    {colunas.filter((c) => !c.oculta).map((c) => (
                       <td key={c.chave} data-rotulo={c.titulo} className={c.direita ? 'direita numero' : undefined}>{c.render ? c.render(l) : String(val(c, l) ?? '')}</td>
                     ))}
                   </tr>

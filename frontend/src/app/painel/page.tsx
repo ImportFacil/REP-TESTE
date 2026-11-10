@@ -142,7 +142,7 @@ export default function PainelDeControle() {
           <div className="pn-secao-titulo">Limite de estoque</div>
           <div className="pn-caixa">
             {!r ? <div className="pn-vazio">Carregando…</div> : !r.estoque_baixo.length ? <div className="pn-vazio">Nenhum produto com estoque baixo.</div> : r.estoque_baixo.map((x) => (
-              <Link key={x.id} href={`/painel/precos/?busca=${encodeURIComponent(x.codigo)}`} className="pn-lista-item">
+              <Link key={x.id} href={`/painel/produto/?id=${x.id}`} className="pn-lista-item">
                 <span className="pn-miniatura"><Icone nome="caixa" /></span>
                 <span style={{ flex: 1, minWidth: 0 }}><b style={{ display: 'block' }}>{x.nome}</b><span className="pequeno muted">Código {x.codigo}</span></span>
                 <span style={{ textAlign: 'right' }}><b className="numero">{reais(x.preco_tabela_centavos)}</b><span className="pequeno" style={{ display: 'block', color: x.estoque <= 1 ? 'var(--vermelho)' : 'var(--ambar)' }}>{x.estoque} em estoque</span></span>

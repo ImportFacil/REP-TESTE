@@ -13,7 +13,8 @@ export interface ItemPainel {
   rotulo: string;
   icone: string;
   papeis?: string[];
-  filhos?: Array<{ href: string; rotulo: string; papeis?: string[] }>;
+  /** oculto: só marca o grupo como ativo (ex.: a página de um produto), sem aparecer no menu */
+  filhos?: Array<{ href: string; rotulo: string; papeis?: string[]; oculto?: boolean }>;
 }
 
 interface Avisos { geral: { parcelas_vencidas: number }; contagens?: Record<string, number> }
@@ -132,7 +133,7 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
                 </Link>
                 {g && !!i.filhos?.length && (
                   <div className="pn-filhos">
-                    {i.filhos.map((f) => (
+                    {i.filhos.filter((f) => !f.oculto).map((f) => (
                       <Link key={f.href} href={f.href} className={`pn-filho ${ativo(f.href) ? 'pn-filho-ativo' : ''}`} aria-current={ativo(f.href) ? 'page' : undefined}>{f.rotulo}</Link>
                     ))}
                   </div>
@@ -160,7 +161,7 @@ function Busca({ itens }: { itens: ItemPainel[] }) {
   const [aberta, setAberta] = useState(false);
   const [sel, setSel] = useState(0);
   const ref = useRef<HTMLInputElement>(null);
-  const paginas = useMemo(() => itens.flatMap((i) => (i.filhos?.length ? i.filhos.map((f) => ({ href: f.href, rotulo: f.rotulo, grupo: i.rotulo, icone: i.icone })) : [{ href: i.href, rotulo: i.rotulo, grupo: '', icone: i.icone }])), [itens]);
+  const paginas = useMemo(() => itens.flatMap((i) => (i.filhos?.length ? i.filhos.filter((f) => !f.oculto).map((f) => ({ href: f.href, rotulo: f.rotulo, grupo: i.rotulo, icone: i.icone })) : [{ href: i.href, rotulo: i.rotulo, grupo: '', icone: i.icone }])), [itens]);
   const tira = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const achados = q.trim() ? paginas.filter((p) => tira(`${p.rotulo} ${p.grupo}`).includes(tira(q.trim()))).slice(0, 8) : paginas.slice(0, 8);
   const numero = /^\d+$/.test(q.trim()) ? Number(q.trim()) : null;

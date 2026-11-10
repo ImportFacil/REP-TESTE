@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { sql, type ExpressionBuilder, type SelectQueryBuilder } from 'kysely';
+import { sql, type ExpressionBuilder, type SelectQueryBuilder, type Transaction } from 'kysely';
 import { AuditoriaService } from '../auditoria/auditoria.service';
 import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
@@ -160,6 +160,8 @@ export class CatalogoService {
             descricao: dto.descricao ?? null,
             ncm: dto.ncm ?? null,
             especificacoes: JSON.stringify(dto.especificacoes ?? []),
+            familia_id: dto.familia_id ?? null,
+            atributos: JSON.stringify(await validarAtributos(trx, dto.familia_id ?? null, dto.atributos ?? {})),
           })
           .returningAll()
           .executeTakeFirstOrThrow();
@@ -176,10 +178,14 @@ export class CatalogoService {
       return await this.db.transaction().execute(async (trx) => {
         const antes = await trx.selectFrom('produtos').selectAll().where('id', '=', id).forUpdate().executeTakeFirst();
         if (!antes) throw new NotFoundException('Produto não encontrado.');
-        const { especificacoes, ...resto } = dto;
+        const { especificacoes, atributos, ...resto } = dto;
+        const familia = dto.familia_id !== undefined ? dto.familia_id : antes.familia_id;
         const set = {
           ...Object.fromEntries(Object.entries(resto).filter(([, v]) => v !== undefined)),
           ...(especificacoes !== undefined && { especificacoes: JSON.stringify(especificacoes) }),
+          ...((atributos !== undefined || dto.familia_id !== undefined) && {
+            atributos: JSON.stringify(await validarAtributos(trx, familia, atributos ?? antes.atributos ?? {})),
+          }),
         };
         if (!Object.keys(set).length) return antes;
         const depois = await trx.updateTable('produtos').set(set).where('id', '=', id).returningAll().executeTakeFirstOrThrow();
@@ -190,6 +196,32 @@ export class CatalogoService {
       throw traduzirErroProduto(e);
     }
   }
+}
+
+/**
+ * Confere os valores dos atributos contra a família do produto: só atributos da família,
+ * obrigatórios preenchidos, número é número, lista só com as opções, sim/não como "sim" ou "não".
+ */
+export async function validarAtributos(trx: Transaction<Database>, familiaId: number | null, valores: Record<string, string>): Promise<Record<string, string>> {
+  const limpos = Object.fromEntries(Object.entries(valores ?? {}).map(([k, v]) => [k, String(v ?? '').trim()]).filter(([, v]) => v !== ''));
+  if (!familiaId) return limpos;
+  const attrs = await trx.selectFrom('familia_atributos as fa').innerJoin('atributos as a', 'a.id', 'fa.atributo_id')
+    .select(['a.codigo', 'a.nome', 'a.tipo', 'a.opcoes', 'a.obrigatorio']).where('fa.familia_id', '=', familiaId).where('a.ativo', '=', true).execute();
+  if (!attrs.length && !(await trx.selectFrom('familias_atributos').select('id').where('id', '=', familiaId).executeTakeFirst())) {
+    throw new BadRequestException('Família de atributos inexistente.');
+  }
+  const erros: string[] = [];
+  const saida: Record<string, string> = {};
+  for (const a of attrs) {
+    const v = limpos[a.codigo];
+    if (!v) { if (a.obrigatorio) erros.push(`${a.nome} é obrigatório`); continue; }
+    if (a.tipo === 'numero' && !/^-?\d+([.,]\d+)?$/.test(v)) erros.push(`${a.nome} deve ser um número`);
+    if (a.tipo === 'lista' && a.opcoes.length && !a.opcoes.includes(v)) erros.push(`${a.nome}: escolha entre ${a.opcoes.join(', ')}`);
+    if (a.tipo === 'sim_nao' && !['sim', 'não'].includes(v.toLowerCase())) erros.push(`${a.nome}: use sim ou não`);
+    saida[a.codigo] = a.tipo === 'sim_nao' ? v.toLowerCase() : v;
+  }
+  if (erros.length) throw new BadRequestException(`Atributos: ${erros.join('; ')}.`);
+  return saida;
 }
 
 function traduzirErroProduto(e: unknown): unknown {

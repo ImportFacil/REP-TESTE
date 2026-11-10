@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { CorpoPedido, type PedidoDetalhe } from '@/components/Pedido';
 import { useEu } from '@/components/Shell';
+import { VendasDoPedido } from '@/components/painel/VendasDoPedido';
 import { Aviso, Cabecalho, Carregando } from '@/components/ui';
 import { api } from '@/lib/api';
 import { SITUACAO_PEDIDO, dataHora } from '@/lib/formato';
@@ -30,7 +31,7 @@ export default function PedidoPainel() {
     <>
       <p className="pequeno"><Link href="/painel/pedidos/">‹ Pedidos</Link></p>
       <Cabecalho titulo={`Pedido ${p.id}`} sub={`${p.razao_social} · ${p.comprador} · ${dataHora(p.criado_em)}`}>
-        {proxima && ['comercial', 'administrador'].includes(papel) && <button className="botao" disabled={acao.enviando} onClick={() => void executar('avancar')}>Marcar como {SITUACAO_PEDIDO[proxima].toLowerCase()}</button>}
+        {proxima === 'em_separacao' && ['comercial', 'administrador'].includes(papel) && <button className="botao" disabled={acao.enviando} onClick={() => void executar('avancar')}>Marcar como {SITUACAO_PEDIDO[proxima].toLowerCase()}</button>}
         {p.situacao_pagamento === 'aguardando_faturamento' && p.situacao !== 'cancelado' && ['financeiro', 'administrador'].includes(papel) && (
           <button className="botao" disabled={acao.enviando} onClick={() => void executar('faturar')}>Faturar e emitir boletos</button>
         )}
@@ -44,6 +45,7 @@ export default function PedidoPainel() {
           </button>
         ) : undefined}
       />
+      <VendasDoPedido pedido={p} papel={papel} aoMudar={recarregar} />
       {['novo', 'em_separacao'].includes(p.situacao) && (
         <div className="cartao formulario" style={{ marginTop: 20, maxWidth: 520 }}>
           <h2>Cancelar pedido</h2>

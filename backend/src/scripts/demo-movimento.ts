@@ -129,7 +129,7 @@ async function principal(): Promise<void> {
     }
 
     let criados = 0;
-    const deslocar: Array<{ pedido: number; dias: number }> = [];
+    const deslocar: Array<{ pedido: number; dias: number; etapas?: number }> = [];
     for (const p of plano) {
       const tab = tabelas.find((t) => t.tipo_cliente === p.tipo)!;
       const fator = 1 - tab.desconto_bp / 10000;
@@ -174,8 +174,18 @@ async function principal(): Promise<void> {
       if (forma === 'boleto' && p.dia > 0) await chamar('POST', `/equipe/pedidos/${pedido.id}/faturar`, ADMIN, 'equipe');
       const pago = forma !== 'pix' || parcelas.every(() => p.dia > 1);
       const etapas = !pago ? 0 : p.dia > 20 ? 3 : p.dia > 8 ? 2 : p.dia > 2 ? 1 : 0;   // em separação → enviado → entregue
-      for (let k = 0; k < etapas; k++) await chamar('POST', `/equipe/pedidos/${pedido.id}/avancar`, ADMIN, 'equipe').catch(() => undefined);
-      deslocar.push({ pedido: pedido.id, dias: p.dia });
+      // nota fiscal assim que o pagamento é confirmado (ou o boleto faturado)
+      if (pago && p.dia > 0) await chamar('POST', `/equipe/vendas/pedidos/${pedido.id}/nota`, ADMIN, 'equipe').catch(() => undefined);
+      // em separação → enviado (com transportadora e rastreio) → entregue
+      if (etapas >= 1) await chamar('POST', `/equipe/pedidos/${pedido.id}/avancar`, ADMIN, 'equipe').catch(() => undefined);
+      if (etapas >= 2) {
+        const transp = s.um(['Jadlog', 'Braspress', 'TNT Mercúrio', 'Rodonaves', 'Correios']);
+        const envio = await chamar<{ id: number }>('POST', `/equipe/vendas/pedidos/${pedido.id}/envio`, ADMIN, 'equipe', {
+          transportadora: transp, codigo_rastreio: `${transp.slice(0, 2).toUpperCase()}${s.entre(100000000, 999999999)}BR`, volumes: s.entre(1, 6), peso_kg: s.entre(5, 900),
+        }).catch(() => null);
+        if (etapas >= 3 && envio) await chamar('POST', `/equipe/vendas/envios/${envio.id}/entregue`, ADMIN, 'equipe').catch(() => undefined);
+      }
+      deslocar.push({ pedido: pedido.id, dias: p.dia, etapas });
     }
 
     // 4) datas no passado, todas do mesmo pedido juntas. Numa conexão só, com os gatilhos desligados
@@ -189,6 +199,11 @@ async function principal(): Promise<void> {
       await sql`UPDATE cobrancas SET criado_em = criado_em - ${desl}, expira_em = expira_em - ${desl} WHERE pedido_id = ${pedido}`.execute(db);
       await sql`UPDATE parcelas SET vencimento = vencimento - ${dias}::int, pago_em = pago_em - ${desl} WHERE cobranca_id IN (SELECT id FROM cobrancas WHERE pedido_id = ${pedido})`.execute(db);
       await sql`UPDATE pagamentos SET pago_em = pago_em - ${desl}, criado_em = criado_em - ${desl} WHERE parcela_id IN (SELECT pa.id FROM parcelas pa JOIN cobrancas c ON c.id = pa.cobranca_id WHERE c.pedido_id = ${pedido})`.execute(db);
+      await sql`UPDATE notas_fiscais SET emitida_em = emitida_em - ${desl} WHERE pedido_id = ${pedido}`.execute(db);
+      // envio dois dias depois do pedido; entrega de 3 a 6 dias depois do envio
+      await sql`UPDATE envios SET enviado_em = enviado_em - ${desl} + interval '2 days', entregue_em = entregue_em - ${desl} + interval '2 days' + (${3 + (pedido % 4)}::int * interval '1 day') WHERE pedido_id = ${pedido}`.execute(db);
+      await sql`UPDATE pedido_eventos SET criado_em = criado_em + interval '2 days' WHERE pedido_id = ${pedido} AND descricao LIKE 'Enviado%'`.execute(db);
+      await sql`UPDATE pedido_eventos SET criado_em = criado_em + interval '2 days' + (${3 + (pedido % 4)}::int * interval '1 day') WHERE pedido_id = ${pedido} AND descricao = 'Entregue.'`.execute(db);
     }
 
     await sql`SET session_replication_role = DEFAULT`.execute(db);
@@ -215,7 +230,29 @@ async function principal(): Promise<void> {
     });
     await app.get(RotinasService).diaria(hojeBrasil());
 
-    // 6) importação: um orçamento aguardando proposta, um aceito (ordem em andamento) e um recusado
+    // 6) reembolsos de exemplo: um parcial (com devolução ao estoque) e um total no cartão
+    const entregues = await db.selectFrom('pedidos').select(['id', 'forma_pagamento', 'total_centavos']).where('situacao', '=', 'entregue').where('situacao_pagamento', '=', 'pago').orderBy('id').execute();
+    const parcial = entregues.find((x) => x.forma_pagamento === 'pix');
+    if (parcial) {
+      const item = await db.selectFrom('pedido_itens').select(['produto_id', 'preco_unitario_centavos']).where('pedido_id', '=', parcial.id).executeTakeFirstOrThrow();
+      await chamar('POST', `/equipe/vendas/pedidos/${parcial.id}/reembolso`, ADMIN, 'equipe', {
+        valor_centavos: item.preco_unitario_centavos, motivo: 'Uma unidade chegou com avaria no transporte.', devolver_estoque: true, itens: [{ produto_id: item.produto_id, quantidade: 1 }],
+      }).catch((e) => console.warn('Reembolso parcial de exemplo não registrado:', (e as Error).message));
+    }
+    const total = entregues.find((x) => x.forma_pagamento === 'cartao');
+    if (total) {
+      await chamar('POST', `/equipe/vendas/pedidos/${total.id}/reembolso`, ADMIN, 'equipe', { valor_centavos: total.total_centavos, motivo: 'Cliente desistiu da compra dentro do prazo.' })
+        .catch((e) => console.warn('Reembolso total de exemplo não registrado:', (e as Error).message));
+    }
+    await db.connection().execute(async (db) => {
+      await sql`SET session_replication_role = replica`.execute(db);
+      await sql`UPDATE reembolsos r SET criado_em = (SELECT max(v.entregue_em) FROM envios v WHERE v.pedido_id = r.pedido_id) + interval '2 days'
+                WHERE EXISTS (SELECT 1 FROM envios v WHERE v.pedido_id = r.pedido_id AND v.entregue_em IS NOT NULL)`.execute(db);
+      await sql`UPDATE pedido_eventos e SET criado_em = r.criado_em FROM reembolsos r WHERE e.pedido_id = r.pedido_id AND e.tipo = 'reembolso'`.execute(db);
+      await sql`SET session_replication_role = DEFAULT`.execute(db);
+    });
+
+    // 7) importação: um orçamento aguardando proposta, um aceito (ordem em andamento) e um recusado
     const imp = DEMONSTRACAO.find((d) => d.tipo === 'cooperativa')!;
     await chamar('POST', '/orcamentos', imp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Drone pulverizador 40 L', quantidade: 4 }, { descricao: 'Baterias extras para drone', quantidade: 12 }] });
     const aceito = await chamar<{ id: number; itens: Array<{ id: number }> }>('POST', '/orcamentos', imp.email, 'cliente', { modalidade: 'conta_e_ordem', itens: [{ descricao: 'Plantadeira pneumática 12 linhas', quantidade: 2 }] });
@@ -229,7 +266,7 @@ async function principal(): Promise<void> {
     await chamar('POST', '/orcamentos', hosp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Monitor multiparamétrico', quantidade: 10 }] });
 
     const tot = await db.selectFrom('pedidos').select([sql<number>`count(*)::int`.as('n'), sql<number>`coalesce(sum(total_centavos),0)::bigint`.as('v')]).executeTakeFirstOrThrow();
-    console.log(`Movimento de demonstração: ${criados} pedidos em ${DIAS} dias (R$ ${(Number(tot.v) / 100).toLocaleString('pt-BR')}), ${atrasadas} parcela(s) em atraso, 3 orçamentos de importação.`);
+    console.log(`Movimento de demonstração: ${criados} pedidos em ${DIAS} dias (R$ ${(Number(tot.v) / 100).toLocaleString('pt-BR')}), ${atrasadas} parcela(s) em atraso, 3 orçamentos de importação, notas, envios e 2 reembolsos.`);
   } finally {
     await app.close();
     await db.destroy();

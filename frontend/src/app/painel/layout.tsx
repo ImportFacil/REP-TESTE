@@ -11,17 +11,31 @@ const MENU: ItemPainel[] = [
   { href: '/painel/', rotulo: 'Painel de controle', icone: 'painel' },
   { href: '/painel/vendas', rotulo: 'Vendas', icone: 'vendas', filhos: [
     { href: '/painel/pedidos/', rotulo: 'Pedidos' },
+    { href: '/painel/pedido/', rotulo: 'Pedido', oculto: true },
+    { href: '/painel/notas/', rotulo: 'Notas fiscais' },
+    { href: '/painel/envios/', rotulo: 'Envios' },
+    { href: '/painel/reembolsos/', rotulo: 'Reembolsos' },
+    { href: '/painel/transacoes/', rotulo: 'Transações', papeis: FIN },
   ] },
   { href: '/painel/catalogo', rotulo: 'Catálogo', icone: 'catalogo', filhos: [
-    { href: '/painel/precos/', rotulo: 'Produtos e preços' },
+    { href: '/painel/produtos/', rotulo: 'Produtos' },
+    { href: '/painel/produto/', rotulo: 'Produto', oculto: true },
+    { href: '/painel/categorias/', rotulo: 'Categorias' },
+    { href: '/painel/atributos/', rotulo: 'Atributos' },
+    { href: '/painel/familias/', rotulo: 'Famílias de atributos' },
   ] },
   { href: '/painel/clientes', rotulo: 'Clientes', icone: 'clientes', filhos: [
     { href: '/painel/empresas/', rotulo: 'Empresas' },
+    { href: '/painel/empresa/', rotulo: 'Empresa', oculto: true },
+    { href: '/painel/analise/', rotulo: 'Análise de crédito', oculto: true },
+    { href: '/painel/precos/', rotulo: 'Grupos (tipos de cliente)' },
     { href: '/painel/credito/', rotulo: 'Crédito' },
   ] },
   { href: '/painel/importacao', rotulo: 'Importação', icone: 'importacao', filhos: [
     { href: '/painel/orcamentos/', rotulo: 'Orçamentos' },
+    { href: '/painel/orcamento/', rotulo: 'Orçamento', oculto: true },
     { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
+    { href: '/painel/ordem/', rotulo: 'Ordem', oculto: true },
   ] },
   { href: '/painel/financeiro', rotulo: 'Financeiro', icone: 'financeiro', filhos: [
     { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
