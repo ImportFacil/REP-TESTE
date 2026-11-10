@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-  ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsInt, IsOptional, IsString, Length, Matches, Max, MaxLength, Min, ValidateNested, IsObject } from 'class-validator';
+  ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString, Length, Matches, Max, MaxLength, Min, ValidateNested, IsObject } from 'class-validator';
 import { Paginacao } from '../comum/paginacao';
 
 const aparar = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
@@ -13,6 +13,12 @@ export class FiltroProdutos extends Paginacao {
   @ApiPropertyOptional() @IsOptional() @Transform(paraBooleano) @IsBoolean() destaque?: boolean;
   @ApiPropertyOptional({ description: 'Só para a equipe: ver os preços de um tipo de cliente' }) @IsOptional() @IsString() tipo_cliente?: string;
   @ApiPropertyOptional({ description: 'Só para a equipe: incluir produtos inativos' }) @IsOptional() @Transform(paraBooleano) @IsBoolean() incluir_inativos?: boolean;
+  @ApiPropertyOptional({ description: 'Só estes produtos (ids separados por vírgula)', example: '12,40' }) @IsOptional() @Matches(/^\d+(,\d+){0,199}$/) ids?: string;
+  @ApiPropertyOptional({ description: 'Só estes códigos (separados por vírgula), para o pedido rápido', example: 'EP-CP01,MQ-EN01' })
+  @IsOptional() @Matches(/^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+){0,499}$/) codigos?: string;
+  @ApiPropertyOptional({ description: 'Filtro por atributo, em JSON: {"tensao":["220 V","Bivolt"]}' }) @IsOptional() @IsString() @MaxLength(2000) atributos?: string;
+  @ApiPropertyOptional({ enum: ['relevancia', 'nome', 'menor_preco', 'maior_preco', 'novidades'] })
+  @IsOptional() @IsIn(['relevancia', 'nome', 'menor_preco', 'maior_preco', 'novidades']) ordem?: 'relevancia' | 'nome' | 'menor_preco' | 'maior_preco' | 'novidades';
 }
 
 export class ItemCotacaoDto {

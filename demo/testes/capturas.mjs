@@ -96,6 +96,43 @@ try {
   await page.screenshot({ path: `${saida}/21-loja-carrinho-cupom.png`, fullPage: true });
   checar('loja-carrinho-cupom', true, (await page.getByText(/Cupom PARCEIRO5|A promoção vale a partir|não vale|já usou/).first().innerText()).slice(0, 80));
 } catch (e) { checar('loja-entrega3', false, e.message.split('\n')[0]); }
+
+// Fase 2 da loja: filtros por atributo, favoritos, comparar, pedido rápido, listas e endereços
+for (const [nome, caminho, espera] of [
+  ['22-loja-favoritos', '/loja/favoritos/', 'Favoritos'],
+  ['23-loja-listas', '/loja/listas/', 'Reposição mensal'],
+  ['24-loja-enderecos', '/loja/enderecos/', 'Armazém de grãos'],
+]) await visitar(page, nome, caminho, { espera });
+try {
+  await visitar(page, '28-loja-catalogo-filtros', '/loja/catalogo/?categoria=seguranca', { espera: 'Catálogo' });
+  const antes = await page.locator('.cartao.produto').count();
+  const caixa = page.locator('.filtros-loja input[type="checkbox"]').first();
+  await caixa.check();
+  await page.waitForLoadState('networkidle'); await page.waitForTimeout(600);
+  const depois = await page.locator('.cartao.produto').count();
+  checar('loja-filtro-atributo', depois > 0 && depois <= antes, `${antes} → ${depois} produto(s) com o filtro`);
+  await caixa.uncheck();
+  await page.waitForLoadState('networkidle'); await page.waitForTimeout(600);
+  await page.locator('.cartao.produto button[aria-label="Comparar"]').nth(0).click();
+  await page.locator('.cartao.produto button[aria-label="Comparar"]').nth(0).click(); // o 1º virou "Tirar da comparação": este é o 2º
+  await page.screenshot({ path: `${saida}/29-loja-catalogo-comparar.png`, fullPage: true });
+  await page.getByRole('link', { name: 'Comparar', exact: true }).last().click();
+  await page.getByText('Seu preço').waitFor({ timeout: 15000 });
+  const colunas = await page.locator('table.comparar thead th').count();
+  await page.screenshot({ path: `${saida}/30-loja-comparar.png`, fullPage: true });
+  checar('loja-comparar', colunas === 3, `${colunas - 1} produto(s) lado a lado`);
+  await visitar(page, '31-loja-pedido-rapido', '/loja/pedido-rapido/', { espera: 'Pedido rápido' });
+  await page.locator('textarea').fill('EP-CP01;100\nMQ-EN01\nNAO-EXISTE;5\nEP-CP01;7');
+  await page.getByRole('button', { name: 'Conferir' }).click();
+  await page.getByText(/de 4 linha\(s\) prontas/).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/32-loja-pedido-rapido.png`, fullPage: true });
+  checar('loja-pedido-rapido', /2 de 4 linha/.test(await page.getByText(/de 4 linha\(s\) prontas/).innerText()), 'código inexistente e múltiplo errado apontados');
+  await visitar(page, '33-loja-lista', '/loja/listas/', { espera: 'Reposição mensal' });
+  await page.getByText('Reposição mensal').first().click();
+  await page.getByRole('button', { name: /Tudo para o carrinho/ }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/34-loja-lista.png`, fullPage: true });
+  checar('loja-lista', (await page.locator('table tbody tr').count()) === 5, 'lista com 5 produtos');
+} catch (e) { checar('loja-fase2', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Páginas de conteúdo abertas, sem login

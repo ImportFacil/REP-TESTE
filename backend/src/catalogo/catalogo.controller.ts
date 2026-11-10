@@ -24,6 +24,18 @@ export class CatalogoController {
     return this.catalogo.listarProdutos(u, f);
   }
 
+  @Get('filtros')
+  @ApiOperation({ summary: 'Atributos filtráveis com os valores existentes (para os filtros da loja)' })
+  filtros(@UsuarioAtual() u: UsuarioAutenticado, @Query() f: FiltroProdutos) {
+    return this.catalogo.filtros(u, f);
+  }
+
+  @Get('atributos')
+  @ApiOperation({ summary: 'Atributos que a loja mostra (comparação e página do produto)' })
+  atributos() {
+    return this.catalogo.atributosDaLoja();
+  }
+
   @Get('produtos/:id')
   @ApiQuery({ name: 'tipo_cliente', required: false, description: 'Só para a equipe' })
   produto(@UsuarioAtual() u: UsuarioAutenticado, @Param('id', ParseIntPipe) id: number, @Query('tipo_cliente') tipo?: string) {

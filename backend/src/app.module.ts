@@ -20,6 +20,7 @@ import { ConteudoModule } from './conteudo/conteudo.module';
 import { MarketingModule } from './marketing/marketing.module';
 import { ConfiguracoesModule } from './configuracoes/configuracoes.module';
 import { RelatoriosModule } from './relatorios/relatorios.module';
+import { LojaModule } from './loja/loja.module';
 import { PedidosModule } from './pedidos/pedidos.module';
 import { RotinasModule } from './rotinas/rotinas.module';
 import { SaudeController } from './saude/saude.controller';
@@ -63,6 +64,7 @@ export class AppModule {
         ConteudoModule,
         RelatoriosModule,
         ConfiguracoesModule,
+        LojaModule,
       ],
       controllers: [SaudeController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

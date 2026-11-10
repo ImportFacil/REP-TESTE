@@ -6,7 +6,11 @@ const SECOES = [
   { titulo: 'Loja', itens: [
     { href: '/loja/', rotulo: 'Início', icone: '🏠' },
     { href: '/loja/catalogo/', rotulo: 'Catálogo', icone: '🔎' },
+    { href: '/loja/pedido-rapido/', rotulo: 'Pedido rápido', icone: '⚡' },
     { href: '/loja/carrinho/', rotulo: 'Carrinho', icone: '🛒' },
+    { href: '/loja/favoritos/', rotulo: 'Favoritos', icone: '♥' },
+    { href: '/loja/comparar/', rotulo: 'Comparar', icone: '⚖️' },
+    { href: '/loja/listas/', rotulo: 'Listas de compra', icone: '📋' },
   ] },
   { titulo: 'Compras', itens: [
     { href: '/loja/pedidos/', rotulo: 'Pedidos', icone: '📦' },
@@ -16,6 +20,7 @@ const SECOES = [
   ] },
   { titulo: 'Empresa', itens: [
     { href: '/loja/credito/', rotulo: 'Cadastro e crédito', icone: '📄' },
+    { href: '/loja/enderecos/', rotulo: 'Endereços de entrega', icone: '📍' },
     { href: '/loja/conta/', rotulo: 'Conta e usuários', icone: '👥' },
   ] },
 ];

@@ -1,7 +1,7 @@
 'use client';
 import type { ReactNode } from 'react';
 import { Copiar, Situacao } from './ui';
-import { FORMA, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, dataHora, reais } from '@/lib/formato';
+import { FORMA, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, dataHora, reais, enderecoEmLinha } from '@/lib/formato';
 
 export interface PedidoDetalhe {
   id: number;
@@ -18,6 +18,7 @@ export interface PedidoDetalhe {
   situacao: string;
   situacao_pagamento: string;
   observacao: string | null;
+  endereco_entrega?: { cep: string; logradouro: string; numero: string; complemento?: string; bairro: string; cidade: string; uf: string } | null;
   criado_em: string;
   faturado_em: string | null;
   itens: Array<{ id: number; produto_id: number; codigo: string; nome: string; unidade: string; quantidade: number; preco_unitario_centavos: number; total_centavos: number }>;
@@ -72,6 +73,7 @@ export function CorpoPedido({ p, acoesParcela }: { p: PedidoDetalhe; acoesParcel
           {p.desconto_centavos > 0 && <div className="linha entre"><span>Desconto Pix</span><span className="numero">− {reais(p.desconto_centavos)}</span></div>}
           {p.juros_centavos > 0 && <div className="linha entre"><span>Juros do cartão</span><span className="numero">+ {reais(p.juros_centavos)}</span></div>}
           <div className="linha entre"><b>Total</b><b className="numero">{reais(p.total_centavos)}</b></div>
+          {p.endereco_entrega && <p className="pequeno muted">Entrega: {enderecoEmLinha(p.endereco_entrega)}</p>}
           {p.observacao && <p className="pequeno muted">Obs.: {p.observacao}</p>}
         </div>
         {pendentes.some((c) => c.meio === 'pix') && (

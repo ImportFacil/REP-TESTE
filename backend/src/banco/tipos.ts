@@ -581,6 +581,39 @@ export interface ImportacoesProdutosTabela {
   criado_em: Generated<Momento>;
 }
 
+export interface FavoritosTabela {
+  usuario_id: string;
+  produto_id: number;
+  criado_em: Generated<Momento>;
+}
+
+export interface EnderecosEntregaTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  apelido: string;
+  endereco: Json<Endereco>;
+  padrao: Generated<boolean>;
+  ativo: Generated<boolean>;
+  criado_por: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface ListasCompraTabela {
+  id: Generated<number>;
+  empresa_id: string;
+  nome: string;
+  ativo: Generated<boolean>;
+  criado_por: string | null;
+  criado_em: Generated<Momento>;
+  atualizado_em: Momento;
+}
+
+export interface ListaItensTabela {
+  lista_id: number;
+  produto_id: number;
+  quantidade: number;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -623,6 +656,10 @@ export interface Database {
   estoque_locais: EstoqueLocaisTabela;
   cotacoes_cambio: CotacoesCambioTabela;
   importacoes_produtos: ImportacoesProdutosTabela;
+  favoritos: FavoritosTabela;
+  enderecos_entrega: EnderecosEntregaTabela;
+  listas_compra: ListasCompraTabela;
+  lista_itens: ListaItensTabela;
 }
 
 export type Politica = Selectable<PoliticasPagamentoTabela>;

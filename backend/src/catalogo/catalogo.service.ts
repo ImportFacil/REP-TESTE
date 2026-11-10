@@ -98,8 +98,19 @@ export class CatalogoService {
       const termo = f.busca.trim().replace(/[%_\\]/g, (c) => `\\${c}`);
       q = q.where(sql<boolean>`${EXPR_BUSCA} LIKE '%' || busca_normalizada(${termo}) || '%'`);
     }
+    if (f.ids) q = q.where('p.id', 'in', f.ids.split(',').map(Number));
+    if (f.codigos) q = q.where('p.codigo', 'in', f.codigos.split(',').map((c) => c.toUpperCase()));
+    for (const [codigo, valores] of Object.entries(lerFiltroAtributos(f.atributos))) {
+      q = q.where(sql<boolean>`p.atributos->>${codigo} = ANY(${valores}::text[])`);
+    }
+    const ordem = {
+      relevancia: [sql`p.destaque DESC`, sql`p.nome`], nome: [sql`p.nome`], menor_preco: [sql`p.preco_tabela_centavos`, sql`p.nome`],
+      maior_preco: [sql`p.preco_tabela_centavos DESC`, sql`p.nome`], novidades: [sql`p.criado_em DESC`, sql`p.id DESC`],
+    }[f.ordem ?? 'relevancia'];
+    let consulta = q.selectAll('p').select('c.nome as categoria_nome');
+    for (const o of ordem) consulta = consulta.orderBy(o);
     const [linhas, total] = await Promise.all([
-      q.selectAll('p').select('c.nome as categoria_nome').orderBy('p.destaque', 'desc').orderBy('p.nome').limit(limite).offset(deslocamento).execute(),
+      consulta.limit(limite).offset(deslocamento).execute(),
       q.select(sql<number>`count(*)::int`.as('n')).executeTakeFirstOrThrow(),
     ]);
     return {
@@ -109,6 +120,37 @@ export class CatalogoService {
       por_pagina: limite,
       pedido_minimo_centavos: t?.pedido_minimo_centavos ?? null,
     };
+  }
+
+  /** Filtros da loja (como no Bagisto): os atributos filtráveis com os valores que existem entre os produtos visíveis. */
+  async filtros(u: UsuarioAutenticado, f: { categoria?: string; busca?: string }) {
+    let q = this.consultaProdutos(u, false);
+    if (f.categoria) q = q.where('p.categoria_id', '=', f.categoria);
+    if (f.busca?.trim()) {
+      const termo = f.busca.trim().replace(/[%_\\]/g, (c) => `\\${c}`);
+      q = q.where(sql<boolean>`${EXPR_BUSCA} LIKE '%' || busca_normalizada(${termo}) || '%'`);
+    }
+    const ids = (await q.select('p.id').execute()).map((r) => r.id);
+    if (!ids.length) return [];
+    const r = await sql<{ codigo: string; nome: string; unidade: string | null; valor: string; n: number }>`
+      SELECT a.codigo, a.nome, a.unidade, a.ordem, kv.value AS valor, count(*)::int AS n
+      FROM produtos p CROSS JOIN LATERAL jsonb_each_text(p.atributos) kv
+      JOIN atributos a ON a.codigo = kv.key AND a.ativo AND a.filtravel AND a.visivel_na_loja
+      WHERE p.id = ANY(${ids}::bigint[]) AND kv.value <> ''
+      GROUP BY a.codigo, a.nome, a.unidade, a.ordem, kv.value ORDER BY a.ordem, a.nome, kv.value`.execute(this.db);
+    const grupos = new Map<string, { codigo: string; nome: string; unidade: string | null; valores: Array<{ valor: string; produtos: number }> }>();
+    for (const x of r.rows) {
+      const g = grupos.get(x.codigo) ?? { codigo: x.codigo, nome: x.nome, unidade: x.unidade, valores: [] };
+      g.valores.push({ valor: x.valor, produtos: x.n });
+      grupos.set(x.codigo, g);
+    }
+    return [...grupos.values()].filter((g) => g.valores.length >= 2);
+  }
+
+  /** Atributos que a loja mostra (para a comparação e a página do produto). */
+  atributosDaLoja() {
+    return this.db.selectFrom('atributos').select(['codigo', 'nome', 'unidade', 'tipo']).where('ativo', '=', true).where('visivel_na_loja', '=', true)
+      .orderBy('ordem').orderBy('nome').execute();
   }
 
   async obterProduto(u: UsuarioAutenticado, id: number, tipo?: string): Promise<ProdutoComPreco> {
@@ -228,4 +270,19 @@ function traduzirErroProduto(e: unknown): unknown {
   if (codigoPg(e) === PG_VIOLACAO_UNICA) return new ConflictException('Já existe um produto com este código.');
   if (codigoPg(e) === PG_VIOLACAO_FK) return new BadRequestException('Categoria inexistente.');
   return e;
+}
+
+/** Filtro de atributos da loja: {"tensao":["220 V"]} → só valores de texto, códigos válidos. */
+export function lerFiltroAtributos(json: string | undefined): Record<string, string[]> {
+  if (!json) return {};
+  let v: unknown;
+  try { v = JSON.parse(json); } catch { throw new BadRequestException('Filtro de atributos inválido.'); }
+  if (!v || typeof v !== 'object' || Array.isArray(v)) throw new BadRequestException('Filtro de atributos inválido.');
+  const r: Record<string, string[]> = {};
+  for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
+    if (!/^[a-z][a-z0-9_]{1,39}$/.test(k)) throw new BadRequestException(`Atributo inválido: ${k}`);
+    const lista = (Array.isArray(x) ? x : [x]).filter((y): y is string => typeof y === 'string' && y.length <= 200);
+    if (lista.length) r[k] = lista.slice(0, 50);
+  }
+  return r;
 }

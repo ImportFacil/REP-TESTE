@@ -14,6 +14,7 @@ export class NovoPedidoDto {
   @ApiPropertyOptional({ type: EnderecoDto }) @IsOptional() @ValidateNested() @Type(() => EnderecoDto) endereco_entrega?: EnderecoDto;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) observacao?: string;
   @ApiPropertyOptional({ description: 'Cupom de promoção' }) @IsOptional() @IsString() @MaxLength(30) cupom?: string;
+  @ApiPropertyOptional({ description: 'Endereço de entrega cadastrado da empresa (sem ele, vale o padrão)' }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) endereco_id?: number;
 }
 
 export class FiltroPedidos extends Paginacao {

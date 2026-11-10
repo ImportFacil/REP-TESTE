@@ -1,7 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { AcoesProduto } from '@/components/AcoesProduto';
 import { Avaliacoes } from '@/components/Avaliacoes';
+import { GuardarNaLista } from '@/components/GuardarNaLista';
 import { Passo, iconeCategoria, type ProdutoApi } from '@/components/Produto';
 import { Aviso, Carregando } from '@/components/ui';
 import { adicionar } from '@/lib/carrinho';
@@ -12,6 +14,7 @@ export default function Produto() {
   const id = useParametro('id');
   const { dados: p, erro } = useDados<ProdutoApi>(id ? `/catalogo/produtos/${id}` : null);
   const cats = useDados<Array<{ id: string; icone: string | null }>>('/catalogo/categorias');
+  const atributos = useDados<Array<{ codigo: string; nome: string; unidade: string | null }>>('/catalogo/atributos');
   const [qtd, setQtd] = useState<number | null>(null);
   const [ok, setOk] = useState(false);
   if (erro) return <Aviso tipo="erro">{erro}</Aviso>;
@@ -27,7 +30,7 @@ export default function Produto() {
           <div className="foto" style={{ fontSize: '4rem' }}>{iconeCategoria(cats.dados?.find((c) => c.id === p.categoria_id)?.icone)}</div>
         </div>
         <div className="cartao pilha">
-          <span className="pequeno muted">{p.marca} · {p.codigo}{p.importado ? ' · Linha de importação' : ''}</span>
+          <div className="linha entre" style={{ flexWrap: 'wrap' }}><span className="pequeno muted">{p.marca} · {p.codigo}{p.importado ? ' · Linha de importação' : ''}</span><AcoesProduto produtoId={p.id} rotulos /></div>
           <h1>{p.nome}</h1>
           {p.descricao && <p>{p.descricao}</p>}
           {p.sob_orcamento ? (
@@ -53,7 +56,13 @@ export default function Produto() {
                 }}>Adicionar ao carrinho</button>
                 {ok && <Link className="botao secundario" href="/loja/carrinho/">Ir para o carrinho</Link>}
               </div>
+              <GuardarNaLista itens={[{ produto_id: p.id, quantidade }]} />
             </>
+          )}
+          {(atributos.dados ?? []).some((a) => p.atributos?.[a.codigo]) && (
+            <table aria-label="Características">
+              <tbody>{(atributos.dados ?? []).filter((a) => p.atributos?.[a.codigo]).map((a) => <tr key={a.codigo}><th style={{ width: '40%' }}>{a.nome}</th><td>{p.atributos![a.codigo]}{a.unidade && !p.atributos![a.codigo].includes(a.unidade) ? ` ${a.unidade}` : ''}</td></tr>)}</tbody>
+            </table>
           )}
           {p.especificacoes.length > 0 && (
             <table>

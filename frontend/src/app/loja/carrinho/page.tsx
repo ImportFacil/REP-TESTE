@@ -2,13 +2,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { GuardarNaLista } from '@/components/GuardarNaLista';
 import { Passo } from '@/components/Produto';
 import { useEu } from '@/components/Shell';
 import { Aviso, Cabecalho, Carregando, Vazio } from '@/components/ui';
 import { api } from '@/lib/api';
 import { definirQuantidade, esvaziar, useCarrinho } from '@/lib/carrinho';
-import { data, reais } from '@/lib/formato';
-import { useAcao } from '@/lib/hooks';
+import { data, enderecoEmLinha, reais } from '@/lib/formato';
+import { useAcao, useDados } from '@/lib/hooks';
 
 interface Cotacao {
   itens: Array<{ produto_id: number; quantidade: number; preco_unitario_centavos: number; total_centavos: number; problema: string | null; nome: string; unidade: string; multiplo_venda: number }>;
@@ -50,6 +51,8 @@ export default function Carrinho() {
   const [observacao, setObservacao] = useState('');
   const [cupomTexto, setCupomTexto] = useState('');
   const [cupom, setCupom] = useState('');
+  const enderecos = useDados<Array<{ id: number; apelido: string; padrao: boolean; endereco: { cep: string; logradouro: string; numero: string; complemento?: string; bairro: string; cidade: string; uf: string } }>>('/loja/enderecos');
+  const [enderecoId, setEnderecoId] = useState<number | null>(null);
   const fechar = useAcao();
   const chave = useMemo(() => JSON.stringify(itens.map((i) => [i.produto_id, i.quantidade])), [itens]);
 
@@ -103,6 +106,7 @@ export default function Carrinho() {
           ...(forma === 'cartao' && { token_cartao: recusar ? 'tok_recusado' : 'tok_teste' }),
           ...(observacao.trim() && { observacao: observacao.trim() }),
           ...(cupom && !cotacao?.cupom_erro && { cupom }),
+          ...(enderecoId && { endereco_id: enderecoId }),
         },
       });
       esvaziar();
@@ -137,6 +141,10 @@ export default function Carrinho() {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="linha entre" style={{ marginTop: 10, flexWrap: 'wrap' }}>
+            <GuardarNaLista itens={itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade }))} rotulo="Guardar o carrinho numa lista" />
+            <Link className="pequeno" href="/loja/pedido-rapido/">Pedido rápido por código ›</Link>
           </div>
         </div>
 
@@ -219,6 +227,13 @@ export default function Carrinho() {
                   <label className="linha pequeno"><input type="checkbox" checked={recusar} onChange={(e) => setRecusar(e.target.checked)} style={{ width: 'auto' }} /> Simular cartão recusado</label>
                 </>
               )}
+              <label className="campo">Entrega
+                {enderecos.dados?.length ? (
+                  <select value={enderecoId ?? enderecos.dados.find((x) => x.padrao)?.id ?? ''} onChange={(e) => setEnderecoId(Number(e.target.value))} aria-label="Endereço de entrega">
+                    {enderecos.dados.map((x) => <option key={x.id} value={x.id}>{x.apelido}{x.padrao ? ' (padrão)' : ''}: {enderecoEmLinha(x.endereco)}</option>)}
+                  </select>
+                ) : <span className="pequeno muted" style={{ fontWeight: 400 }}>Sem endereço cadastrado: a ImportFácil combina a entrega. <Link href="/loja/enderecos/">Cadastrar endereços</Link></span>}
+              </label>
               <textarea placeholder="Observação para a ImportFácil (opcional)" value={observacao} onChange={(e) => setObservacao(e.target.value)} maxLength={1000} />
               <div className="linha entre"><span>Total</span><b style={{ fontSize: '1.2rem' }} className="numero">{reais(totalEscolhido)}</b></div>
               <Aviso tipo="erro">{fechar.erro}</Aviso>

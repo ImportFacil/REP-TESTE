@@ -5,6 +5,7 @@ import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
 import type { Endereco, FormaPagamento, SituacaoPedido } from '../banco/tipos';
 import { CatalogoService } from '../catalogo/catalogo.service';
+import { LojaService } from '../loja/loja.service';
 import { MarketingService } from '../marketing/marketing.service';
 import { limites } from '../comum/paginacao';
 import { PagamentosService } from '../pagamentos/pagamentos.service';
@@ -19,6 +20,7 @@ export interface NovoPedido {
   endereco_entrega?: Endereco;
   observacao?: string;
   cupom?: string;
+  endereco_id?: number;
 }
 
 /** Próximo passo permitido na logística do pedido. */
@@ -35,6 +37,7 @@ export class PedidosService {
     private readonly politica: PoliticaService,
     private readonly auditoria: AuditoriaService,
     private readonly marketing: MarketingService,
+    private readonly loja: LojaService,
   ) {}
 
   /** Opções de pagamento para um subtotal: Pix com desconto, boleto (se o crédito permitir) e cartão. */
@@ -77,6 +80,10 @@ export class PedidosService {
     }
     const parcelas = dto.parcelas ?? 1;
     const subtotal = cot.subtotal_centavos;
+    // Entrega: o endereço escolhido, o informado ou, sem nenhum, o padrão da empresa.
+    let endereco = dto.endereco_entrega ?? null;
+    if (dto.endereco_id) endereco = await this.loja.enderecoDaEmpresa(u.empresaId!, dto.endereco_id);
+    else if (!endereco) endereco = (await this.loja.enderecos(u)).find((e) => e.padrao)?.endereco ?? null;
 
     return this.db.transaction().execute(async (trx) => {
       // Trava o cadastro da empresa para que dois pedidos no boleto não usem o mesmo limite ao mesmo tempo.
@@ -118,7 +125,7 @@ export class PedidosService {
         subtotal_centavos: subtotal, desconto_centavos: desconto, juros_centavos: juros, total_centavos: total,
         situacao_pagamento: situacaoPagamento, politica_id: pol.id,
         promocao_id: promo.promocao?.id ?? null, cupom: promo.promocao?.cupom ?? null, promocao_centavos: promocao,
-        endereco_entrega: dto.endereco_entrega ? JSON.stringify(dto.endereco_entrega) : null, observacao: dto.observacao ?? null,
+        endereco_entrega: endereco ? JSON.stringify(endereco) : null, observacao: dto.observacao ?? null,
       }).returningAll().executeTakeFirstOrThrow();
 
       for (const i of cot.itens) {

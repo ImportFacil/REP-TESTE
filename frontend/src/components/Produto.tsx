@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { AcoesProduto } from '@/components/AcoesProduto';
 import { adicionar } from '@/lib/carrinho';
 import { reais } from '@/lib/formato';
 
@@ -23,6 +24,8 @@ export interface ProdutoApi {
   importado: boolean;
   ativo: boolean;
   especificacoes: Array<{ nome: string; valor: string }>;
+  atributos?: Record<string, string>;
+  familia_id?: number | null;
 }
 
 export const ICONES: Record<string, string> = {
@@ -62,7 +65,7 @@ export function CartaoProduto({ p, icone }: { p: ProdutoApi; icone?: string | nu
         {desconto > 0 && <span className="desconto">-{desconto}%</span>}
         {iconeCategoria(icone)}
       </Link>
-      <span className="codigo">{p.marca} · {p.codigo}</span>
+      <div className="linha entre" style={{ gap: 6 }}><span className="codigo">{p.marca} · {p.codigo}</span><AcoesProduto produtoId={p.id} /></div>
       <Link href={`/loja/produto/?id=${p.id}`} className="nome">{p.nome}</Link>
       {p.sob_orcamento ? (
         <>

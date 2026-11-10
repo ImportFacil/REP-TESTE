@@ -60,3 +60,8 @@ export const ETAPA_NUMERARIO: Record<string, string> = { cambio: 'Câmbio', trib
 export const PAPEL: Record<string, string> = {
   comprador: 'Comprador', aprovador: 'Aprovador', comercial: 'Comercial', financeiro: 'Financeiro', administrador: 'Administrador',
 };
+
+/** Endereço numa linha: "Rua X, 10 · Bairro · Cidade/UF · CEP 00000-000". */
+export function enderecoEmLinha(e: { cep: string; logradouro: string; numero: string; complemento?: string; bairro: string; cidade: string; uf: string }) {
+  return `${e.logradouro}, ${e.numero}${e.complemento ? ` (${e.complemento})` : ''} · ${e.bairro} · ${e.cidade}/${e.uf} · CEP ${e.cep.replace(/(\d{5})(\d{3})/, '$1-$2')}`;
+}

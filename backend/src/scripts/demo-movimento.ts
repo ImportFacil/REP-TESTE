@@ -147,6 +147,21 @@ async function principal(): Promise<void> {
       }
     }
 
+    // 2e) endereços de entrega de cada empresa (o padrão vai nos pedidos) e um segundo armazém da cooperativa
+    const ENDERECOS: Record<string, Array<{ apelido: string; endereco: Record<string, string> }>> = {
+      cooperativa: [
+        { apelido: 'Matriz', endereco: { cep: '78890000', logradouro: 'Avenida Blumenau', numero: '2150', bairro: 'Centro', cidade: 'Sorriso', uf: 'MT' } },
+        { apelido: 'Armazém de grãos', endereco: { cep: '78890000', logradouro: 'Rodovia BR-163', numero: 'km 740', bairro: 'Distrito Industrial', cidade: 'Sorriso', uf: 'MT' } },
+      ],
+      distribuidora: [{ apelido: 'Centro de distribuição', endereco: { cep: '13087000', logradouro: 'Rua Lauro Vannucci', numero: '1020', bairro: 'Jardim Santa Cândida', cidade: 'Campinas', uf: 'SP' } }],
+      revendedor: [{ apelido: 'Loja', endereco: { cep: '89010001', logradouro: 'Rua XV de Novembro', numero: '510', bairro: 'Centro', cidade: 'Blumenau', uf: 'SC' } }],
+      construtora: [{ apelido: 'Escritório', endereco: { cep: '30130010', logradouro: 'Avenida Afonso Pena', numero: '1500', complemento: 'sala 801', bairro: 'Centro', cidade: 'Belo Horizonte', uf: 'MG' } }],
+      hospital: [{ apelido: 'Almoxarifado', endereco: { cep: '80060000', logradouro: 'Rua General Carneiro', numero: '181', bairro: 'Alto da Glória', cidade: 'Curitiba', uf: 'PR' } }],
+    };
+    for (const d of DEMONSTRACAO) {
+      for (const e of ENDERECOS[d.tipo] ?? []) await chamar('POST', '/loja/enderecos', d.email, 'cliente', e).catch(() => undefined);
+    }
+
     // 3) pedidos ao longo de 90 dias
     const tabelas = await db.selectFrom('tabelas_preco').select(['tipo_cliente', 'pedido_minimo_centavos', 'desconto_bp']).execute();
     const categorias = await db.selectFrom('categorias').select(['id', 'tipos_cliente']).execute();
@@ -342,6 +357,16 @@ async function principal(): Promise<void> {
     }
     const saiu = await db.selectFrom('newsletter_inscritos').select('id').where('email', '=', inscritos[2]).executeTakeFirst();
     if (saiu) await chamar('PATCH', `/equipe/marketing/newsletter/${saiu.id}`, ADMIN, 'equipe', { ativo: false });
+
+    // 6d) uma lista de compra da cooperativa e alguns favoritos, a partir do que ela já comprou
+    const coopDemo = DEMONSTRACAO.find((d) => d.tipo === 'cooperativa')!;
+    const jaComprou = await db.selectFrom('pedido_itens as i').innerJoin('pedidos as p', 'p.id', 'i.pedido_id').innerJoin('empresas as e', 'e.id', 'p.empresa_id')
+      .select(['i.produto_id', sql<number>`max(i.quantidade)::int`.as('quantidade')]).where('e.cnpj', '=', coopDemo.cnpj).where('p.situacao', '<>', 'cancelado')
+      .groupBy('i.produto_id').orderBy('i.produto_id').limit(6).execute();
+    if (jaComprou.length) {
+      await chamar('POST', '/loja/listas', coopDemo.email, 'cliente', { nome: 'Reposição mensal', itens: jaComprou.slice(0, 5) }).catch(() => undefined);
+      for (const f of jaComprou.slice(0, 3)) await chamar('PUT', `/loja/favoritos/${f.produto_id}`, coopDemo.email, 'cliente').catch(() => undefined);
+    }
 
     // 7) importação: um orçamento aguardando proposta, um aceito (ordem em andamento) e um recusado
     const imp = DEMONSTRACAO.find((d) => d.tipo === 'cooperativa')!;
