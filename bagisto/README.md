@@ -32,6 +32,7 @@ servidor Node.js e a loja Next.js, que ficaram guardados no ramo `legado-node`.
 | **Cartão até 12×** | Forma de pagamento `importfacil_cartao` (`Payment/Cartao.php`) |
 | **Financeiro do cliente** | Página `/customer/account/financeiro` na conta da empresa: parcelas, vencimentos, situação e totais |
 | **App para celular** | App instalável (PWA): `/manifest.webmanifest`, `/sw.js` (funciona sem rede) e a página `/app` com QR e o passo a passo |
+| **Todas as páginas no app** | `/paginas` reúne a loja, as categorias, a área da empresa, o Painel da equipe e as telas do protótipo, com busca. O botão "Todas as páginas" fica fixo na loja e no Painel, e o ícone do app tem o atalho. O protótipo abre dentro do app em `/prototipo`, com link direto para cada tela (`/prototipo/#pedidos`, `/prototipo/#equipe/calc`) |
 | **Importação sob encomenda** | `Importacao/Ordens.php`: o cliente pede a ordem pelo carrinho ou pela página do produto, e a equipe avança as etapas (enviada, recebida, em processo, em trânsito, entregue). Na entrega, sai a NF-e de venda e a cobrança na forma escolhida |
 | **Importação por conta e ordem** | Só para empresas liberadas (faixa A). O cliente paga o numerário por Pix: a mercadoria antes do câmbio e os tributos antes da DUIMP. A ordem não avança sem o pagamento. Na entrega, prestação de contas e cobrança só da taxa de serviço |
 | **Calculadora de importação** | `Importacao/Calculadora.php`: o mesmo cálculo do protótipo (planilha FINAL IMPORT COSTS DRONES), no Painel → Importação. Também abre com os itens de uma ordem |
