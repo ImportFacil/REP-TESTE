@@ -6,6 +6,33 @@ trap 'echo "[iniciar.sh] falhou na linha $LINENO: $BASH_COMMAND" >&2' ERR
 echo "[iniciar.sh] começando $(date -Is)"
 cd /var/www/bagisto
 
+# No Codespaces: a cada início, baixa o código mais novo do repositório e usa o pacote ImportFácil,
+# o protótipo e os textos dele, sem reconstruir a imagem. (Mudança no Dockerfile ainda pede "Rebuild Container".)
+atualizar_do_repositorio() {
+  local ws repo
+  ws=$(ls -d /workspaces/*/bagisto/pacote 2>/dev/null | head -1 | xargs -r dirname) || true
+  [ -n "${CODESPACE_NAME:-}" ] && [ -n "$ws" ] || return 0
+  repo=$(dirname "$ws")
+  echo "== Atualizando o código pelo repositório =="
+  git -c safe.directory='*' -C "$repo" pull --ff-only -q 2>&1 | tail -2 || echo "aviso: não foi possível baixar a versão nova; seguindo com a atual"
+  # se o próprio iniciar.sh mudou, recomeça com a versão nova (uma vez só)
+  if [ -z "${IF_ATUALIZADO:-}" ] && ! cmp -s "$ws/iniciar.sh" /opt/demo/iniciar.sh; then
+    cp "$ws/iniciar.sh" /opt/demo/iniciar.sh
+    IF_ATUALIZADO=1 exec bash /opt/demo/iniciar.sh
+  fi
+  rm -rf packages/ImportFacil/Loja && cp -r "$ws/pacote" packages/ImportFacil/Loja
+  mkdir -p public/importfacil && cp -r packages/ImportFacil/Loja/public/. public/importfacil/
+  cp "$ws/app/ImportfacilDemo.php" app/Console/Commands/ImportfacilDemo.php
+  cp "$ws/lang/shop/pt_BR/app.php" lang/vendor/shop/pt_BR/app.php
+  cp "$ws/catalogo-importfacil.json" /opt/demo/catalogo-importfacil.json
+  cp "$ws/dados/ncm.json" /opt/demo/ncm.json
+  [ -f "$ws/scripts/preparar-prototipo.py" ] && [ -f "$ws/prototipo/index.html" ] \
+    && python3 "$ws/scripts/preparar-prototipo.py" "$ws/prototipo/index.html" "$ws/dados/ncm.json" public/prototipo
+  composer dump-autoload -o --no-dev -q
+  echo "Código atualizado: $(git -c safe.directory='*' -C "$repo" log -1 --format='%h %s' 2>/dev/null)"
+}
+atualizar_do_repositorio
+
 : "${DB_HOST:=db}" "${DB_PORT:=3306}" "${DB_DATABASE:=bagisto}" "${DB_USERNAME:=bagisto}" "${DB_PASSWORD:=bagisto}"
 if [ -z "${APP_URL:-}" ]; then
   if [ -n "${CODESPACE_NAME:-}" ]; then
