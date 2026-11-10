@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Avaliacoes } from '@/components/Avaliacoes';
 import { Passo, iconeCategoria, type ProdutoApi } from '@/components/Produto';
 import { Aviso, Carregando } from '@/components/ui';
 import { adicionar } from '@/lib/carrinho';
@@ -61,6 +62,7 @@ export default function Produto() {
           )}
         </div>
       </div>
+      <Avaliacoes produtoId={p.id} />
     </>
   );
 }

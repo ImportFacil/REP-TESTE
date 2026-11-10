@@ -4,6 +4,7 @@ import { randomInt } from 'node:crypto';
 import { AuditoriaService } from '../auditoria/auditoria.service';
 import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
+import { NotificacoesService } from '../notificacoes/notificacoes.service';
 
 export interface NovoEnvio { transportadora: string; codigo_rastreio?: string; volumes?: number; peso_kg?: number; observacao?: string }
 export interface NovoReembolso {
@@ -29,7 +30,7 @@ function chaveSimulada(numero: number, cnpj: string): string {
 /** Vendas no formato do Bagisto: notas fiscais, envios, reembolsos e transações (pagamentos recebidos). */
 @Injectable()
 export class VendasService {
-  constructor(@Inject(BANCO) private readonly db: Banco, private readonly auditoria: AuditoriaService) {}
+  constructor(@Inject(BANCO) private readonly db: Banco, private readonly auditoria: AuditoriaService, private readonly notificacoes: NotificacoesService) {}
 
   // ---------------- notas fiscais ----------------
   listarNotas() {
@@ -95,6 +96,15 @@ export class VendasService {
       const rastreio = dto.codigo_rastreio ? `, rastreio ${dto.codigo_rastreio}` : '';
       await trx.insertInto('pedido_eventos').values({ pedido_id: pedidoId, tipo: 'situacao', usuario_id: autor.id, descricao: `Enviado por ${dto.transportadora}${rastreio}.` }).execute();
       await this.auditoria.registrar({ usuario: autor, acao: 'pedido.enviar', entidade: 'pedido', entidadeId: pedidoId, antes: { situacao: p.situacao }, depois: envio, ip }, trx);
+      return envio;
+    }).then(async (envio) => {
+      // Avisa quem comprou (modelo "Pedido enviado", editável em Marketing → Modelos de e-mail).
+      const c = await this.db.selectFrom('pedidos as p').innerJoin('usuarios as u', 'u.id', 'p.comprador_id').innerJoin('empresas as e', 'e.id', 'p.empresa_id')
+        .select(['u.email', 'u.nome', 'e.razao_social', 'p.empresa_id']).where('p.id', '=', pedidoId).executeTakeFirstOrThrow();
+      await this.notificacoes.registrar({
+        empresaId: c.empresa_id, destinatarios: [c.email], modelo: 'pedido_enviado', chave: `envio:${envio.id}`,
+        dados: { nome: c.nome, empresa: c.razao_social, pedido: pedidoId, transportadora: envio.transportadora, rastreio: envio.codigo_rastreio ?? 'não informado', volumes: envio.volumes },
+      });
       return envio;
     });
   }

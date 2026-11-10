@@ -13,6 +13,8 @@ export interface PedidoDetalhe {
   desconto_centavos: number;
   juros_centavos: number;
   total_centavos: number;
+  promocao_centavos?: number;
+  cupom?: string | null;
   situacao: string;
   situacao_pagamento: string;
   observacao: string | null;
@@ -66,6 +68,7 @@ export function CorpoPedido({ p, acoesParcela }: { p: PedidoDetalhe; acoesParcel
           <div className="linha entre"><span>Forma</span><b>{FORMA[p.forma_pagamento]}{p.forma_pagamento !== 'pix' ? ` em ${p.parcelas}×` : ''}</b></div>
           <hr style={{ border: 0, borderTop: '1px solid var(--borda)', width: '100%' }} />
           <div className="linha entre"><span>Subtotal</span><span className="numero">{reais(p.subtotal_centavos)}</span></div>
+          {(p.promocao_centavos ?? 0) > 0 && <div className="linha entre"><span>{p.cupom ? `Cupom ${p.cupom}` : 'Promoção'}</span><span className="numero">− {reais(p.promocao_centavos)}</span></div>}
           {p.desconto_centavos > 0 && <div className="linha entre"><span>Desconto Pix</span><span className="numero">− {reais(p.desconto_centavos)}</span></div>}
           {p.juros_centavos > 0 && <div className="linha entre"><span>Juros do cartão</span><span className="numero">+ {reais(p.juros_centavos)}</span></div>}
           <div className="linha entre"><b>Total</b><b className="numero">{reais(p.total_centavos)}</b></div>

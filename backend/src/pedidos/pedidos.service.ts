@@ -5,6 +5,7 @@ import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
 import type { Endereco, FormaPagamento, SituacaoPedido } from '../banco/tipos';
 import { CatalogoService } from '../catalogo/catalogo.service';
+import { MarketingService } from '../marketing/marketing.service';
 import { limites } from '../comum/paginacao';
 import { PagamentosService } from '../pagamentos/pagamentos.service';
 import { PoliticaService } from '../pagamentos/politica.service';
@@ -17,6 +18,7 @@ export interface NovoPedido {
   token_cartao?: string;
   endereco_entrega?: Endereco;
   observacao?: string;
+  cupom?: string;
 }
 
 /** Próximo passo permitido na logística do pedido. */
@@ -32,6 +34,7 @@ export class PedidosService {
     private readonly pagamentos: PagamentosService,
     private readonly politica: PoliticaService,
     private readonly auditoria: AuditoriaService,
+    private readonly marketing: MarketingService,
   ) {}
 
   /** Opções de pagamento para um subtotal: Pix com desconto, boleto (se o crédito permitir) e cartão. */
@@ -79,20 +82,25 @@ export class PedidosService {
       // Trava o cadastro da empresa para que dois pedidos no boleto não usem o mesmo limite ao mesmo tempo.
       await trx.selectFrom('cadastros_credito').select('empresa_id').where('empresa_id', '=', u.empresaId!).forUpdate().execute();
       const pol = await this.politica.atual(trx);
+      // Promoção: a do cupom ou a automática de maior desconto (linhas travadas: o limite de usos não estoura).
+      const promo = await this.marketing.avaliar(trx, { empresaId: u.empresaId!, tipoCliente: cot.tipo_cliente }, cot.itens, subtotal, dto.cupom, true);
+      if (dto.cupom?.trim() && promo.cupom_erro) throw new BadRequestException(promo.cupom_erro);
+      const promocao = promo.promocao ? Math.min(promo.promocao.desconto_centavos, subtotal - 1) : 0;
+      const base = subtotal - promocao;
       let desconto = 0;
       let juros = 0;
-      let total = subtotal;
+      let total = base;
       let situacaoPagamento: 'aguardando_pagamento' | 'aguardando_faturamento' | 'pago';
 
       if (dto.forma_pagamento === 'pix') {
         if (parcelas !== 1) throw new BadRequestException('Pix é à vista.');
-        desconto = descontoPix(subtotal, pol.pix_desconto_bp);
-        total = subtotal - desconto;
+        desconto = descontoPix(base, pol.pix_desconto_bp);
+        total = base - desconto;
         situacaoPagamento = 'aguardando_pagamento';
       } else if (dto.forma_pagamento === 'cartao') {
         if (parcelas > pol.cartao_max_parcelas) throw new BadRequestException(`O cartão aceita até ${pol.cartao_max_parcelas} parcelas.`);
         if (!dto.token_cartao) throw new BadRequestException('Informe o token do cartão gerado pelo formulário do gateway.');
-        const r = parcelamentoCartao(subtotal, parcelas, pol.cartao_sem_juros_ate, pol.cartao_juros_am_bp);
+        const r = parcelamentoCartao(base, parcelas, pol.cartao_sem_juros_ate, pol.cartao_juros_am_bp);
         total = r.total;
         juros = r.juros;
         situacaoPagamento = 'pago';
@@ -100,7 +108,7 @@ export class PedidosService {
         const credito = await this.pagamentos.resumoCredito(u.empresaId!, trx);
         if (credito.bloqueado) throw new ForbiddenException(credito.motivo_bloqueio);
         if (parcelas > credito.max_parcelas_boleto) throw new BadRequestException(`O boleto da sua empresa vai até ${credito.max_parcelas_boleto} parcelas.`);
-        if (subtotal > credito.disponivel_centavos) throw new ForbiddenException('O pedido passa do limite de crédito disponível.');
+        if (base > credito.disponivel_centavos) throw new ForbiddenException('O pedido passa do limite de crédito disponível.');
         situacaoPagamento = 'aguardando_faturamento';
       }
       if (dto.forma_pagamento !== 'boleto') this.pagamentos.gw(); // 503 se pagamentos não estiverem habilitados
@@ -109,6 +117,7 @@ export class PedidosService {
         empresa_id: u.empresaId!, comprador_id: u.id, tipo_cliente: cot.tipo_cliente, forma_pagamento: dto.forma_pagamento, parcelas,
         subtotal_centavos: subtotal, desconto_centavos: desconto, juros_centavos: juros, total_centavos: total,
         situacao_pagamento: situacaoPagamento, politica_id: pol.id,
+        promocao_id: promo.promocao?.id ?? null, cupom: promo.promocao?.cupom ?? null, promocao_centavos: promocao,
         endereco_entrega: dto.endereco_entrega ? JSON.stringify(dto.endereco_entrega) : null, observacao: dto.observacao ?? null,
       }).returningAll().executeTakeFirstOrThrow();
 
@@ -121,7 +130,7 @@ export class PedidosService {
         pedido_id: pedido.id, produto_id: i.produto_id, codigo: i.codigo, nome: i.nome, unidade: i.unidade, quantidade: i.quantidade,
         preco_tabela_centavos: i.preco_tabela_centavos, preco_unitario_centavos: i.preco_unitario_centavos, total_centavos: i.total_centavos,
       }))).execute();
-      await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'criado', usuario_id: u.id, descricao: `Pedido feito por ${u.nome} (${descreverPagamento(dto.forma_pagamento, parcelas)}).` }).execute();
+      await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'criado', usuario_id: u.id, descricao: `Pedido feito por ${u.nome} (${descreverPagamento(dto.forma_pagamento, parcelas)})${promo.promocao ? `, com a promoção ${promo.promocao.nome}` : ''}.` }).execute();
 
       if (dto.forma_pagamento === 'pix') {
         await this.pagamentos.criarPix(trx, { pedidoId: pedido.id }, total, `Pedido ${pedido.id} ImportFácil`);
@@ -130,7 +139,7 @@ export class PedidosService {
         if (!r.aprovado) throw new HttpException(r.motivo, HttpStatus.PAYMENT_REQUIRED);
         await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'pagamento', usuario_id: null, descricao: 'Cartão aprovado.' }).execute();
       }
-      await this.auditoria.registrar({ usuario: u, acao: 'pedido.criar', entidade: 'pedido', entidadeId: pedido.id, depois: { total, forma: dto.forma_pagamento, parcelas }, ip }, trx);
+      await this.auditoria.registrar({ usuario: u, acao: 'pedido.criar', entidade: 'pedido', entidadeId: pedido.id, depois: { total, forma: dto.forma_pagamento, parcelas, promocao_id: promo.promocao?.id ?? null, promocao_centavos: promocao }, ip }, trx);
       return pedido.id;
     }).then((id) => this.detalhe(id, u.empresaId!));
   }

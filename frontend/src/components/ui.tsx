@@ -78,11 +78,13 @@ const CORES: Record<string, 'verde' | 'ambar' | 'vermelho' | 'azul' | undefined>
   enviado: 'azul', em_separacao: 'azul', novo: 'azul', em_aberto: 'azul', pendente: 'ambar', pendente_documentos: 'ambar', rascunho: undefined,
   vencida: 'vermelho', pix_expirado: 'vermelho', reprovado: 'vermelho', cancelado: 'vermelho', cancelada: 'vermelho', bloqueada: 'vermelho',
   inativa: 'vermelho', recusado: 'vermelho', expirado: 'vermelho', expirada: 'vermelho',
+  aprovada: 'verde', recusada: 'vermelho', publicada: 'verde', enviada: 'verde', falhou: 'vermelho', inscrito: 'verde', saiu: undefined,
 };
 
 const NOMES_PADRAO: Record<string, string> = {
   aberta: 'Em aberto', vencida: 'Vencida', paga: 'Paga', cancelada: 'Cancelada', aguardando: 'Aguardando pagamento', pago: 'Pago',
   ativa: 'Ativa', bloqueada: 'Bloqueada', inativa: 'Inativa', pendente: 'Pendente', expirada: 'Expirada',
+  aprovada: 'Aprovada', recusada: 'Recusada', enviada: 'Enviada', falhou: 'Falhou',
 };
 
 export function Situacao({ valor, nomes }: { valor: string; nomes?: Record<string, string> }) {

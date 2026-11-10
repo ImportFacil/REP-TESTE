@@ -52,3 +52,19 @@ export async function baixar(caminho: string, nome: string) {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
+
+/** Rotas abertas da API (páginas de conteúdo, newsletter): sem token e sem mandar para o login. */
+export async function apiPublica<T = unknown>(caminho: string, corpo?: unknown): Promise<T> {
+  const c = await carregarConfig();
+  const r = await fetch(`${c.api}${caminho}`, {
+    method: corpo ? 'POST' : 'GET',
+    headers: corpo ? { 'Content-Type': 'application/json' } : {},
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  const dados = (await r.json().catch(() => ({}))) as { message?: string | string[] };
+  if (!r.ok) {
+    const msg = Array.isArray(dados?.message) ? dados.message.join(' ') : dados?.message ?? 'Algo deu errado. Tente de novo.';
+    throw new ErroApi(r.status, traduzir(msg), dados);
+  }
+  return dados as T;
+}

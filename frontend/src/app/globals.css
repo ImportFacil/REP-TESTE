@@ -217,3 +217,22 @@ tr.clicavel:hover td { background: var(--superficie-2); }
 .entrar .cartao { width: 100%; max-width: 440px; }
 .grade-lado { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 860px) { .grade-lado { grid-template-columns: minmax(0, 1fr); } }
+
+/* Estrelas das avaliações e texto das páginas de conteúdo */
+.estrelas { display: inline-flex; gap: 2px; vertical-align: middle; }
+.markdown { line-height: 1.65; max-width: 72ch; }
+.markdown h2 { font-size: 1.2rem; margin: 1.6em 0 0.4em; }
+.markdown h3 { font-size: 1.05rem; margin: 1.3em 0 0.3em; }
+.markdown p, .markdown ul { margin: 0 0 0.9em; }
+.markdown ul { padding-left: 1.3em; }
+.markdown li { margin: 0.25em 0; }
+.markdown > :first-child { margin-top: 0; }
+
+/* Rodapé da loja e das páginas abertas */
+.rodape { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; margin-top: 40px; padding: 24px 0 8px; border-top: 1px solid var(--borda); }
+.rodape-paginas { display: grid; gap: 8px; min-width: 0; }
+.rodape-paginas nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.rodape-paginas a { color: var(--texto-2, inherit); font-size: 0.9rem; }
+.rodape-news { display: grid; gap: 8px; flex: 0 1 380px; min-width: 0; }
+.rodape-news label { display: grid; gap: 2px; }
+.pagina-aberta { max-width: 1040px; margin: 0 auto; padding: 0 16px 24px; }

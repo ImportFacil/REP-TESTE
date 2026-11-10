@@ -13,6 +13,9 @@ export class NotificacoesService {
 
   async registrar(n: { empresaId: string | null; destinatarios: string[]; modelo: string; chave: string; dados: Record<string, unknown> }): Promise<number> {
     if (!n.destinatarios.length) return 0;
+    // Modelo desativado no Painel (Marketing → Modelos de e-mail) = esse aviso não é mandado.
+    const modelo = await this.db.selectFrom('modelos_email').select('ativo').where('codigo', '=', n.modelo).executeTakeFirst();
+    if (modelo && !modelo.ativo) return 0;
     const r = await this.db.insertInto('notificacoes')
       .values(n.destinatarios.map((d) => ({
         empresa_id: n.empresaId, destinatario: d, canal: 'email' as const, modelo: n.modelo, chave: `${n.chave}:${d}`, dados: JSON.stringify(n.dados),

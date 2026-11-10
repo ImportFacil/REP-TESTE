@@ -17,7 +17,7 @@ import { criarConexao } from '../banco/conexao';
 import { DEMONSTRACAO } from '../banco/semear';
 import { lerConfig } from '../config';
 import { documentosExigidos } from '../credito/documentos-exigidos';
-import { hojeBrasil } from '../pagamentos/regras';
+import { hojeBrasil, somarDias } from '../pagamentos/regras';
 import { RotinasService } from '../rotinas/rotinas.service';
 
 const DIAS = 90;
@@ -111,6 +111,16 @@ async function principal(): Promise<void> {
     const coop = empresas.find((e) => e.tipo_cliente === 'cooperativa')!;
     await chamar('PUT', `/equipe/empresas/${coop.id}/conta-e-ordem`, ADMIN, 'equipe', { liberar: true });
 
+    // 2b) promoções: uma automática (EPI), um cupom de parceiro, um de boas-vindas e uma já encerrada
+    const hojeD = hojeBrasil();
+    for (const promo of [
+      { nome: 'EPI com 8% de desconto', descricao: 'Equipamentos de proteção para cooperativas e construtoras.', tipo_desconto: 'percentual', desconto_bp: 800, categorias: ['epis', 'c-epi'] },
+      { nome: 'Parceiro 5%', descricao: 'Cupom dos representantes comerciais.', cupom: 'PARCEIRO5', tipo_desconto: 'percentual', desconto_bp: 500, subtotal_minimo_centavos: 500_000, limite_usos: 200 },
+      { nome: 'Boas-vindas', descricao: 'R$ 300 no primeiro pedido acima de R$ 5.000.', cupom: 'BEMVINDO', tipo_desconto: 'valor_fixo', desconto_centavos: 30_000, subtotal_minimo_centavos: 500_000, limite_por_empresa: 1 },
+      { nome: 'Feira Agrishow', descricao: 'Condição da feira, encerrada.', cupom: 'AGRISHOW', tipo_desconto: 'percentual', desconto_bp: 700, tipos_cliente: ['cooperativa'],
+        inicio: somarDias(hojeD, -200), fim: somarDias(hojeD, -180) },
+    ]) await chamar('POST', '/equipe/marketing/promocoes', ADMIN, 'equipe', promo).catch((e) => { if (e.status !== 409) throw e; });
+
     // 3) pedidos ao longo de 90 dias
     const tabelas = await db.selectFrom('tabelas_preco').select(['tipo_cliente', 'pedido_minimo_centavos', 'desconto_bp']).execute();
     const categorias = await db.selectFrom('categorias').select(['id', 'tipos_cliente']).execute();
@@ -154,12 +164,19 @@ async function principal(): Promise<void> {
       const corpo: Record<string, unknown> = { itens: [...itens].map(([produto_id, quantidade]) => ({ produto_id, quantidade })), forma_pagamento: forma };
       if (forma === 'boleto') corpo.parcelas = s.entre(1, credito!.faixa === 'A' ? 4 : 2);
       if (forma === 'cartao') { corpo.parcelas = s.entre(1, 10); corpo.token_cartao = 'tok_demonstracao'; }
+      const cupomSorte = s.r();
+      if (cupomSorte < 0.12) corpo.cupom = 'PARCEIRO5';
+      else if (cupomSorte < 0.2) corpo.cupom = 'BEMVINDO';
       let pedido: { id: number };
       try {
         pedido = await chamar('POST', '/pedidos', p.email, 'cliente', corpo);
       } catch (e) {
-        if ([400, 403, 409].includes((e as { status?: number }).status ?? 0)) continue; // limite de crédito, atraso, estoque…
-        throw e;
+        const st = (e as { status?: number }).status ?? 0;
+        if (st === 400 && corpo.cupom) {                         // cupom que a empresa já usou: fecha sem ele
+          delete corpo.cupom;
+          try { pedido = await chamar('POST', '/pedidos', p.email, 'cliente', corpo); } catch { continue; }
+        } else if ([400, 403, 409].includes(st)) continue;        // limite de crédito, atraso, estoque…
+        else throw e;
       }
       for (const [id, q] of itens) estoque.set(id, (estoque.get(id) ?? 0) - q);
       criados++;
@@ -252,6 +269,54 @@ async function principal(): Promise<void> {
       await sql`SET session_replication_role = DEFAULT`.execute(db);
     });
 
+    // 6b) avaliações dos produtos entregues: a maioria publicada, algumas aguardando moderação e uma recusada
+    const COMENTARIOS: Array<[number, string, string]> = [
+      [5, 'Chegou antes do prazo', 'Entrega rápida e bem embalada. O produto é exatamente o da descrição.'],
+      [5, 'Recompramos sempre', 'Qualidade constante entre os lotes; já é o terceiro pedido do mesmo item.'],
+      [4, 'Bom custo-benefício', 'Atende bem ao uso diário. Só a embalagem poderia ser mais resistente.'],
+      [5, 'Equipe atenciosa', 'Tivemos uma dúvida sobre a nota e o comercial resolveu no mesmo dia.'],
+      [4, 'Funciona bem', 'Instalação simples e manual em português. Recomendo.'],
+      [3, 'Dentro do esperado', 'Cumpre o que promete, mas o prazo de entrega para o interior foi longo.'],
+      [5, 'Excelente acabamento', 'Material resistente, muito superior ao que usávamos antes.'],
+      [4, 'Boa compra', 'Preço da tabela da cooperativa compensa bastante no volume.'],
+      [2, 'Uma unidade com defeito', 'Uma das unidades veio com avaria; o reembolso foi feito sem problema.'],
+      [5, 'Perfeito para a obra', 'Usamos em três canteiros e não tivemos nenhuma reclamação.'],
+      [4, 'Recomendo', 'Produto bom e a nota fiscal chegou junto com o rastreio.'],
+      [1, 'Entrem em contato pelo meu WhatsApp', 'Vendo o mesmo produto mais barato, chama no 11 9xxxx-xxxx.'],
+    ];
+    const comprados = await db.selectFrom('pedido_itens as i').innerJoin('pedidos as p', 'p.id', 'i.pedido_id').innerJoin('usuarios as u', 'u.id', 'p.comprador_id')
+      .innerJoin('envios as v', 'v.pedido_id', 'p.id')
+      .select(['i.produto_id', 'u.email', 'v.entregue_em']).distinctOn(['i.produto_id', 'u.email'])
+      .where('p.situacao', '=', 'entregue').orderBy('i.produto_id').orderBy('u.email').limit(60).execute();
+    let avaliadas = 0;
+    for (const [k, c] of comprados.filter((_, i) => i % 4 === 0).slice(0, COMENTARIOS.length).entries()) {
+      const [nota, titulo, comentario] = COMENTARIOS[k];
+      const a = await chamar<{ id: number }>('POST', `/catalogo/produtos/${c.produto_id}/avaliacoes`, c.email, 'cliente', { nota, titulo, comentario }).catch(() => null);
+      if (!a) continue;
+      avaliadas++;
+      if (nota === 1) await chamar('POST', `/equipe/clientes/avaliacoes/${a.id}/moderar`, ADMIN, 'equipe', { situacao: 'recusada', motivo: 'Contém propaganda e contato pessoal.' });
+      else if (k % 5 !== 2) await chamar('POST', `/equipe/clientes/avaliacoes/${a.id}/moderar`, ADMIN, 'equipe', { situacao: 'aprovada' });
+      await db.connection().execute(async (db) => {
+        await sql`SET session_replication_role = replica`.execute(db);
+        await sql`UPDATE avaliacoes SET criado_em = ${c.entregue_em}::timestamptz + interval '3 days', moderada_em = CASE WHEN moderada_em IS NULL THEN NULL ELSE ${c.entregue_em}::timestamptz + interval '4 days' END WHERE id = ${a.id}`.execute(db);
+        await sql`SET session_replication_role = DEFAULT`.execute(db);
+      });
+    }
+
+    // 6c) newsletter: inscrições do rodapé da loja ao longo dos meses (uma pessoa saiu da lista)
+    const inscritos = ['compras@agropecuaria-vale.com.br', 'suprimentos@hospitalsaolucas.org.br', 'gerencia@ferragensdocentro.com.br', 'obras@construtorahorizonte.com.br',
+      'marina.souza@coop-demo.com.br', 'compras@distribuidora-demo.com.br', 'contato@revendasul.com.br', 'engenharia@solarcampo.com.br'];
+    for (const [k, email] of inscritos.entries()) {
+      await chamar('POST', '/equipe/marketing/newsletter', ADMIN, 'equipe', { email }).catch(() => undefined);
+      await db.connection().execute(async (db) => {
+        await sql`SET session_replication_role = replica`.execute(db);
+        await sql`UPDATE newsletter_inscritos SET inscrito_em = now() - ${sql.raw(`interval '${80 - k * 9} days'`)}, origem = 'loja' WHERE email = ${email}`.execute(db);
+        await sql`SET session_replication_role = DEFAULT`.execute(db);
+      });
+    }
+    const saiu = await db.selectFrom('newsletter_inscritos').select('id').where('email', '=', inscritos[2]).executeTakeFirst();
+    if (saiu) await chamar('PATCH', `/equipe/marketing/newsletter/${saiu.id}`, ADMIN, 'equipe', { ativo: false });
+
     // 7) importação: um orçamento aguardando proposta, um aceito (ordem em andamento) e um recusado
     const imp = DEMONSTRACAO.find((d) => d.tipo === 'cooperativa')!;
     await chamar('POST', '/orcamentos', imp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Drone pulverizador 40 L', quantidade: 4 }, { descricao: 'Baterias extras para drone', quantidade: 12 }] });
@@ -266,7 +331,7 @@ async function principal(): Promise<void> {
     await chamar('POST', '/orcamentos', hosp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Monitor multiparamétrico', quantidade: 10 }] });
 
     const tot = await db.selectFrom('pedidos').select([sql<number>`count(*)::int`.as('n'), sql<number>`coalesce(sum(total_centavos),0)::bigint`.as('v')]).executeTakeFirstOrThrow();
-    console.log(`Movimento de demonstração: ${criados} pedidos em ${DIAS} dias (R$ ${(Number(tot.v) / 100).toLocaleString('pt-BR')}), ${atrasadas} parcela(s) em atraso, 3 orçamentos de importação, notas, envios e 2 reembolsos.`);
+    console.log(`Movimento de demonstração: ${criados} pedidos em ${DIAS} dias (R$ ${(Number(tot.v) / 100).toLocaleString('pt-BR')}), ${atrasadas} parcela(s) em atraso, 3 orçamentos de importação, notas, envios, 2 reembolsos, ${avaliadas} avaliações e ${inscritos.length} inscritos na newsletter.`);
   } finally {
     await app.close();
     await db.destroy();

@@ -210,6 +210,9 @@ export interface PedidosTabela {
   endereco_entrega: Json<Endereco> | null;
   observacao: string | null;
   faturado_em: Momento | null;
+  promocao_id: number | null;
+  cupom: string | null;
+  promocao_centavos: Generated<number>;
   criado_em: Generated<Momento>;
   atualizado_em: Generated<Momento>;
 }
@@ -448,6 +451,82 @@ export interface FamiliaAtributosTabela {
   ordem: Generated<number>;
 }
 
+export interface AvaliacoesTabela {
+  id: Generated<number>;
+  produto_id: number;
+  empresa_id: string;
+  usuario_id: string;
+  nota: number;
+  titulo: string;
+  comentario: string;
+  compra_verificada: Generated<boolean>;
+  situacao: Generated<'pendente' | 'aprovada' | 'recusada'>;
+  motivo_recusa: string | null;
+  moderada_por: string | null;
+  moderada_em: Momento | null;
+  criado_em: Generated<Momento>;
+}
+
+type Data = ColumnType<string, string, string>;
+
+export interface PromocoesTabela {
+  id: Generated<number>;
+  nome: string;
+  descricao: string | null;
+  cupom: string | null;
+  tipo_desconto: 'percentual' | 'valor_fixo';
+  desconto_bp: number | null;
+  desconto_centavos: number | null;
+  tipos_cliente: string[] | null;
+  categorias: string[] | null;
+  subtotal_minimo_centavos: Generated<number>;
+  inicio: Data | null;
+  fim: Data | null;
+  limite_usos: number | null;
+  limite_por_empresa: number | null;
+  ativo: Generated<boolean>;
+  criado_em: Generated<Momento>;
+  atualizado_em: Generated<Momento>;
+}
+
+export interface NewsletterInscritosTabela {
+  id: Generated<number>;
+  email: string;
+  nome: string | null;
+  empresa_id: string | null;
+  origem: Generated<'loja' | 'painel' | 'cadastro'>;
+  token: Generated<string>;
+  ativo: Generated<boolean>;
+  inscrito_em: Momento;
+  cancelado_em: Momento | null;
+}
+
+export interface ModelosEmailTabela {
+  codigo: string;
+  nome: string;
+  descricao: string;
+  assunto: string;
+  corpo: string;
+  variaveis: Generated<string[]>;
+  ativo: Generated<boolean>;
+  atualizado_em: Generated<Momento>;
+  atualizado_por: string | null;
+}
+
+export interface PaginasTabela {
+  id: Generated<number>;
+  slug: string;
+  titulo: string;
+  resumo: string | null;
+  conteudo: string;
+  publicada: Generated<boolean>;
+  no_rodape: Generated<boolean>;
+  ordem: Generated<number>;
+  criado_em: Generated<Momento>;
+  atualizado_em: Generated<Momento>;
+  atualizado_por: string | null;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -480,6 +559,11 @@ export interface Database {
   atributos: AtributosTabela;
   familias_atributos: FamiliasAtributosTabela;
   familia_atributos: FamiliaAtributosTabela;
+  avaliacoes: AvaliacoesTabela;
+  promocoes: PromocoesTabela;
+  newsletter_inscritos: NewsletterInscritosTabela;
+  modelos_email: ModelosEmailTabela;
+  paginas: PaginasTabela;
 }
 
 export type Politica = Selectable<PoliticasPagamentoTabela>;

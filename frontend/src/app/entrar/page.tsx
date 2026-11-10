@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Aviso, Carregando } from '@/components/ui';
@@ -71,6 +72,7 @@ export default function Entrar() {
             </form>
           </>
         )}
+        <p className="pequeno muted" style={{ margin: 0 }}><Link href="/pagina/">Sobre a ImportFácil, entrega, pagamentos e privacidade</Link></p>
       </div>
     </div>
   );

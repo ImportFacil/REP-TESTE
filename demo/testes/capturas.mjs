@@ -78,6 +78,31 @@ for (const [nome, caminho, espera] of [
   ['17-loja-credito', '/loja/credito/'],
   ['18-loja-conta', '/loja/conta/'],
 ]) await visitar(page, nome, caminho, { espera });
+
+// Entrega 3 na loja: avaliações no produto, cupom no carrinho e rodapé com páginas e newsletter
+try {
+  const textoCatalogo = await visitar(page, '19-loja-catalogo-produtos', '/loja/catalogo/');
+  checar('loja-rodape', /Novidades por e-mail/.test(textoCatalogo) && /Sobre a ImportFácil/.test(textoCatalogo), 'rodapé com páginas e newsletter');
+  await page.locator('a[href*="/loja/produto/?id="]').first().click();
+  await page.getByRole('heading', { name: 'Avaliações' }).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/20-loja-produto-avaliacoes.png`, fullPage: true });
+  checar('loja-produto-avaliacoes', await page.getByText(/Avaliar este produto|Sua avaliação/).first().isVisible(), 'formulário ou avaliação própria no produto');
+  const adicionar = page.getByRole('button', { name: 'Adicionar ao carrinho' });
+  if (await adicionar.isVisible()) await adicionar.click();
+  await page.goto(base + '/loja/carrinho/', { waitUntil: 'networkidle' });
+  await page.getByLabel('Cupom de desconto').first().fill('parceiro5');
+  await page.getByRole('button', { name: 'Aplicar' }).click();
+  await page.getByText(/Cupom PARCEIRO5|A promoção vale a partir|não vale|já usou/).first().waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/21-loja-carrinho-cupom.png`, fullPage: true });
+  checar('loja-carrinho-cupom', true, (await page.getByText(/Cupom PARCEIRO5|A promoção vale a partir|não vale|já usou/).first().innerText()).slice(0, 80));
+} catch (e) { checar('loja-entrega3', false, e.message.split('\n')[0]); }
+await ctx.close();
+
+// Páginas de conteúdo abertas, sem login
+({ ctx, page } = await novaSessao());
+await visitar(page, '25-pagina-indice', '/pagina/', { espera: 'Perguntas frequentes' });
+await visitar(page, '26-pagina-sobre', '/pagina/?p=sobre', { espera: 'O que fazemos' });
+await visitar(page, '27-pagina-privacidade', '/pagina/?p=politica-de-privacidade', { espera: 'Seus direitos' });
 await ctx.close();
 
 // 3) Painel da equipe (administrador)
@@ -126,6 +151,16 @@ for (const [nome, caminho, espera] of [
   ['57-catalogo-familias', '/painel/familias/', 'Famílias de atributos'],
   ['58-clientes-grupos', '/painel/precos/', 'Grupos de clientes'],
   ['59-catalogo-novo-produto', '/painel/produto/?novo=1', 'Criar produto'],
+  // entrega 3: clientes, marketing e conteúdo
+  ['70-clientes-usuarios', '/painel/usuarios/', 'Usuários dos clientes'],
+  ['71-clientes-avaliacoes', '/painel/avaliacoes/', 'aguardando moderação'],
+  ['72-marketing-promocoes', '/painel/promocoes/', 'PARCEIRO5'],
+  ['73-marketing-newsletter', '/painel/newsletter/', 'inscrito(s) ativo(s)'],
+  ['74-marketing-modelos', '/painel/modelos/', 'Pedido enviado'],
+  ['75-marketing-modelo', '/painel/modelo/?codigo=parcela_em_atraso', 'Cooperativa Agro Sorriso'],
+  ['76-marketing-caixa-de-saida', '/painel/caixa-de-saida/', 'Na fila'],
+  ['77-conteudo-paginas', '/painel/paginas/', 'Trocas e devoluções'],
+  ['78-conteudo-pagina', '/painel/pagina/?novo=1', 'Prévia'],
 ]) await visitar(page, nome, caminho, { espera });
 try {
   await visitar(page, '60-notas-lista', '/painel/notas/', { espera: 'Notas fiscais' });

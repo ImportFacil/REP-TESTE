@@ -7,6 +7,7 @@ import { carregarConfig } from '@/lib/config';
 import { useCarrinho } from '@/lib/carrinho';
 import { useDados } from '@/lib/hooks';
 import { NOMES_TIPO, PAPEL } from '@/lib/formato';
+import { Rodape } from './Rodape';
 import { Carregando } from './ui';
 import { PainelLayout, type ItemPainel } from './painel/PainelLayout';
 
@@ -113,6 +114,7 @@ export function Shell({ origem, secoes = [], painel, children }: { origem: Orige
       </nav>
       <main className="conteudo">
         <EuContexto.Provider value={{ eu, recarregar }}>{children}</EuContexto.Provider>
+        <Rodape />
       </main>
     </div>
   );

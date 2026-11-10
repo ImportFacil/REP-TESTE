@@ -13,6 +13,7 @@ export class NovoPedidoDto {
   @IsOptional() @IsString() @MaxLength(200) token_cartao?: string;
   @ApiPropertyOptional({ type: EnderecoDto }) @IsOptional() @ValidateNested() @Type(() => EnderecoDto) endereco_entrega?: EnderecoDto;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) observacao?: string;
+  @ApiPropertyOptional({ description: 'Cupom de promoção' }) @IsOptional() @IsString() @MaxLength(30) cupom?: string;
 }
 
 export class FiltroPedidos extends Paginacao {

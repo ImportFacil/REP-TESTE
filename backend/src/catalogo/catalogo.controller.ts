@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, Ip, Param, ParseIntPipe, Patch, Post, 
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SoEquipe, UsuarioAtual } from '../auth/decoradores';
 import type { UsuarioAutenticado } from '../auth/identidade';
+import { MarketingService } from '../marketing/marketing.service';
 import { CatalogoService } from './catalogo.service';
 import { AlterarProdutoDto, AlterarTabelaPrecoDto, CotacaoDto, FiltroProdutos, ProdutoDto } from './dto';
 
@@ -9,7 +10,7 @@ import { AlterarProdutoDto, AlterarTabelaPrecoDto, CotacaoDto, FiltroProdutos, P
 @ApiBearerAuth()
 @Controller('catalogo')
 export class CatalogoController {
-  constructor(private readonly catalogo: CatalogoService) {}
+  constructor(private readonly catalogo: CatalogoService, private readonly marketing: MarketingService) {}
 
   @Get('categorias')
   @ApiOperation({ summary: 'Categorias visíveis para quem está logado' })
@@ -31,9 +32,15 @@ export class CatalogoController {
 
   @Post('cotacao')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Calcula preços, confere múltiplo de venda, estoque e pedido mínimo' })
-  cotacao(@UsuarioAtual() u: UsuarioAutenticado, @Body() dto: CotacaoDto) {
-    return this.catalogo.cotar(u, dto);
+  @ApiOperation({ summary: 'Calcula preços, confere múltiplo de venda, estoque e pedido mínimo; aplica a promoção (cupom ou automática)' })
+  async cotacao(@UsuarioAtual() u: UsuarioAutenticado, @Body() dto: CotacaoDto) {
+    const cot = await this.catalogo.cotar(u, dto);
+    const validos = cot.itens.filter((i) => i.problema === null);
+    const r = u.empresaId
+      ? await this.marketing.avaliar(this.marketing.banco, { empresaId: u.empresaId, tipoCliente: cot.tipo_cliente }, validos, cot.subtotal_centavos, dto.cupom)
+      : { promocao: null, cupom_erro: null };
+    const promocao = r.promocao ? { ...r.promocao, desconto_centavos: Math.min(r.promocao.desconto_centavos, cot.subtotal_centavos - 1) } : null;
+    return { ...cot, promocao, cupom_erro: r.cupom_erro, total_com_promocao_centavos: cot.subtotal_centavos - (promocao?.desconto_centavos ?? 0) };
   }
 }
 

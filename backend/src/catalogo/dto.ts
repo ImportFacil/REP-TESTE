@@ -23,6 +23,7 @@ export class ItemCotacaoDto {
 export class CotacaoDto {
   @ApiProperty({ type: [ItemCotacaoDto] }) @IsArray() @ArrayMinSize(1) @ArrayMaxSize(200) @ValidateNested({ each: true }) @Type(() => ItemCotacaoDto) itens!: ItemCotacaoDto[];
   @ApiPropertyOptional({ description: 'Só para a equipe: cotar para um tipo de cliente' }) @IsOptional() @IsString() tipo_cliente?: string;
+  @ApiPropertyOptional({ description: 'Cupom de promoção' }) @IsOptional() @IsString() @MaxLength(30) cupom?: string;
 }
 
 export class EspecificacaoDto {

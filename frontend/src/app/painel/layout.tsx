@@ -28,8 +28,21 @@ const MENU: ItemPainel[] = [
     { href: '/painel/empresas/', rotulo: 'Empresas' },
     { href: '/painel/empresa/', rotulo: 'Empresa', oculto: true },
     { href: '/painel/analise/', rotulo: 'Análise de crédito', oculto: true },
+    { href: '/painel/usuarios/', rotulo: 'Usuários' },
     { href: '/painel/precos/', rotulo: 'Grupos (tipos de cliente)' },
+    { href: '/painel/avaliacoes/', rotulo: 'Avaliações' },
     { href: '/painel/credito/', rotulo: 'Crédito' },
+  ] },
+  { href: '/painel/marketing', rotulo: 'Marketing', icone: 'marketing', filhos: [
+    { href: '/painel/promocoes/', rotulo: 'Promoções e cupons' },
+    { href: '/painel/newsletter/', rotulo: 'Newsletter' },
+    { href: '/painel/modelos/', rotulo: 'Modelos de e-mail' },
+    { href: '/painel/modelo/', rotulo: 'Modelo', oculto: true },
+    { href: '/painel/caixa-de-saida/', rotulo: 'Caixa de saída' },
+  ] },
+  { href: '/painel/conteudo', rotulo: 'Conteúdo', icone: 'conteudo', filhos: [
+    { href: '/painel/paginas/', rotulo: 'Páginas' },
+    { href: '/painel/pagina/', rotulo: 'Página', oculto: true },
   ] },
   { href: '/painel/importacao', rotulo: 'Importação', icone: 'importacao', filhos: [
     { href: '/painel/orcamentos/', rotulo: 'Orçamentos' },

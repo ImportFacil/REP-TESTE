@@ -17,6 +17,9 @@ interface Cotacao {
   falta_para_minimo_centavos: number;
   atinge_pedido_minimo: boolean;
   pode_fechar: boolean;
+  promocao: { id: number; nome: string; cupom: string | null; desconto_centavos: number } | null;
+  cupom_erro: string | null;
+  total_com_promocao_centavos: number;
 }
 
 interface Condicoes {
@@ -45,6 +48,8 @@ export default function Carrinho() {
   const [parcelas, setParcelas] = useState(1);
   const [recusar, setRecusar] = useState(false);
   const [observacao, setObservacao] = useState('');
+  const [cupomTexto, setCupomTexto] = useState('');
+  const [cupom, setCupom] = useState('');
   const fechar = useAcao();
   const chave = useMemo(() => JSON.stringify(itens.map((i) => [i.produto_id, i.quantidade])), [itens]);
 
@@ -54,20 +59,20 @@ export default function Carrinho() {
       return;
     }
     const t = setTimeout(() => {
-      api<Cotacao>('/catalogo/cotacao', { corpo: { itens: itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade })) } })
+      api<Cotacao>('/catalogo/cotacao', { corpo: { itens: itens.map((i) => ({ produto_id: i.produto_id, quantidade: i.quantidade })), ...(cupom && { cupom }) } })
         .then((c) => { setCotacao(c); setErroCotacao(null); })
         .catch((e) => setErroCotacao(e.message));
     }, 300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chave]);
+  }, [chave, cupom]);
 
   useEffect(() => {
     if (!cotacao?.pode_fechar) {
       setCondicoes(null);
       return;
     }
-    api<Condicoes>(`/pedidos/condicoes?subtotal_centavos=${cotacao.subtotal_centavos}`).then(setCondicoes).catch(() => setCondicoes(null));
+    api<Condicoes>(`/pedidos/condicoes?subtotal_centavos=${cotacao.total_com_promocao_centavos}`).then(setCondicoes).catch(() => setCondicoes(null));
   }, [cotacao]);
 
   useEffect(() => {
@@ -86,7 +91,7 @@ export default function Carrinho() {
 
   const linha = (id: number) => cotacao?.itens.find((i) => i.produto_id === id);
   const totalEscolhido =
-    forma === 'pix' ? condicoes?.pix.total_centavos : forma === 'cartao' ? condicoes?.cartao[parcelas - 1]?.total_centavos : cotacao?.subtotal_centavos;
+    forma === 'pix' ? condicoes?.pix.total_centavos : forma === 'cartao' ? condicoes?.cartao[parcelas - 1]?.total_centavos : cotacao?.total_com_promocao_centavos;
 
   const confirmar = () =>
     fechar.executar(async () => {
@@ -97,6 +102,7 @@ export default function Carrinho() {
           parcelas,
           ...(forma === 'cartao' && { token_cartao: recusar ? 'tok_recusado' : 'tok_teste' }),
           ...(observacao.trim() && { observacao: observacao.trim() }),
+          ...(cupom && !cotacao?.cupom_erro && { cupom }),
         },
       });
       esvaziar();
@@ -144,6 +150,20 @@ export default function Carrinho() {
                 <div className="linha entre muted pequeno"><span>Pedido mínimo</span><span>{reais(cotacao.pedido_minimo_centavos)}</span></div>
                 {!cotacao.atinge_pedido_minimo && <Aviso tipo="atencao">Faltam {reais(cotacao.falta_para_minimo_centavos)} para o pedido mínimo.</Aviso>}
                 {cotacao.atinge_pedido_minimo && !cotacao.pode_fechar && <Aviso tipo="atencao">Ajuste os itens marcados em vermelho.</Aviso>}
+                {cotacao.promocao && (
+                  <>
+                    <div className="linha entre" style={{ color: 'var(--verde)' }}>
+                      <span>{cotacao.promocao.cupom ? `Cupom ${cotacao.promocao.cupom}` : 'Promoção'} · {cotacao.promocao.nome}</span>
+                      <b className="numero">− {reais(cotacao.promocao.desconto_centavos)}</b>
+                    </div>
+                    <div className="linha entre"><span>Total dos produtos</span><b className="numero">{reais(cotacao.total_com_promocao_centavos)}</b></div>
+                  </>
+                )}
+                <form className="linha" onSubmit={(e) => { e.preventDefault(); setCupom(cupomTexto.trim().toUpperCase()); }}>
+                  <input value={cupomTexto} onChange={(e) => setCupomTexto(e.target.value)} placeholder="Cupom de desconto" aria-label="Cupom de desconto" style={{ flex: 1, minWidth: 0, textTransform: 'uppercase' }} maxLength={30} />
+                  {cupom ? <button type="button" className="botao leve" onClick={() => { setCupom(''); setCupomTexto(''); }}>Tirar</button> : <button className="botao secundario" disabled={!cupomTexto.trim()}>Aplicar</button>}
+                </form>
+                {cupom && cotacao.cupom_erro && <Aviso tipo="atencao">{cotacao.cupom_erro}</Aviso>}
               </>
             )}
           </div>
