@@ -20,8 +20,9 @@
   color-scheme: light;
 }
 
+/* Tema escuro: segue o aparelho, a não ser que a pessoa escolha no Painel (html[data-tema]). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-tema="claro"]) {
     --azul: #5b9bf0;
     --azul-escuro: #8bb8f5;
     --azul-claro: #1b2b42;
@@ -40,6 +41,25 @@
     --sombra: none;
     color-scheme: dark;
   }
+}
+:root[data-tema="escuro"] {
+  --azul: #5b9bf0;
+  --azul-escuro: #8bb8f5;
+  --azul-claro: #1b2b42;
+  --fundo: #12151b;
+  --superficie: #1b1f27;
+  --superficie-2: #20252e;
+  --borda: #2d333e;
+  --texto: #e7e9ee;
+  --texto-2: #9aa3b2;
+  --verde: #4cc283;
+  --verde-claro: #16301f;
+  --ambar: #e7a640;
+  --ambar-claro: #33270f;
+  --vermelho: #ef7a6c;
+  --vermelho-claro: #3a1d19;
+  --sombra: none;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }

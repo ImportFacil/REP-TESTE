@@ -96,6 +96,35 @@ for (const [nome, caminho, espera] of [
   ['39-painel-equipe', '/painel/equipe/'],
   ['40-painel-auditoria', '/painel/auditoria/'],
 ]) await visitar(page, nome, caminho, { espera });
+
+// Painel no formato do Bagisto: números, gráfico, filtros pelo endereço, exportação e seleção em lote
+try {
+  await visitar(page, '41-painel-controle-completo', '/painel/', { espera: 'Total de vendas', cheia: true });
+  const barras = await page.locator('svg.pn-grafico rect').count();
+  const vendas = await page.locator('.pn-numero strong').first().innerText();
+  checar('painel-grafico-e-numeros', barras >= 28 && /R\$\s?[1-9]/.test(vendas), `gráfico com ${barras} dias, vendas ${vendas}`);
+  await visitar(page, '42-pedidos-entregues', '/painel/pedidos/?situacao=entregue', { espera: 'Situação do pedido: Entregue' });
+  const situacoes = await page.locator('.pn-tabela tbody td[data-rotulo="Situação do pedido"]').allInnerTexts();
+  checar('grade-filtro-pelo-endereco', situacoes.length > 0 && situacoes.every((t) => t.includes('Entregue')), `${situacoes.length} linha(s), todas entregues`);
+  const [baixa] = await Promise.all([page.waitForEvent('download', { timeout: 10000 }), page.getByRole('button', { name: 'Exportar' }).click()]);
+  const csv = fs.readFileSync(await baixa.path(), 'utf8');
+  checar('grade-exportar-csv', csv.split('\n').length === situacoes.length + 1 || csv.split('\n').length > 2, `${baixa.suggestedFilename()} com ${csv.split('\n').length - 1} linha(s)`);
+  await page.locator('.pn-tabela tbody input[type="checkbox"]').first().check();
+  checar('grade-selecao-em-lote', await page.locator('.pn-lote').isVisible(), 'barra de ações em lote ao marcar um pedido');
+  await page.screenshot({ path: `${saida}/43-pedidos-selecao.png` });
+} catch (e) { checar('painel-bagisto', false, e.message.split('\n')[0]); }
+await ctx.close();
+
+// Painel no celular: menu em gaveta e tabela em cartões
+({ ctx, page } = await novaSessao({ ...devices['Pixel 7'] }));
+await entrar(page, 'Equipe');
+await visitar(page, '44-celular-painel', '/painel/', { espera: 'Total de vendas' });
+try {
+  await page.getByRole('button', { name: 'Abrir menu' }).click(); await page.waitForTimeout(400);
+  await page.screenshot({ path: `${saida}/45-celular-menu.png` });
+  checar('celular-menu', await page.locator('.pn-menu.pn-aberto').isVisible(), 'menu do Painel abre em gaveta');
+} catch (e) { checar('celular-menu', false, e.message.split('\n')[0]); }
+await visitar(page, '46-celular-pedidos', '/painel/pedidos/', { espera: 'Pedidos' });
 await ctx.close();
 
 await browser.close();

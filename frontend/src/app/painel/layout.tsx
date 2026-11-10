@@ -1,28 +1,38 @@
 'use client';
 import type { ReactNode } from 'react';
 import { Shell } from '@/components/Shell';
+import type { ItemPainel } from '@/components/painel/PainelLayout';
 
 const FIN = ['financeiro', 'administrador'];
-const SECOES = [
-  { titulo: 'Visão geral', itens: [{ href: '/painel/', rotulo: 'Início', icone: '📊' }] },
-  { titulo: 'Vendas', itens: [
-    { href: '/painel/pedidos/', rotulo: 'Pedidos', icone: '📦' },
-    { href: '/painel/orcamentos/', rotulo: 'Orçamentos', icone: '📝' },
-    { href: '/painel/ordens/', rotulo: 'Ordens de importação', icone: '🚢' },
+const ADM = ['administrador'];
+
+/** Menu do Painel da equipe, no formato do Bagisto: um item por área, com as páginas dentro. */
+const MENU: ItemPainel[] = [
+  { href: '/painel/', rotulo: 'Painel de controle', icone: 'painel' },
+  { href: '/painel/vendas', rotulo: 'Vendas', icone: 'vendas', filhos: [
+    { href: '/painel/pedidos/', rotulo: 'Pedidos' },
   ] },
-  { titulo: 'Clientes', itens: [
-    { href: '/painel/empresas/', rotulo: 'Empresas', icone: '🏢' },
-    { href: '/painel/credito/', rotulo: 'Crédito', icone: '📄' },
+  { href: '/painel/catalogo', rotulo: 'Catálogo', icone: 'catalogo', filhos: [
+    { href: '/painel/precos/', rotulo: 'Produtos e preços' },
   ] },
-  { titulo: 'Financeiro', itens: [{ href: '/painel/recebiveis/', rotulo: 'Recebíveis', icone: '💰', papeis: FIN }] },
-  { titulo: 'Configuração', itens: [
-    { href: '/painel/precos/', rotulo: 'Preços e produtos', icone: '🏷️' },
-    { href: '/painel/condicoes/', rotulo: 'Condições de pagamento', icone: '⚖️' },
-    { href: '/painel/equipe/', rotulo: 'Equipe', icone: '👥', papeis: ['administrador'] },
-    { href: '/painel/auditoria/', rotulo: 'Auditoria', icone: '🔍', papeis: ['administrador'] },
+  { href: '/painel/clientes', rotulo: 'Clientes', icone: 'clientes', filhos: [
+    { href: '/painel/empresas/', rotulo: 'Empresas' },
+    { href: '/painel/credito/', rotulo: 'Crédito' },
+  ] },
+  { href: '/painel/importacao', rotulo: 'Importação', icone: 'importacao', filhos: [
+    { href: '/painel/orcamentos/', rotulo: 'Orçamentos' },
+    { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
+  ] },
+  { href: '/painel/financeiro', rotulo: 'Financeiro', icone: 'financeiro', filhos: [
+    { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
+    { href: '/painel/condicoes/', rotulo: 'Condições de pagamento' },
+  ] },
+  { href: '/painel/configuracoes', rotulo: 'Configurações', icone: 'configuracoes', papeis: ADM, filhos: [
+    { href: '/painel/equipe/', rotulo: 'Equipe' },
+    { href: '/painel/auditoria/', rotulo: 'Auditoria' },
   ] },
 ];
 
 export default function LayoutPainel({ children }: { children: ReactNode }) {
-  return <Shell origem="equipe" secoes={SECOES}>{children}</Shell>;
+  return <Shell origem="equipe" painel={MENU}>{children}</Shell>;
 }

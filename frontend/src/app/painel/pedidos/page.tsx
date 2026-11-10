@@ -1,45 +1,55 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Cabecalho, Carregando, Situacao, Vazio } from '@/components/ui';
+import { useEu } from '@/components/Shell';
+import { Grade, type Coluna } from '@/components/painel/Grade';
+import { Situacao } from '@/components/ui';
+import { api } from '@/lib/api';
 import { FORMA, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
 interface Linha { id: number; razao_social: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string }
 
+const COLUNAS: Coluna<Linha>[] = [
+  { chave: 'id', titulo: 'Nº', ordenavel: true, render: (p) => <b>{p.id}</b> },
+  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'opcoes' },
+  { chave: 'criado_em', titulo: 'Data', ordenavel: true, filtro: 'data', render: (p) => data(p.criado_em), valorCsv: (p) => data(p.criado_em) },
+  { chave: 'forma_pagamento', titulo: 'Pagamento', filtro: 'opcoes', opcoes: FORMA,
+    render: (p) => <>{FORMA[p.forma_pagamento]}{p.forma_pagamento !== 'pix' ? ` ${p.parcelas}×` : ''}</>, valorCsv: (p) => `${FORMA[p.forma_pagamento]} ${p.parcelas}x` },
+  { chave: 'situacao_pagamento', titulo: 'Situação do pagamento', filtro: 'opcoes', opcoes: SITUACAO_PAGAMENTO,
+    render: (p) => <Situacao valor={p.situacao_pagamento} nomes={SITUACAO_PAGAMENTO} />, valorCsv: (p) => SITUACAO_PAGAMENTO[p.situacao_pagamento] },
+  { chave: 'situacao', titulo: 'Situação do pedido', filtro: 'opcoes', opcoes: SITUACAO_PEDIDO,
+    render: (p) => <Situacao valor={p.situacao} nomes={SITUACAO_PEDIDO} />, valorCsv: (p) => SITUACAO_PEDIDO[p.situacao] },
+  { chave: 'total_centavos', titulo: 'Total', ordenavel: true, direita: true, filtro: 'numero', valor: (p) => p.total_centavos,
+    render: (p) => reais(p.total_centavos), valorCsv: (p) => (p.total_centavos / 100).toFixed(2).replace('.', ',') },
+];
+
 export default function PedidosPainel() {
   const router = useRouter();
-  const [f, setF] = useState({ situacao: '', situacao_pagamento: '', empresa_id: '' });
-  useEffect(() => {
-    const q = new URLSearchParams(location.search);
-    setF({ situacao: q.get('situacao') ?? '', situacao_pagamento: q.get('situacao_pagamento') ?? '', empresa_id: q.get('empresa_id') ?? '' });
-  }, []);
-  const q = new URLSearchParams({ por_pagina: '100', ...Object.fromEntries(Object.entries(f).filter(([, v]) => v)) });
-  const { dados, carregando } = useDados<{ itens: Linha[]; total: number }>(`/equipe/pedidos?${q}`);
+  const { eu } = useEu();
+  const { dados, carregando, recarregar } = useDados<{ itens: Linha[]; total: number }>('/equipe/pedidos?por_pagina=1000');
+  const fin = ['financeiro', 'administrador'].includes(eu.usuario.papel);
+  const emLote = async (linhas: Linha[], caminho: (p: Linha) => string) => {
+    const erros: string[] = [];
+    for (const p of linhas) await api(caminho(p), { metodo: 'POST' }).catch((e: Error) => erros.push(`Nº ${p.id}: ${e.message}`));
+    await recarregar();
+    if (erros.length) throw new Error(`Alguns pedidos não mudaram. ${erros.slice(0, 3).join(' · ')}${erros.length > 3 ? ` (+${erros.length - 3})` : ''}`);
+  };
   return (
-    <>
-      <Cabecalho titulo="Pedidos" sub={dados ? `${dados.total} pedido(s)` : ' '}>
-        <select value={f.situacao} onChange={(e) => setF({ ...f, situacao: e.target.value })} aria-label="Situação">
-          <option value="">Toda situação</option>{Object.entries(SITUACAO_PEDIDO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-        <select value={f.situacao_pagamento} onChange={(e) => setF({ ...f, situacao_pagamento: e.target.value })} aria-label="Pagamento">
-          <option value="">Todo pagamento</option>{Object.entries(SITUACAO_PAGAMENTO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-      </Cabecalho>
-      {carregando && !dados ? <Carregando /> : !dados?.itens.length ? <Vazio>Nenhum pedido.</Vazio> : (
-        <div className="cartao tabela-rolagem">
-          <table>
-            <thead><tr><th>Nº</th><th>Empresa</th><th>Data</th><th>Pagamento</th><th>Situação</th><th className="direita">Total</th></tr></thead>
-            <tbody>{dados.itens.map((p) => (
-              <tr key={p.id} className="clicavel" onClick={() => router.push(`/painel/pedido/?id=${p.id}`)}>
-                <td><b>{p.id}</b></td><td>{p.razao_social}</td><td>{data(p.criado_em)}</td>
-                <td>{FORMA[p.forma_pagamento]}{p.forma_pagamento !== 'pix' ? ` ${p.parcelas}×` : ''}<div><Situacao valor={p.situacao_pagamento} nomes={SITUACAO_PAGAMENTO} /></div></td>
-                <td><Situacao valor={p.situacao} nomes={SITUACAO_PEDIDO} /></td><td className="direita numero">{reais(p.total_centavos)}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
-    </>
+    <Grade
+      titulo="Pedidos"
+      sub={dados ? `${dados.total} pedido(s)` : ' '}
+      linhas={dados?.itens}
+      carregando={carregando}
+      colunas={COLUNAS}
+      chave={(p) => p.id}
+      aoClicar={(p) => router.push(`/painel/pedido/?id=${p.id}`)}
+      ordemInicial={{ chave: 'id', dir: 'desc' }}
+      nomeArquivo="pedidos"
+      vazio="Nenhum pedido."
+      acoesLote={[
+        { rotulo: 'Avançar para a próxima etapa', confirmar: 'Avançar {n} pedido(s) para a próxima etapa (separação, envio ou entrega)?', executar: (l) => emLote(l, (p) => `/equipe/pedidos/${p.id}/avancar`) },
+        ...(fin ? [{ rotulo: 'Faturar boletos', confirmar: 'Faturar {n} pedido(s) no boleto? As parcelas são emitidas na hora.', executar: (l: Linha[]) => emLote(l.filter((p) => p.situacao_pagamento === 'aguardando_faturamento'), (p) => `/equipe/pedidos/${p.id}/faturar`) }] : []),
+      ]}
+    />
   );
 }

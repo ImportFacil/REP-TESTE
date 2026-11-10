@@ -1,8 +1,9 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useEu } from '@/components/Shell';
-import { Aviso, Cabecalho, Campo, Carregando, Situacao, Vazio } from '@/components/ui';
+import { Grade, type Coluna } from '@/components/painel/Grade';
+import { Aviso, Campo, Situacao } from '@/components/ui';
 import { api } from '@/lib/api';
 import { NOMES_TIPO, cnpj } from '@/lib/formato';
 import { useAcao, useDados } from '@/lib/hooks';
@@ -13,20 +14,28 @@ export default function Empresas() {
   const router = useRouter();
   const { eu } = useEu();
   const pode = ['comercial', 'administrador'].includes(eu.usuario.papel);
-  const [busca, setBusca] = useState('');
-  const [termo, setTermo] = useState('');
-  useEffect(() => { const t = setTimeout(() => setTermo(busca), 300); return () => clearTimeout(t); }, [busca]);
-  const lista = useDados<{ itens: Empresa[]; total: number }>(`/equipe/empresas?por_pagina=100${termo.trim() ? `&busca=${encodeURIComponent(termo.trim())}` : ''}`);
+  const lista = useDados<{ itens: Empresa[]; total: number }>('/equipe/empresas?por_pagina=1000');
   const tipos = useDados<Array<{ tipo_cliente: string; nome: string }>>('/equipe/tabelas-preco');
   const [novo, setNovo] = useState(false);
   const [form, setForm] = useState({ cnpj: '', razao_social: '', nome_fantasia: '', tipo_cliente: 'cooperativa' });
   const acao = useAcao();
 
+  const colunas: Coluna<Empresa>[] = [
+    { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, render: (e) => <><b>{e.razao_social}</b>{e.nome_fantasia && <div className="pequeno muted">{e.nome_fantasia}</div>}</> },
+    { chave: 'cnpj', titulo: 'CNPJ', render: (e) => <span className="numero">{cnpj(e.cnpj)}</span>, valorCsv: (e) => cnpj(e.cnpj) },
+    { chave: 'tipo_cliente', titulo: 'Tipo de cliente', ordenavel: true, filtro: 'opcoes', opcoes: NOMES_TIPO, render: (e) => NOMES_TIPO[e.tipo_cliente] ?? e.tipo_cliente, valorCsv: (e) => NOMES_TIPO[e.tipo_cliente] ?? e.tipo_cliente },
+    { chave: 'situacao', titulo: 'Situação', filtro: 'opcoes', opcoes: { ativa: 'Ativa', bloqueada: 'Bloqueada', inativa: 'Inativa' }, render: (e) => <Situacao valor={e.situacao} /> },
+    { chave: 'conta_e_ordem_liberada', titulo: 'Conta e ordem', filtro: 'opcoes', opcoes: { true: 'Liberada', false: 'Não liberada' }, valor: (e) => String(e.conta_e_ordem_liberada),
+      render: (e) => (e.conta_e_ordem_liberada ? <Situacao valor="aprovado" nomes={{ aprovado: 'Liberada' }} /> : <span className="muted">—</span>), valorCsv: (e) => (e.conta_e_ordem_liberada ? 'Liberada' : 'Não') },
+  ];
+
   return (
     <>
-      <Cabecalho titulo="Empresas" sub={lista.dados ? `${lista.dados.total} empresa(s)` : ' '}>
-        {pode && <button className="botao" onClick={() => setNovo(!novo)}>{novo ? 'Fechar' : 'Cadastrar empresa'}</button>}
-      </Cabecalho>
+      <Grade
+        titulo="Empresas"
+        sub={lista.dados ? `${lista.dados.total} empresa(s)` : ' '}
+        acoes={pode && <button className="botao" onClick={() => setNovo(!novo)}>{novo ? 'Fechar' : 'Cadastrar empresa'}</button>}
+        topo={<>
       {novo && (
         <form className="cartao formulario" style={{ marginBottom: 20 }} onSubmit={(e) => { e.preventDefault(); void acao.executar(async () => {
           const r = await api<Empresa>('/equipe/empresas', { corpo: { ...form, nome_fantasia: form.nome_fantasia || undefined } });
@@ -45,21 +54,16 @@ export default function Empresas() {
           <div><button className="botao" disabled={acao.enviando}>Cadastrar</button></div>
         </form>
       )}
-      <input type="search" placeholder="Buscar por razão social, nome fantasia ou CNPJ…" value={busca} onChange={(e) => setBusca(e.target.value)} style={{ marginBottom: 14 }} />
-      {lista.carregando && !lista.dados ? <Carregando /> : !lista.dados?.itens.length ? <Vazio>Nenhuma empresa.</Vazio> : (
-        <div className="cartao tabela-rolagem">
-          <table>
-            <thead><tr><th>Empresa</th><th>CNPJ</th><th>Tipo</th><th>Situação</th></tr></thead>
-            <tbody>{lista.dados.itens.map((e) => (
-              <tr key={e.id} className="clicavel" onClick={() => router.push(`/painel/empresa/?id=${e.id}`)}>
-                <td><b>{e.razao_social}</b>{e.nome_fantasia && <div className="pequeno muted">{e.nome_fantasia}</div>}</td>
-                <td className="numero">{cnpj(e.cnpj)}</td><td>{NOMES_TIPO[e.tipo_cliente] ?? e.tipo_cliente}</td>
-                <td><Situacao valor={e.situacao} />{e.conta_e_ordem_liberada && <> <Situacao valor="aprovado" nomes={{ aprovado: 'Conta e ordem' }} /></>}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
+        </>}
+        linhas={lista.dados?.itens}
+        carregando={lista.carregando}
+        colunas={colunas}
+        chave={(e) => e.id}
+        aoClicar={(e) => router.push(`/painel/empresa/?id=${e.id}`)}
+        ordemInicial={{ chave: 'razao_social', dir: 'asc' }}
+        nomeArquivo="empresas"
+        vazio="Nenhuma empresa."
+      />
     </>
   );
 }

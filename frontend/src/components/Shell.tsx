@@ -8,6 +8,7 @@ import { useCarrinho } from '@/lib/carrinho';
 import { useDados } from '@/lib/hooks';
 import { NOMES_TIPO, PAPEL } from '@/lib/formato';
 import { Carregando } from './ui';
+import { PainelLayout, type ItemPainel } from './painel/PainelLayout';
 
 export interface Eu {
   usuario: { id: string; origem: Origem; papel: string; nome: string; email: string };
@@ -31,7 +32,7 @@ export interface ItemMenu {
 }
 
 /** Estrutura das áreas logadas: menu lateral (gaveta no celular) e conteúdo. */
-export function Shell({ origem, secoes, children }: { origem: Origem; secoes: Array<{ titulo: string; itens: ItemMenu[] }>; children: ReactNode }) {
+export function Shell({ origem, secoes = [], painel, children }: { origem: Origem; secoes?: Array<{ titulo: string; itens: ItemMenu[] }>; painel?: ItemPainel[]; children: ReactNode }) {
   const router = useRouter();
   const caminho = usePathname();
   const [pronto, setPronto] = useState(false);
@@ -52,6 +53,15 @@ export function Shell({ origem, secoes, children }: { origem: Origem; secoes: Ar
 
   if (!pronto || (!eu && !erro)) return <Carregando />;
   if (!eu) return <div className="conteudo"><div className="aviso erro">{erro}</div></div>;
+
+  // Painel da equipe: formato do Bagisto (barra superior + menu lateral com grupos)
+  if (painel) {
+    return (
+      <PainelLayout itens={painel} usuario={eu.usuario} ambiente={ambiente}>
+        <EuContexto.Provider value={{ eu, recarregar }}>{children}</EuContexto.Provider>
+      </PainelLayout>
+    );
+  }
 
   const ativo = (href: string) => (href === '/loja/' || href === '/painel/' ? caminho === href : caminho?.startsWith(href));
 

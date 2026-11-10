@@ -13,6 +13,7 @@ import { CreditoModule } from './credito/credito.module';
 import { DevTokenController } from './auth/dev-token.controller';
 import { ImportacaoModule } from './importacao/importacao.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
+import { PainelModule } from './painel/painel.module';
 import { PedidosModule } from './pedidos/pedidos.module';
 import { RotinasModule } from './rotinas/rotinas.module';
 import { SaudeController } from './saude/saude.controller';
@@ -49,6 +50,7 @@ export class AppModule {
         PedidosModule,
         ImportacaoModule,
         RotinasModule,
+        PainelModule,
       ],
       controllers: [SaudeController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

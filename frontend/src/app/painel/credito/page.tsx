@@ -1,40 +1,38 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Cabecalho, Carregando, Situacao, Vazio } from '@/components/ui';
+import { Grade, type Coluna } from '@/components/painel/Grade';
+import { Situacao } from '@/components/ui';
 import { NOMES_TIPO, SITUACAO_CADASTRO, data, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
 interface Linha { empresa_id: string; razao_social: string; tipo_cliente: string; situacao: string; faixa: string | null; limite_aprovado_centavos: number; limite_solicitado_centavos: number | null; enviado_em: string | null; proxima_revisao_em: string | null }
 
+const COLUNAS: Coluna<Linha>[] = [
+  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, render: (c) => <b>{c.razao_social}</b> },
+  { chave: 'tipo_cliente', titulo: 'Tipo', filtro: 'opcoes', opcoes: NOMES_TIPO, render: (c) => NOMES_TIPO[c.tipo_cliente] ?? c.tipo_cliente, valorCsv: (c) => NOMES_TIPO[c.tipo_cliente] ?? c.tipo_cliente },
+  { chave: 'enviado_em', titulo: 'Enviado', ordenavel: true, filtro: 'data', render: (c) => data(c.enviado_em), valorCsv: (c) => data(c.enviado_em) },
+  { chave: 'situacao', titulo: 'Situação', filtro: 'opcoes', opcoes: SITUACAO_CADASTRO, render: (c) => <Situacao valor={c.situacao} nomes={SITUACAO_CADASTRO} />, valorCsv: (c) => SITUACAO_CADASTRO[c.situacao] },
+  { chave: 'faixa', titulo: 'Faixa', filtro: 'opcoes', opcoes: { A: 'A', B: 'B', C: 'C' }, render: (c) => c.faixa ?? '—' },
+  { chave: 'limite_solicitado_centavos', titulo: 'Solicitado', ordenavel: true, direita: true, valor: (c) => c.limite_solicitado_centavos ?? 0, render: (c) => reais(c.limite_solicitado_centavos), valorCsv: (c) => ((c.limite_solicitado_centavos ?? 0) / 100).toFixed(2).replace('.', ',') },
+  { chave: 'limite_aprovado_centavos', titulo: 'Aprovado', ordenavel: true, direita: true, filtro: 'numero', render: (c) => (c.faixa ? reais(c.limite_aprovado_centavos) : '—'), valorCsv: (c) => (c.limite_aprovado_centavos / 100).toFixed(2).replace('.', ',') },
+  { chave: 'proxima_revisao_em', titulo: 'Revisão', ordenavel: true, render: (c) => data(c.proxima_revisao_em), valorCsv: (c) => data(c.proxima_revisao_em) },
+];
+
 export default function CreditoPainel() {
   const router = useRouter();
-  const [situacao, setSituacao] = useState('em_analise');
-  const { dados, carregando } = useDados<Linha[]>(`/equipe/credito${situacao ? `?situacao=${situacao}` : ''}`);
+  const { dados, carregando } = useDados<Linha[]>('/equipe/credito');
   return (
-    <>
-      <Cabecalho titulo="Crédito" sub="Análise dos cadastros. Limites acima de R$ 100.000,00 são aprovados pelo administrador.">
-        <select value={situacao} onChange={(e) => setSituacao(e.target.value)} aria-label="Situação">
-          <option value="">Todos</option>
-          {Object.entries(SITUACAO_CADASTRO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-      </Cabecalho>
-      {carregando ? <Carregando /> : !dados?.length ? <Vazio>Nenhum cadastro nesta situação.</Vazio> : (
-        <div className="cartao tabela-rolagem">
-          <table>
-            <thead><tr><th>Empresa</th><th>Tipo</th><th>Enviado</th><th>Situação</th><th className="direita">Solicitado</th><th className="direita">Aprovado</th><th>Revisão</th></tr></thead>
-            <tbody>{dados.map((c) => (
-              <tr key={c.empresa_id} className="clicavel" onClick={() => router.push(`/painel/analise/?empresa=${c.empresa_id}`)}>
-                <td><b>{c.razao_social}</b></td><td>{NOMES_TIPO[c.tipo_cliente] ?? c.tipo_cliente}</td><td>{data(c.enviado_em)}</td>
-                <td><Situacao valor={c.situacao} nomes={SITUACAO_CADASTRO} /></td>
-                <td className="direita numero">{reais(c.limite_solicitado_centavos)}</td>
-                <td className="direita numero">{c.faixa ? `${c.faixa} · ${reais(c.limite_aprovado_centavos)}` : '—'}</td>
-                <td>{data(c.proxima_revisao_em)}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
-    </>
+    <Grade
+      titulo="Crédito"
+      sub="Análise dos cadastros. Limites acima de R$ 100.000,00 são aprovados pelo administrador."
+      linhas={dados ?? undefined}
+      carregando={carregando}
+      colunas={COLUNAS}
+      chave={(c) => c.empresa_id}
+      aoClicar={(c) => router.push(`/painel/analise/?empresa=${c.empresa_id}`)}
+      ordemInicial={{ chave: 'enviado_em', dir: 'desc' }}
+      nomeArquivo="credito"
+      vazio="Nenhum cadastro de crédito."
+    />
   );
 }
