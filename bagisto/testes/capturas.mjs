@@ -275,6 +275,17 @@ try {
   checar('botao-no-painel', (await page.locator('#if-todas-paginas').count()) > 0, 'botão "Todas as páginas" no Painel');
 
   await visitar(page, '40-todas-as-paginas', '/paginas', { espera: 'Todas as páginas', cheia: true });
+  // aparência: os cartões em grade (sem o CSS, a página vira um texto corrido) e a busca funcionando
+  const visual = await page.evaluate(() => {
+    const g = document.querySelector('.if-pg .grade'), it = document.querySelector('.if-pg a.item');
+    return { grade: g && getComputedStyle(g).display, borda: it && getComputedStyle(it).borderTopStyle, item: it && getComputedStyle(it).display };
+  });
+  checar('paginas-aparencia', visual.grade === 'grid' && visual.borda === 'solid' && visual.item === 'block', `grade=${visual.grade} borda=${visual.borda} item=${visual.item}`);
+  await page.fill('#if-filtro', 'calculadora'); await page.waitForTimeout(300);
+  const achados = await page.locator('.if-pg a.item:visible').count();
+  checar('paginas-busca', achados >= 1 && achados <= 4, `busca "calculadora" → ${achados} páginas`);
+  await page.screenshot({ path: `${saida}/40b-todas-as-paginas-busca.png` });
+  await page.fill('#if-filtro', ''); await page.waitForTimeout(200);
   const links = await page.locator('.if-pg a.item').evaluateAll(as => as.map(a => ({ nome: a.querySelector('b').textContent.trim(), href: a.getAttribute('href') })));
   checar('paginas-quantidade', links.length >= 60, `${links.length} páginas listadas`);
   const ruins = [];

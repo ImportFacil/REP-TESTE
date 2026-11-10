@@ -11,6 +11,8 @@
         $total = collect($secoes)->sum(fn ($s) => count($s['itens']));
     @endphp
 
+    {{-- estilos e script nas pilhas do layout: dentro do conteúdo, o Vue do Bagisto descarta <style> e <script> --}}
+    @pushOnce('styles', 'importfacil-paginas')
     <style>
         .if-pg{max-width:1100px;margin:24px auto 64px;padding:0 16px;color:#18181B}
         .if-pg h1{font-size:28px;font-weight:600;margin:0}
@@ -29,6 +31,7 @@
         .if-pg .item span{display:block;color:#71717A;font-size:13px;margin-top:2px}
         .if-pg .vazio{display:none;color:#52525B;margin-top:20px}
     </style>
+    @endPushOnce
 
     <div class="if-pg">
         <h1>Todas as páginas</h1>
@@ -60,12 +63,14 @@
         <p class="vazio" id="if-vazio">Nenhuma página com esse nome.</p>
     </div>
 
+    @pushOnce('scripts', 'importfacil-paginas-js')
     <script>
+        // escuta no documento: o Vue do Bagisto redesenha a página depois de carregar
         (function () {
-            var f = document.getElementById('if-filtro'), vazio = document.getElementById('if-vazio');
-            var tira = function (s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); };
-            f.addEventListener('input', function () {
-                var q = tira(f.value.trim()), algum = false;
+            var tira = function (s) { return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+            document.addEventListener('input', function (ev) {
+                if (!ev.target || ev.target.id !== 'if-filtro') return;
+                var q = tira(ev.target.value.trim()), algum = false;
                 document.querySelectorAll('[data-secao]').forEach(function (sec) {
                     var n = 0;
                     sec.querySelectorAll('.item').forEach(function (a) {
@@ -74,8 +79,10 @@
                     });
                     sec.style.display = n ? '' : 'none'; if (n) algum = true;
                 });
-                vazio.style.display = algum ? 'none' : 'block';
+                var vazio = document.getElementById('if-vazio');
+                if (vazio) vazio.style.display = algum ? 'none' : 'block';
             });
         })();
     </script>
+    @endPushOnce
 </x-shop::layouts>
