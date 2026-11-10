@@ -59,6 +59,7 @@ echo "Aguardando o banco"
 for i in $(seq 1 60); do node -e "const {Client}=require('pg');const c=new Client({connectionString:process.env.DATABASE_URL});c.connect().then(()=>c.end()).then(()=>process.exit(0),()=>process.exit(1))" && break; sleep 2; done
 npm run migrar --silent
 npm run semear --silent -- --demonstracao
+node dist/scripts/demo-movimento.js   # 90 dias de pedidos e pagamentos (só se o banco ainda não tiver pedidos)
 
 echo "Loja e Painel: ${APP_URL}   (login de demonstração em ${APP_URL}/entrar/)"
 exec node dist/main.js
