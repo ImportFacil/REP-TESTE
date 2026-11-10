@@ -121,6 +121,32 @@ async function principal(): Promise<void> {
         inicio: somarDias(hojeD, -200), fim: somarDias(hojeD, -180) },
     ]) await chamar('POST', '/equipe/marketing/promocoes', ADMIN, 'equipe', promo).catch((e) => { if (e.status !== 409) throw e; });
 
+    // 2c) um segundo local de estoque (depósito em Mato Grosso, perto das cooperativas) com parte das máquinas e insumos
+    const dep = await chamar<{ id: number }>('POST', '/equipe/configuracoes/locais', ADMIN, 'equipe', { codigo: 'dep-sorriso', nome: 'Depósito avançado', cidade: 'Sorriso', uf: 'MT', prioridade: 5 })
+      .catch(() => null);
+    if (dep) {
+      const agro = await db.selectFrom('produtos').select(['id', 'estoque']).where('categoria_id', 'in', ['maquinario', 'fertilizantes', 'irrigacao', 'pecas', 'tratores'])
+        .where('estoque', '>', 4).orderBy('id').execute();
+      for (const pr of agro.filter((_, k) => k % 2 === 0)) {
+        const la = Math.floor(pr.estoque * 0.4);
+        await chamar('PUT', `/equipe/configuracoes/estoque/${pr.id}`, ADMIN, 'equipe', { locais: [{ local_id: 1, quantidade: pr.estoque - la }, { local_id: dep.id, quantidade: la }] });
+      }
+    }
+
+    // 2d) câmbio dos últimos 60 dias (PTAX de venda, aproximada)
+    let usd = 5.52, eur = 5.98, cny = 0.762;
+    for (let d = 60; d >= 0; d--) {
+      const dia = somarDias(hojeD, -d);
+      const sem = new Date(`${dia}T12:00:00Z`).getUTCDay();
+      if (sem === 0 || sem === 6) continue;
+      usd = Math.round((usd + (s.r() - 0.52) * 0.045) * 10_000) / 10_000;
+      eur = Math.round((eur + (s.r() - 0.52) * 0.05) * 10_000) / 10_000;
+      cny = Math.round((cny + (s.r() - 0.52) * 0.006) * 10_000) / 10_000;
+      for (const [moeda, taxa] of [['USD', usd], ['EUR', eur], ['CNY', cny]] as const) {
+        await chamar('POST', '/equipe/configuracoes/cambio', ADMIN, 'equipe', { moeda, data: dia, taxa, fonte: 'PTAX venda (Banco Central)' });
+      }
+    }
+
     // 3) pedidos ao longo de 90 dias
     const tabelas = await db.selectFrom('tabelas_preco').select(['tipo_cliente', 'pedido_minimo_centavos', 'desconto_bp']).execute();
     const categorias = await db.selectFrom('categorias').select(['id', 'tipos_cliente']).execute();

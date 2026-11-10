@@ -394,6 +394,8 @@ export interface NotasFiscaisTabela {
   emitida_por: string | null;
   cancelada_em: Momento | null;
   motivo_cancelamento: string | null;
+  tributos_centavos: Generated<number>;
+  tributos: ColumnType<Record<string, unknown>, string | undefined, string>;
 }
 
 export interface EnviosTabela {
@@ -527,6 +529,58 @@ export interface PaginasTabela {
   atualizado_por: string | null;
 }
 
+export interface RegrasImpostosTabela {
+  id: Generated<number>;
+  nome: string;
+  ncm_prefixo: string | null;
+  uf: string | null;
+  origem: 'nacional' | 'importado' | null;
+  aliquota_federal_bp: number;
+  aliquota_estadual_bp: number;
+  ativo: Generated<boolean>;
+  criado_em: Generated<Momento>;
+  atualizado_em: Generated<Momento>;
+}
+
+export interface LocaisEstoqueTabela {
+  id: Generated<number>;
+  codigo: string;
+  nome: string;
+  cidade: string;
+  uf: string;
+  prioridade: Generated<number>;
+  ativo: Generated<boolean>;
+  criado_em: Generated<Momento>;
+}
+
+export interface EstoqueLocaisTabela {
+  produto_id: number;
+  local_id: number;
+  quantidade: Generated<number>;
+}
+
+export interface CotacoesCambioTabela {
+  id: Generated<number>;
+  moeda: 'USD' | 'EUR' | 'CNY';
+  data: ColumnType<string, string, string>;
+  taxa: ColumnType<number, number | string, number | string>;
+  fonte: Generated<string>;
+  criado_por: string | null;
+  criado_em: Generated<Momento>;
+}
+
+export interface ImportacoesProdutosTabela {
+  id: Generated<number>;
+  arquivo: string;
+  linhas: number;
+  criados: number;
+  alterados: number;
+  com_erro: number;
+  erros: Json<Array<{ linha: number; mensagens: string[] }>>;
+  criado_por: string | null;
+  criado_em: Generated<Momento>;
+}
+
 export interface Database {
   tabelas_preco: TabelasPrecoTabela;
   empresas: EmpresasTabela;
@@ -564,6 +618,11 @@ export interface Database {
   newsletter_inscritos: NewsletterInscritosTabela;
   modelos_email: ModelosEmailTabela;
   paginas: PaginasTabela;
+  regras_impostos: RegrasImpostosTabela;
+  locais_estoque: LocaisEstoqueTabela;
+  estoque_locais: EstoqueLocaisTabela;
+  cotacoes_cambio: CotacoesCambioTabela;
+  importacoes_produtos: ImportacoesProdutosTabela;
 }
 
 export type Politica = Selectable<PoliticasPagamentoTabela>;

@@ -54,9 +54,15 @@ const MENU: ItemPainel[] = [
     { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
     { href: '/painel/condicoes/', rotulo: 'Condições de pagamento' },
   ] },
-  { href: '/painel/configuracoes', rotulo: 'Configurações', icone: 'configuracoes', papeis: ADM, filhos: [
-    { href: '/painel/equipe/', rotulo: 'Equipe' },
-    { href: '/painel/auditoria/', rotulo: 'Auditoria' },
+  { href: '/painel/relatorios/', rotulo: 'Relatórios', icone: 'relatorios' },
+  { href: '/painel/configuracoes', rotulo: 'Configurações', icone: 'configuracoes', filhos: [
+    { href: '/painel/equipe/', rotulo: 'Equipe', papeis: ADM },
+    { href: '/painel/permissoes/', rotulo: 'Papéis e permissões', papeis: ADM },
+    { href: '/painel/impostos/', rotulo: 'Impostos' },
+    { href: '/painel/locais/', rotulo: 'Locais de estoque' },
+    { href: '/painel/cambio/', rotulo: 'Câmbio' },
+    { href: '/painel/importar/', rotulo: 'Importar produtos' },
+    { href: '/painel/auditoria/', rotulo: 'Auditoria', papeis: ADM },
   ] },
 ];
 

@@ -5,6 +5,7 @@ import { AuditoriaService } from '../auditoria/auditoria.service';
 import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
 import { NotificacoesService } from '../notificacoes/notificacoes.service';
+import { calcularTributos } from '../configuracoes/impostos';
 
 export interface NovoEnvio { transportadora: string; codigo_rastreio?: string; volumes?: number; peso_kg?: number; observacao?: string }
 export interface NovoReembolso {
@@ -52,8 +53,18 @@ export class VendasService {
       const existe = await trx.selectFrom('notas_fiscais').select('numero').where('pedido_id', '=', pedidoId).where('situacao', '=', 'emitida').executeTakeFirst();
       if (existe) throw new ConflictException(`O pedido já tem a nota fiscal nº ${existe.numero}.`);
       const { numero } = await sql<{ numero: number }>`SELECT nextval('notas_fiscais_numero')::int AS numero`.execute(trx).then((r) => r.rows[0]);
+      // valor aproximado dos tributos (Lei 12.741), pelas regras de Configurações → Impostos
+      const [itens, regras, destino] = await Promise.all([
+        trx.selectFrom('pedido_itens as i').innerJoin('produtos as pr', 'pr.id', 'i.produto_id').select(['pr.ncm', 'pr.importado', 'i.total_centavos as valor_centavos'])
+          .where('i.pedido_id', '=', pedidoId).execute(),
+        trx.selectFrom('regras_impostos').select(['id', 'nome', 'ncm_prefixo', 'uf', 'origem', 'aliquota_federal_bp', 'aliquota_estadual_bp']).where('ativo', '=', true).execute(),
+        trx.selectFrom('pedidos as p').innerJoin('empresas as e', 'e.id', 'p.empresa_id')
+          .select(sql<string | null>`coalesce(p.endereco_entrega->>'uf', e.endereco->>'uf')`.as('uf')).where('p.id', '=', pedidoId).executeTakeFirstOrThrow(),
+      ]);
+      const tributos = calcularTributos(regras, itens, p.total_centavos, destino.uf?.toUpperCase() ?? null);
       const nota = await trx.insertInto('notas_fiscais')
-        .values({ pedido_id: pedidoId, numero, chave: chaveSimulada(numero, p.cnpj), valor_centavos: p.total_centavos, emitida_por: autor.id })
+        .values({ pedido_id: pedidoId, numero, chave: chaveSimulada(numero, p.cnpj), valor_centavos: p.total_centavos, emitida_por: autor.id,
+          tributos_centavos: tributos.total_centavos, tributos: JSON.stringify({ ...tributos, uf: destino.uf }) })
         .returningAll().executeTakeFirstOrThrow();
       await trx.insertInto('pedido_eventos').values({ pedido_id: pedidoId, tipo: 'nota_fiscal', usuario_id: autor.id, descricao: `Nota fiscal nº ${numero} emitida.` }).execute();
       await this.auditoria.registrar({ usuario: autor, acao: 'nota_fiscal.emitir', entidade: 'pedido', entidadeId: pedidoId, depois: nota, ip }, trx);

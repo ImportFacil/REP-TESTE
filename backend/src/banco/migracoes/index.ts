@@ -3,6 +3,7 @@ import * as m0001 from './0001_inicial';
 import * as m0002 from './0002_venda_credito_importacao';
 import * as m0003 from './0003_painel_vendas_catalogo';
 import * as m0004 from './0004_clientes_marketing_conteudo';
+import * as m0005 from './0005_relatorios_configuracoes';
 
 /**
  * Lista de migrações, em ordem. Cada nova migração ganha um arquivo
@@ -13,4 +14,5 @@ export const MIGRACOES: Record<string, Migration> = {
   '0002_venda_credito_importacao': m0002,
   '0003_painel_vendas_catalogo': m0003,
   '0004_clientes_marketing_conteudo': m0004,
+  '0005_relatorios_configuracoes': m0005,
 };

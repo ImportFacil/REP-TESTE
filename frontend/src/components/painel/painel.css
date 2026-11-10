@@ -153,3 +153,10 @@ a.pn-lista-item:hover { background: var(--superficie-2); }
 .pn-filtros label input[type="checkbox"], .pn-tabela input[type="checkbox"], .pn-lote input[type="checkbox"] { width: 17px; height: 17px; flex: none; padding: 0; margin: 0; }
 .pn-filtros label { justify-content: flex-start; text-align: left; }
 .pn-filtros .pn-faixa input { min-width: 0; }
+
+/* Abas (Relatórios) */
+.pn-abas { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Matriz de permissões */
+.pn-matriz td.sim { color: var(--verde); font-weight: 700; text-align: center; }
+.pn-matriz td.nao { color: var(--texto-2); text-align: center; }
+.pn-matriz th.papel { text-align: center; white-space: nowrap; }

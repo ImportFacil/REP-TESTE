@@ -8,7 +8,7 @@ import { AuditoriaService } from './auditoria.service';
 class FiltroAuditoria {
   @IsOptional() @IsString() entidade?: string;
   @IsOptional() @IsString() entidadeId?: string;
-  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(200) limite?: number;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(2000) limite?: number;
   @IsOptional() @Type(() => Number) @IsInt() @Min(1) antesDe?: number;
 }
 

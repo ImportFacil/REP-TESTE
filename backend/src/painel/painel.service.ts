@@ -1,12 +1,12 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 import { BANCO, type Banco } from '../banco/banco.module';
+import { lerPeriodo, type Periodo } from '../comum/periodo';
 import { hojeBrasil, somarDias } from '../pagamentos/regras';
 
 /** Pedidos que contam como venda: tudo, menos os cancelados. */
 const VENDA = sql`p.situacao <> 'cancelado'`;
 
-export interface Periodo { de: string; ate: string }
 
 /** Painel de controle da equipe (no formato do Bagisto): números do período, comparação, gráfico e rankings. */
 @Injectable()
@@ -15,13 +15,7 @@ export class PainelService {
 
   /** Período padrão: os últimos 30 dias, até hoje (datas no fuso de Brasília). */
   periodo(de?: string, ate?: string): Periodo {
-    const valida = (d: string) => { const t = new Date(`${d}T00:00:00Z`); return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d; };
-    for (const d of [de, ate]) if (d && !valida(d)) throw new BadRequestException(`Data inválida: ${d}`);
-    const fim = ate ?? hojeBrasil();
-    const inicio = de ?? somarDias(fim, -29);
-    if (inicio > fim) throw new BadRequestException('A data inicial vem depois da final.');
-    if (Date.parse(fim) - Date.parse(inicio) > 366 * 86_400_000) throw new BadRequestException('O período vai até um ano.');
-    return { de: inicio, ate: fim };
+    return lerPeriodo(de, ate);
   }
 
   private async totais(de: string, ate: string) {

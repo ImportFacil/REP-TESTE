@@ -161,7 +161,31 @@ for (const [nome, caminho, espera] of [
   ['76-marketing-caixa-de-saida', '/painel/caixa-de-saida/', 'Na fila'],
   ['77-conteudo-paginas', '/painel/paginas/', 'Trocas e devoluções'],
   ['78-conteudo-pagina', '/painel/pagina/?novo=1', 'Prévia'],
+  // entrega 4: relatórios e configurações
+  ['80-relatorios-vendas', '/painel/relatorios/', 'Ticket médio'],
+  ['81-relatorios-produtos', '/painel/relatorios/?aba=produtos', 'Vendas por categoria'],
+  ['82-relatorios-clientes', '/painel/relatorios/?aba=clientes', 'Empresas que compraram'],
+  ['83-config-permissoes', '/painel/permissoes/', 'Papéis e permissões'],
+  ['84-config-impostos', '/painel/impostos/', 'Padrão: mercadoria nacional'],
+  ['85-config-locais', '/painel/locais/', 'Depósito avançado'],
+  ['86-config-cambio', '/painel/cambio/', 'Dólar (USD)'],
+  ['87-config-importar', '/painel/importar/', 'Importar produtos'],
+  ['88-config-auditoria', '/painel/auditoria/', 'Auditoria'],
 ]) await visitar(page, nome, caminho, { espera });
+try {
+  await visitar(page, '89-produto-estoque-locais', '/painel/produtos/?busca=MQ-EN01', { espera: 'Produtos' });
+  await page.locator('.pn-tabela tbody tr').first().click();
+  await page.getByText('Salvar estoque por local').waitFor({ timeout: 15000 });
+  const locais = await page.locator('input[aria-label^="Estoque em"]').count();
+  await page.screenshot({ path: `${saida}/90-produto-estoque-locais.png`, fullPage: true });
+  checar('produto-estoque-por-local', locais >= 2, `${locais} local(is) de estoque no produto`);
+  await visitar(page, '91-importar-previa', '/painel/importar/', { espera: 'Importar produtos' });
+  await page.getByLabel('Conteúdo da planilha').fill('codigo;nome;categoria;preco\nMQ-EN01;;;\nNV-9;Produto novo;epis;10,00\nNV-10;Sem categoria;nao-existe;1');
+  await page.getByRole('button', { name: 'Ver prévia' }).click();
+  await page.getByText(/linha\(s\): 1 nova/).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${saida}/92-importar-previa.png`, fullPage: true });
+  checar('importar-previa', true, (await page.getByText(/linha\(s\): 1 nova/).innerText()).slice(0, 100));
+} catch (e) { checar('configuracoes-entrega4', false, e.message.split('\n')[0]); }
 try {
   await visitar(page, '60-notas-lista', '/painel/notas/', { espera: 'Notas fiscais' });
   const notas = await page.locator('.pn-tabela tbody tr').count();

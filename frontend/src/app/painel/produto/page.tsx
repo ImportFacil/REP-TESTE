@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useEu } from '@/components/Shell';
+import { EstoqueLocais } from '@/components/painel/EstoqueLocais';
 import { Aviso, Campo, Carregando } from '@/components/ui';
 import { api } from '@/lib/api';
 import { paraCentavos, paraTexto } from '@/lib/formato';
@@ -58,12 +59,12 @@ export default function ProdutoPainel() {
     const atributos = Object.fromEntries((familia?.atributos ?? []).map((a) => [a.codigo, p.atributos[a.codigo] ?? '']));
     const corpo = {
       nome: p.nome, marca: p.marca || undefined, categoria_id: p.categoria_id, subcategoria: p.subcategoria || undefined, descricao: p.descricao || undefined,
-      ncm: p.ncm || undefined, unidade: p.unidade, multiplo_venda: Number(p.multiplo_venda), estoque: Number(p.estoque),
+      ncm: p.ncm || undefined, unidade: p.unidade, multiplo_venda: Number(p.multiplo_venda),
       preco_tabela_centavos: paraCentavos(preco) ?? 0, sob_orcamento: p.sob_orcamento, destaque: p.destaque, especificacoes,
       ...(p.familia_id ? { familia_id: p.familia_id, atributos } : {}),
     };
     if (novo) {
-      const r = await api<Produto>('/equipe/produtos', { corpo: { ...corpo, codigo: p.codigo, importado: p.importado } });
+      const r = await api<Produto>('/equipe/produtos', { corpo: { ...corpo, estoque: Number(p.estoque), codigo: p.codigo, importado: p.importado } });
       router.replace(`/painel/produto/?id=${r.id}`);
     } else {
       await api(`/equipe/produtos/${p.id}`, { metodo: 'PATCH', corpo: { ...corpo, ativo: p.ativo } });
@@ -156,7 +157,9 @@ export default function ProdutoPainel() {
             <section className="pn-caixa formulario" style={{ padding: 18 }}>
               <h2 style={{ margin: 0 }}>Preço e estoque</h2>
               <Campo rotulo="Preço de tabela (R$)" dica="O cliente paga este preço menos o desconto do seu tipo"><input inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} /></Campo>
-              <Campo rotulo="Estoque"><input type="number" min={0} value={p.estoque} onChange={(e) => muda({ estoque: Number(e.target.value) })} /></Campo>
+              {novo
+                ? <Campo rotulo="Estoque inicial" dica="Entra no local de estoque de maior prioridade"><input type="number" min={0} value={p.estoque} onChange={(e) => muda({ estoque: Number(e.target.value) })} /></Campo>
+                : <EstoqueLocais produtoId={p.id} pode={pode} aoMudar={(total) => muda({ estoque: total })} />}
             </section>
 
             <section className="pn-caixa formulario" style={{ padding: 18 }}>
