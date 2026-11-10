@@ -48,6 +48,10 @@ RUN cd /var/www/bagisto \
  && sed -i 's|^];|    ImportFacil\\Loja\\Providers\\ImportFacilServiceProvider::class,\n];|' bootstrap/providers.php \
  && grep -q ImportFacilServiceProvider bootstrap/providers.php
 
+# protótipo com todas as telas, dentro do app em /prototipo (cópia de ../index.html, mantida pelo workflow "Protótipo na loja")
+COPY prototipo/index.html /opt/demo/prototipo.html
+RUN python3 /opt/demo/scripts/preparar-prototipo.py /opt/demo/prototipo.html /opt/demo/ncm.json /var/www/bagisto/public/prototipo
+
 WORKDIR /var/www/bagisto
 EXPOSE 8000
 CMD ["bash", "/opt/demo/iniciar.sh"]

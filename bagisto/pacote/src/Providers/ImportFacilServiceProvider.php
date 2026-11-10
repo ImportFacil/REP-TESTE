@@ -39,6 +39,9 @@ class ImportFacilServiceProvider extends ServiceProvider
         Event::listen('checkout.order.save.after', [GerarParcelas::class, 'handle']);
 
         Event::listen('bagisto.shop.layout.head.after', fn ($e) => $e->addTemplate('importfacil::pwa.head'));
+        // botão "Todas as páginas" na loja e no Painel da equipe
+        Event::listen('bagisto.shop.layout.body.after', fn ($e) => $e->addTemplate('importfacil::paginas.botao'));
+        Event::listen('bagisto.admin.layout.body.after', fn ($e) => $e->addTemplate('importfacil::paginas.botao'));
         Event::listen('bagisto.shop.products.price.after', fn ($e) => $e->addTemplate('importfacil::produto.multiplo'));
         Event::listen('bagisto.shop.checkout.cart.breadcrumbs.after', fn ($e) => $e->addTemplate('importfacil::carrinho.importacao'));
     }

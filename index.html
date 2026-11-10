@@ -5909,7 +5909,7 @@ function confirmaLogin(){
   if(cad.razao){ cfg.empresa=cad.razao; cfg.cnpj=cad.cnpj; }
   else { cfg.empresa=cfg.empresa||'Empresa demonstração Ltda'; cfg.cnpj=cfg.cnpj||'11.222.333/0001-81'; }
   document.getElementById('loginscr').classList.remove('open');
-  if(cfg.perfil){ setGreet(); go('home'); toast('Bem-vindo de volta!'); }
+  if(cfg.perfil){ setGreet(); irParaPendente(); toast('Bem-vindo de volta!'); }
   else mostrarPerfil();
 }
 function mostrarPerfil(){
@@ -5942,7 +5942,7 @@ function escolherPerfil(k){
   cfg.perfil=k;
   if(!cad.razao && (!cfg.empresa || /demonstração|Agro Sorriso/.test(cfg.empresa))) cfg.empresa=DEMO_EMPRESA[k]||'Empresa demonstração Ltda';
   document.getElementById('perfilscr').classList.remove('open');
-  setGreet(); carrinho=[]; badges(); go('home');
+  setGreet(); carrinho=[]; badges(); irParaPendente();
   toast(PERFIS[k].nome+': preços com '+Math.round(PERFIS[k].desc*100)+'% de desconto liberados ✓');
 }
 const DEMO_EMPRESA={cooperativa:'Cooperativa Agro Sorriso',distribuidora:'Distribuidora Central Ltda',revendedor:'Revenda Ferramentas Ltda',construtora:'Construtora Horizonte Ltda',hospital:'Hospital Santa Clara'};
@@ -6049,6 +6049,25 @@ window.addEventListener('pagehide',salvarEstado);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') salvarEstado(); });
 setInterval(salvarEstado,2000);
 
+/* ================= Links diretos (#tela, #equipe/aba) =================
+   Ex.: index.html#pedidos, index.html#equipe/calc. Usados pela página "Todas as páginas" do app.
+   Sem login ou sem tipo de cliente, a tela fica guardada e abre logo depois de entrar. */
+const TELAS_LINK=['home','categorias','busca','favoritos','carrinho','pedidos','orcamentos','ordens','financeiro','meucadastro','contato','tabela','conta','cadastro','imagens','revisar','equipe'];
+const ABAS_EQUIPE=['geral','catalogo','cadastros','pedidos','recebiveis','condicoes','calc'];
+function telaDoLink(){
+  let h=''; try{ h=decodeURIComponent(location.hash.replace(/^#\/?/,'')); }catch(e){}
+  const [t,aba]=h.split('/');
+  if(!TELAS_LINK.includes(t)) return null;
+  if(t==='equipe' && ABAS_EQUIPE.includes(aba)) eqTab=aba;
+  return t;
+}
+let telaPendente=telaDoLink();
+function irParaPendente(){ const t=telaPendente||'home'; telaPendente=null; go(t); }
+window.addEventListener('hashchange',()=>{
+  const t=telaDoLink(); if(!t) return;
+  if(cfg.logged && cfg.perfil){ telaPendente=null; go(t); } else telaPendente=t;
+});
+
 /* ================= Init ================= */
 document.getElementById('clock').textContent=String(hoje.getHours()).padStart(2,'0')+':'+String(hoje.getMinutes()).padStart(2,'0');
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=I(e.dataset.ic));
@@ -6057,7 +6076,7 @@ renderSidebar();
 if(restaurarEstado()){
   document.getElementById('loginscr').classList.remove('open');
   document.body.dataset.theme=cfg.dark?'dark':''; if(cfg.big) document.documentElement.dataset.big='';
-  if(cfg.perfil){ setGreet(); badges(); renderSidebar(); render('home'); }
+  if(cfg.perfil){ setGreet(); badges(); renderSidebar(); if(telaPendente) irParaPendente(); else render('home'); }
   else { render('home'); mostrarPerfil(); }
 } else { mostrarLogin(); render('home'); }
 </script>

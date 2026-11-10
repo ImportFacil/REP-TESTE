@@ -257,6 +257,68 @@ try {
 } catch (e) { checar('importacao-faixa-c', false, e.message.split('\n')[0]); }
 await ctx.close();
 
+// 7) Todas as páginas: índice do app, botão em todas as telas e o protótipo dentro do app
+ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'pt-BR' });
+page = await ctx.newPage();
+try {
+  // entra como empresa e como equipe na mesma sessão, para abrir todas as páginas de verdade
+  await page.goto(base + '/customer/login', { waitUntil: 'networkidle' });
+  await page.fill('input[name="email"]', 'cooperativa@demo.importfacil.com.br');
+  await page.fill('input[name="password"]', 'demo1234');
+  await page.press('input[name="password"]', 'Enter');
+  await page.waitForLoadState('networkidle').catch(() => {}); await page.waitForTimeout(1500);
+  await page.goto(base + '/admin/login', { waitUntil: 'networkidle' });
+  await page.fill('input[name="email"]', 'admin@example.com');
+  await page.fill('input[name="password"]', 'admin123');
+  await page.press('input[name="password"]', 'Enter');
+  await page.waitForLoadState('networkidle').catch(() => {}); await page.waitForTimeout(1500);
+  checar('botao-no-painel', (await page.locator('#if-todas-paginas').count()) > 0, 'botão "Todas as páginas" no Painel');
+
+  await visitar(page, '40-todas-as-paginas', '/paginas', { espera: 'Todas as páginas', cheia: true });
+  const links = await page.locator('.if-pg a.item').evaluateAll(as => as.map(a => ({ nome: a.querySelector('b').textContent.trim(), href: a.getAttribute('href') })));
+  checar('paginas-quantidade', links.length >= 60, `${links.length} páginas listadas`);
+  const ruins = [];
+  for (const l of links) {
+    if (l.href.startsWith('/prototipo')) continue;            // o protótipo é testado abaixo
+    const r = await page.request.get(base + l.href, { timeout: 120000 }).catch(e => null);
+    const final = r ? new URL(r.url()).pathname : '';
+    const corpo = r ? await r.text() : '';
+    if (!r || r.status() >= 400 || /\/(customer|admin)\/login$/.test(final) || /Whoops|Server Error|ErrorException/.test(corpo))
+      ruins.push(`${l.nome} ${l.href} → ${r ? r.status() + ' ' + final : 'sem resposta'}`);
+  }
+  checar('paginas-todas-abrem', ruins.length === 0, ruins.length ? 'falharam: ' + ruins.join('; ') : `${links.filter(l => !l.href.startsWith('/prototipo')).length} páginas da loja e do Painel abriram (empresa e equipe logadas)`);
+
+  await visitar(page, '41-loja-com-botao', '/', { espera: 'Todas as páginas' });
+  const man = await (await page.request.get(base + '/manifest.webmanifest')).json();
+  checar('atalho-no-icone', (man.shortcuts || []).some(x => x.url === '/paginas'), 'atalho "Todas as páginas" no ícone do app');
+
+  // protótipo dentro do app
+  const pr = await page.request.get(base + '/prototipo');
+  const html = await pr.text();
+  checar('prototipo-servido', pr.ok() && html.includes('<base href="/prototipo/">') && !html.includes('prototipo-sw.js') && html.includes('if-todas-paginas'),
+    `/prototipo → ${pr.status()}, ${Math.round(html.length / 1024)} KB`);
+  const ncm = await page.request.get(base + '/prototipo/prototipo-ncm.json');
+  checar('prototipo-ncm', ncm.ok(), `/prototipo/prototipo-ncm.json → ${ncm.status()}`);
+  const telas = links.filter(l => l.href.startsWith('/prototipo/#'));
+  await page.goto(base + telas[0].href, { waitUntil: 'networkidle' });
+  await page.evaluate(() => { document.getElementById('lgEmail').value = 'equipe@importfacil.com.br'; document.getElementById('lgSenha').value = 'demo1234'; confirmaLogin(); });
+  await page.waitForTimeout(500); await page.evaluate(() => escolherPerfil('cooperativa')); await page.waitForTimeout(1200);
+  const erradas = [];
+  for (const t of telas) {
+    const alvo = t.href.split('#')[1];
+    await page.evaluate(h => { location.hash = h; }, alvo); await page.waitForTimeout(350);
+    const ativa = await page.evaluate(() => (document.querySelector('.screen.active') || {}).id);
+    const aba = alvo.includes('/') ? await page.locator('.eq-seg [aria-selected="true"]').innerText().catch(() => '') : '';
+    if (ativa !== 'scr-' + alvo.split('/')[0] || (alvo.includes('/') && !t.nome.endsWith(aba))) erradas.push(`${t.nome} (${alvo} → ${ativa} ${aba})`);
+  }
+  checar('prototipo-telas', erradas.length === 0, erradas.length ? 'erradas: ' + erradas.join('; ') : `${telas.length} telas do protótipo abriram pelo link`);
+  await page.evaluate(() => { location.hash = 'equipe/geral'; }); await page.waitForTimeout(800);
+  await page.screenshot({ path: `${saida}/42-prototipo-painel-no-app.png` });
+  await page.evaluate(() => { location.hash = 'pedidos'; }); await page.waitForTimeout(600);
+  await page.screenshot({ path: `${saida}/43-prototipo-pedidos-no-app.png` });
+} catch (e) { checar('todas-as-paginas', false, e.message.split('\n')[0]); }
+await ctx.close();
+
 await browser.close();
 fs.writeFileSync(`${saida}/relatorio.json`, JSON.stringify({ base, urlProduto, urlCategoria, urlMult, paginas: relatorio, erros }, null, 2));
 console.log(relatorio.map(r => `${r.ok ? 'OK ' : 'ERRO'} ${r.status} ${r.nome} ${r.caminho}`).join('\n'));

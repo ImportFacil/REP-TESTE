@@ -26,11 +26,21 @@ class AppController extends Controller
                 ['src' => '/importfacil/icone-mascaravel.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
             ],
             'shortcuts' => [
+                ['name' => 'Todas as páginas', 'url' => '/paginas'],
                 ['name' => 'Pedido rápido', 'url' => '/customer/account/quick-orders'],
                 ['name' => 'Meus pedidos', 'url' => '/customer/account/orders'],
                 ['name' => 'Financeiro', 'url' => '/customer/account/financeiro'],
             ],
         ], 200, ['Content-Type' => 'application/manifest+json']);
+    }
+
+    /** Protótipo (index.html preparado no Dockerfile por scripts/preparar-prototipo.py). */
+    public function prototipo()
+    {
+        $arquivo = public_path('prototipo/index.html');
+        abort_unless(is_file($arquivo), 404);
+
+        return response()->file($arquivo, ['Content-Type' => 'text/html; charset=utf-8', 'Cache-Control' => 'no-cache']);
     }
 
     /** Service worker na raiz do site (escopo "/"): guarda o essencial e mostra a página offline sem internet. */

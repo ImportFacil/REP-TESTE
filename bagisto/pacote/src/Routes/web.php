@@ -6,15 +6,20 @@ use ImportFacil\Loja\Http\Controllers\Admin\ImportacaoController as AdminImporta
 use ImportFacil\Loja\Http\Controllers\AppController;
 use ImportFacil\Loja\Http\Controllers\FinanceiroController;
 use ImportFacil\Loja\Http\Controllers\ImportacaoController;
+use ImportFacil\Loja\Http\Controllers\PaginasController;
 use Webkul\Core\Http\Middleware\NoCacheMiddleware;
 
 // app instalável (PWA)
 Route::get('manifest.webmanifest', [AppController::class, 'manifesto'])->name('importfacil.manifesto');
 Route::get('sw.js', [AppController::class, 'serviceWorker'])->name('importfacil.sw');
 
+// protótipo com todas as telas (simulação), dentro do app; links diretos: /prototipo/#pedidos, /prototipo/#equipe/calc
+Route::get('prototipo', [AppController::class, 'prototipo'])->name('importfacil.prototipo');
+
 Route::middleware(['web', 'theme', 'locale', 'currency'])->group(function () {
     Route::get('app', [AppController::class, 'instalar'])->name('importfacil.app');
     Route::get('offline', [AppController::class, 'offline'])->name('importfacil.offline');
+    Route::get('paginas', [PaginasController::class, 'index'])->name('importfacil.paginas');
 
     Route::middleware(['customer'])->prefix('customer/account')->group(function () {
         Route::get('financeiro', [FinanceiroController::class, 'index'])->name('importfacil.financeiro');
