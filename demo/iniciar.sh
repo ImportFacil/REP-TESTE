@@ -81,6 +81,45 @@ if [ -z "${CODESPACE_NAME:-}" ]; then exec node dist/main.js; fi
 ligar_api() { node dist/main.js & API_PID=$!; }
 ligar_api
 REPO=$(ls -d /workspaces/*/backend 2>/dev/null | head -1 | xargs -r dirname)
+
+# Link alternativo que não passa pelo encaminhamento de portas do GitHub: túnel rápido da Cloudflare
+# (sem conta; o endereço *.trycloudflare.com muda a cada vez que o túnel liga). Vai para /tmp/importfacil-tunel.url.
+CLOUDFLARED_VERSAO=2026.10.0
+CLOUDFLARED_SHA256=d33ff2d14475178d2012c2c56beba87389ac5ded27649519f198a7d3134a99db
+TUNEL_PID=""
+processos_com() { # PIDs cujo comando contém o texto
+  local c
+  for c in /proc/[0-9]*/cmdline; do
+    tr '\0' ' ' < "$c" 2>/dev/null | grep -q -- "$1" && basename "$(dirname "$c")"
+  done
+}
+ligar_tunel() {
+  local bin="$APP/cloudflared" link=""
+  if [ ! -x "$bin" ]; then
+    # a imagem não tem curl; o Node baixa (segue o redirecionamento do GitHub)
+    node -e "fetch(process.argv[1]).then(async r=>{if(!r.ok)throw new Error(r.status);require('fs').writeFileSync(process.argv[2],Buffer.from(await r.arrayBuffer()))}).catch(e=>{console.error(e.message);process.exit(1)})" \
+      "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED_VERSAO}/cloudflared-linux-amd64" "$bin.baixando" \
+      && echo "${CLOUDFLARED_SHA256}  $bin.baixando" | sha256sum -c --quiet - \
+      && chmod +x "$bin.baixando" && mv "$bin.baixando" "$bin" \
+      || { rm -f "$bin.baixando"; echo "aviso: não foi possível baixar o cloudflared; só o link do GitHub fica disponível"; return 0; }
+  fi
+  for pid in $(processos_com "[c]loudflared tunnel"); do kill "$pid" 2>/dev/null || true; done
+  rm -f /tmp/importfacil-tunel.url
+  "$bin" tunnel --no-autoupdate --protocol http2 --url http://localhost:8000 > /tmp/importfacil-tunel.log 2>&1 &
+  TUNEL_PID=$!
+  for _ in $(seq 1 30); do
+    link=$(grep -oE 'https://[a-z0-9]+(-[a-z0-9]+)+\.trycloudflare\.com' /tmp/importfacil-tunel.log 2>/dev/null | head -1 || true)
+    [ -n "$link" ] && break; sleep 2
+  done
+  if [ -n "$link" ]; then echo "$link" > /tmp/importfacil-tunel.url; echo "Link alternativo (fora do GitHub): ${link}/entrar/"
+  else echo "aviso: o túnel da Cloudflare não respondeu; só o link do GitHub fica disponível"; fi
+}
+ligar_tunel
+# usa sempre o informar-estado.sh mais novo do repositório (ele publica os dois links no ramo app-endereco)
+if [ -n "$REPO" ] && [ -f "$REPO/.devcontainer/importfacil/informar-estado.sh" ]; then
+  for pid in $(processos_com "importfacil/[i]nformar-estado.sh"); do kill "$pid" 2>/dev/null || true; done
+  setsid nohup bash "$REPO/.devcontainer/importfacil/informar-estado.sh" > /tmp/informar-estado.log 2>&1 < /dev/null &
+fi
 while true; do
   sleep "${INTERVALO_ATUALIZACAO:-300}"
   # compara o GitHub com a versão montada (se uma atualização falhar, tenta de novo na próxima volta)
@@ -100,5 +139,9 @@ while true; do
   if ! kill -0 "$API_PID" 2>/dev/null; then
     echo "== $(date -Is) a API tinha parado; ligando de novo =="
     cd "$APP/backend" && ligar_api
+  fi
+  if [ -n "$TUNEL_PID" ] && ! kill -0 "$TUNEL_PID" 2>/dev/null; then
+    echo "== $(date -Is) o túnel tinha parado; ligando de novo =="
+    ligar_tunel
   fi
 done

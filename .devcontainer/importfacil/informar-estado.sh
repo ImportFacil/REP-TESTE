@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Publica no ramo "app-endereco" o endereço e o estado da loja deste Codespace:
-#   endereco.json  {url, codespace, atualizado}
-#   estado.json    {url, fase: instalando|no_ar|parou, porta: public|private|?, atualizado, log: [...]}
+#   endereco.json  {url, link_alternativo, codespace, atualizado}
+#   estado.json    {url, link_alternativo, fase: instalando|no_ar|parou, porta: public|private|?, atualizado, log: [...]}
+# link_alternativo: o túnel da Cloudflare ligado pelo demo/iniciar.sh (não passa pelo encaminhamento de portas do GitHub).
 # A página do QR (importfacil.github.io/REP-TESTE/app/) lê esses arquivos; a equipe usa o log para diagnosticar.
 # Também torna a porta 8000 pública assim que a loja sobe. Roda em segundo plano enquanto o Codespace estiver ligado.
 set -u
@@ -11,6 +12,7 @@ dominio="${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-app.github.dev}"
 url="https://${CODESPACE_NAME}-8000.${dominio}"
 repo="${GITHUB_REPOSITORY:-ImportFacil/REP-TESTE}"
 LOG=/tmp/importfacil.log
+tunel() { cat /tmp/importfacil-tunel.url 2>/dev/null | head -1; }
 
 no_ar() { (exec 3<>/dev/tcp/127.0.0.1/8000) 2>/dev/null; }
 
@@ -37,15 +39,15 @@ fase() {
 publicar() { # fase porta
   local pasta destino
   pasta=$(mktemp -d)
-  printf '{"url":"%s","codespace":"%s","atualizado":"%s"}\n' "$url" "$CODESPACE_NAME" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$pasta/endereco.json"
+  printf '{"url":"%s","link_alternativo":"%s","codespace":"%s","atualizado":"%s"}\n' "$url" "$(tunel)" "$CODESPACE_NAME" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$pasta/endereco.json"
   # últimas linhas do log da instalação, sem nada que pareça senha ou chave
   tail -n 60 "$LOG" 2>/dev/null | grep -viE "password|senha|secret|token|app_key|key=" | cut -c1-300 \
     | python3 -c 'import sys,json; print(json.dumps([l.rstrip("\n") for l in sys.stdin]))' > "$pasta/log.json" 2>/dev/null || echo '[]' > "$pasta/log.json"
-  python3 - "$pasta" "$url" "$1" "$2" <<'PY'
+  python3 - "$pasta" "$url" "$1" "$2" "$(tunel)" <<'PY'
 import json, sys, datetime
-pasta, url, fase, porta = sys.argv[1:5]
+pasta, url, fase, porta, alternativo = sys.argv[1:6]
 log = json.load(open(pasta + '/log.json'))
-json.dump({'url': url, 'fase': fase, 'porta': porta,
+json.dump({'url': url, 'link_alternativo': alternativo, 'fase': fase, 'porta': porta,
            'atualizado': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'log': log},
           open(pasta + '/estado.json', 'w'), ensure_ascii=False, indent=1)
 PY
@@ -70,9 +72,9 @@ while true; do
   agora=$(date +%s)
   # publica quando o estado muda, a cada 2 minutos durante a instalação e a cada 15 minutos depois
   intervalo=120; [ "$f" = no_ar ] && [ "$p" = public ] && intervalo=900
-  if [ "$f/$p" != "$ultimo" ] || [ $((agora - ultima_vez)) -ge $intervalo ]; then
+  if [ "$f/$p/$(tunel)" != "$ultimo" ] || [ $((agora - ultima_vez)) -ge $intervalo ]; then
     publicar "$f" "$p"
-    ultimo="$f/$p"; ultima_vez=$agora
+    ultimo="$f/$p/$(tunel)"; ultima_vez=$agora
   fi
   sleep 30
 done
