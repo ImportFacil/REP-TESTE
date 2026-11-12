@@ -59,7 +59,7 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
 
   const pode = (papeis?: string[]) => !papeis || papeis.includes(usuario.papel);
   const visiveis = itens.filter((i) => pode(i.papeis)).map((i) => ({ ...i, filhos: i.filhos?.filter((f) => pode(f.papeis)) }))
-    .filter((i) => !i.filhos || i.filhos.some((f) => !f.oculto)); // grupo sem nenhuma página permitida some do menu
+    .filter((i) => !i.filhos || i.filhos.some((f) => !f.oculto) || i.href.endsWith('/')); // grupo sem nenhuma página permitida some do menu
   const ativo = (href: string) => (href === '/painel/' ? caminho === '/painel/' || caminho === '/painel' : caminho.startsWith(href));
   const grupoAtivo = (i: ItemPainel) => ativo(i.href) || !!i.filhos?.some((f) => ativo(f.href));
   // Grupos abertos no menu: o da página atual começa aberto; clicar no grupo abre ou fecha as subcategorias (sem sair da página).
@@ -184,7 +184,7 @@ function Busca({ itens }: { itens: ItemPainel[] }) {
   const [aberta, setAberta] = useState(false);
   const [sel, setSel] = useState(0);
   const ref = useRef<HTMLInputElement>(null);
-  const paginas = useMemo(() => itens.flatMap((i) => (i.filhos?.length ? i.filhos.filter((f) => !f.oculto).map((f) => ({ href: f.href, rotulo: f.rotulo, grupo: i.rotulo, icone: i.icone })) : [{ href: i.href, rotulo: i.rotulo, grupo: '', icone: i.icone }])), [itens]);
+  const paginas = useMemo(() => itens.flatMap((i) => (i.filhos?.some((f) => !f.oculto) ? i.filhos.filter((f) => !f.oculto).map((f) => ({ href: f.href, rotulo: f.rotulo, grupo: i.rotulo, icone: i.icone })) : [{ href: i.href, rotulo: i.rotulo, grupo: '', icone: i.icone }])), [itens]);
   const tira = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const achados = q.trim() ? paginas.filter((p) => tira(`${p.rotulo} ${p.grupo}`).includes(tira(q.trim()))).slice(0, 8) : paginas.slice(0, 8);
   const numero = /^\d+$/.test(q.trim()) ? Number(q.trim()) : null;

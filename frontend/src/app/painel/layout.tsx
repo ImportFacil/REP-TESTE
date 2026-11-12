@@ -19,6 +19,13 @@ const MENU: ItemPainel[] = [
     { href: '/painel/cotacao/', rotulo: 'Cotação', oculto: true },
     { href: '/painel/transacoes/', rotulo: 'Transações', papeis: FIN },
   ] },
+  { href: '/painel/importacao', rotulo: 'Importação', icone: 'importacao', filhos: [
+    { href: '/painel/orcamentos/', rotulo: 'Orçamentos' },
+    { href: '/painel/orcamento/', rotulo: 'Orçamento', oculto: true },
+    { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
+    { href: '/painel/ordem/', rotulo: 'Ordem', oculto: true },
+    { href: '/painel/calculadora/', rotulo: 'Calculadora de importação' },
+  ] },
   { href: '/painel/catalogo', rotulo: 'Catálogo', icone: 'catalogo', filhos: [
     { href: '/painel/produtos/', rotulo: 'Produtos' },
     { href: '/painel/produto/', rotulo: 'Produto', oculto: true },
@@ -26,6 +33,11 @@ const MENU: ItemPainel[] = [
     { href: '/painel/atributos/', rotulo: 'Atributos' },
     { href: '/painel/familias/', rotulo: 'Famílias de atributos' },
   ] },
+  { href: '/painel/financeiro', rotulo: 'Financeiro', icone: 'financeiro', filhos: [
+    { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
+    { href: '/painel/condicoes/', rotulo: 'Condições de pagamento' },
+  ] },
+  { href: '/painel/relatorios/', rotulo: 'Relatórios', icone: 'relatorios' },
   { href: '/painel/clientes', rotulo: 'Clientes', icone: 'clientes', filhos: [
     { href: '/painel/empresas/', rotulo: 'Empresas' },
     { href: '/painel/empresa/', rotulo: 'Empresa', oculto: true },
@@ -42,22 +54,9 @@ const MENU: ItemPainel[] = [
     { href: '/painel/modelo/', rotulo: 'Modelo', oculto: true },
     { href: '/painel/caixa-de-saida/', rotulo: 'Caixa de saída' },
   ] },
-  { href: '/painel/conteudo', rotulo: 'Conteúdo', icone: 'conteudo', filhos: [
-    { href: '/painel/paginas/', rotulo: 'Páginas' },
+  { href: '/painel/paginas/', rotulo: 'Páginas', icone: 'conteudo', filhos: [ // página direta; a de edição fica oculta
     { href: '/painel/pagina/', rotulo: 'Página', oculto: true },
   ] },
-  { href: '/painel/importacao', rotulo: 'Importação', icone: 'importacao', filhos: [
-    { href: '/painel/orcamentos/', rotulo: 'Orçamentos' },
-    { href: '/painel/orcamento/', rotulo: 'Orçamento', oculto: true },
-    { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
-    { href: '/painel/ordem/', rotulo: 'Ordem', oculto: true },
-    { href: '/painel/calculadora/', rotulo: 'Calculadora de importação' },
-  ] },
-  { href: '/painel/financeiro', rotulo: 'Financeiro', icone: 'financeiro', filhos: [
-    { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
-    { href: '/painel/condicoes/', rotulo: 'Condições de pagamento' },
-  ] },
-  { href: '/painel/relatorios/', rotulo: 'Relatórios', icone: 'relatorios' },
   { href: '/painel/configuracoes', rotulo: 'Configurações', icone: 'configuracoes', filhos: [
     { href: '/painel/equipe/', rotulo: 'Equipe', papeis: ADM },
     { href: '/painel/permissoes/', rotulo: 'Papéis e permissões', papeis: ADM },
