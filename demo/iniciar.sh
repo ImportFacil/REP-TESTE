@@ -15,6 +15,16 @@ if [ -z "${APP_URL:-}" ]; then
   fi
 fi
 
+API_PID=""
+parar_api() {
+  if [ -n "$API_PID" ] && kill -0 "$API_PID" 2>/dev/null; then
+    kill "$API_PID" 2>/dev/null || true
+    for _ in $(seq 1 20); do kill -0 "$API_PID" 2>/dev/null || break; sleep 0.5; done
+    kill -9 "$API_PID" 2>/dev/null || true
+  fi
+  API_PID=""
+}
+
 # ---------- Codespaces: atualiza pelo repositório a cada início (sem reconstruir a imagem) ----------
 atualizar_do_repositorio() {
   local repo
@@ -24,6 +34,7 @@ atualizar_do_repositorio() {
   git -c safe.directory='*' -C "$repo" pull --ff-only -q 2>&1 | tail -2 || echo "aviso: não foi possível baixar a versão nova; seguindo com a atual"
   if [ -z "${IF_ATUALIZADO:-}" ] && ! cmp -s "$repo/demo/iniciar.sh" "$APP/demo/iniciar.sh"; then
     cp "$repo/demo/iniciar.sh" "$APP/demo/iniciar.sh"
+    parar_api
     IF_ATUALIZADO=1 exec bash "$APP/demo/iniciar.sh"
   fi
   local versao; versao=$(git -c safe.directory='*' -C "$repo" rev-parse HEAD 2>/dev/null || echo "?")
@@ -31,7 +42,7 @@ atualizar_do_repositorio() {
   for parte in backend frontend; do
     if ! cmp -s "$repo/$parte/package-lock.json" "$APP/$parte/package-lock.json"; then
       cp "$repo/$parte/package.json" "$repo/$parte/package-lock.json" "$APP/$parte/"
-      (cd "$APP/$parte" && npm ci --no-audit --no-fund --loglevel=error)
+      (cd "$APP/$parte" && npm ci --no-audit --no-fund --loglevel=error) || return 1
     fi
   done
   rm -rf "$APP/backend/src" "$APP/frontend/src" "$APP/frontend/public"
@@ -40,8 +51,8 @@ atualizar_do_repositorio() {
   cp -r "$repo/frontend/src" "$repo/frontend/public" "$APP/frontend/"
   cp "$repo"/frontend/{next.config.mjs,tsconfig.json} "$APP/frontend/" 2>/dev/null || true
   echo "== Montando a API e o site =="
-  (cd "$APP/backend" && npm run build --silent)
-  (cd "$APP/frontend" && NEXT_TELEMETRY_DISABLED=1 npm run build --silent >/dev/null)
+  (cd "$APP/backend" && npm run build --silent) || return 1
+  (cd "$APP/frontend" && NEXT_TELEMETRY_DISABLED=1 npm run build --silent >/dev/null) || return 1
   echo "$versao" > "$APP/.versao"
   echo "Código atualizado: $(git -c safe.directory='*' -C "$repo" log -1 --format='%h %s' 2>/dev/null)"
 }
@@ -62,4 +73,32 @@ npm run semear --silent -- --demonstracao
 node dist/scripts/demo-movimento.js   # 90 dias de pedidos e pagamentos (só se o banco ainda não tiver pedidos)
 
 echo "Loja e Painel: ${APP_URL}   (login de demonstração em ${APP_URL}/entrar/)"
-exec node dist/main.js
+if [ -z "${CODESPACE_NAME:-}" ]; then exec node dist/main.js; fi
+
+# ---------- Codespaces: fica de olho no repositório enquanto estiver ligado ----------
+# A cada 5 minutos procura versão nova no GitHub. Achando, monta a versão nova com a loja ainda no ar
+# e só então troca (a loja fica fora por alguns segundos). Se a API cair, liga de novo.
+ligar_api() { node dist/main.js & API_PID=$!; }
+ligar_api
+REPO=$(ls -d /workspaces/*/backend 2>/dev/null | head -1 | xargs -r dirname)
+while true; do
+  sleep "${INTERVALO_ATUALIZACAO:-300}"
+  # compara o GitHub com a versão montada (se uma atualização falhar, tenta de novo na próxima volta)
+  if [ -n "$REPO" ] && git -c safe.directory='*' -C "$REPO" fetch -q origin 2>/dev/null \
+     && [ "$(git -c safe.directory='*' -C "$REPO" rev-parse '@{u}' 2>/dev/null || echo "?")" != "$(cat "$APP/.versao" 2>/dev/null)" ]; then
+    echo "== $(date -Is) versão nova no GitHub =="
+    if IF_ATUALIZADO= atualizar_do_repositorio && [ "$(git -c safe.directory='*' -C "$REPO" rev-parse HEAD)" = "$(cat "$APP/.versao" 2>/dev/null)" ]; then
+      (cd "$APP/backend" && npm run migrar --silent && npm run semear --silent -- --demonstracao) || echo "aviso: migração ou dados de demonstração com problema"
+      printf '{"ambiente":"demonstracao","api":"/api","auth":"dev"}\n' > "$APP/frontend/out/config.json"
+      parar_api
+      cd "$APP/backend" && ligar_api
+      echo "== $(date -Is) loja atualizada: $(cat "$APP/.versao" 2>/dev/null | cut -c1-7) =="
+    else
+      echo "aviso: a atualização falhou; a versão anterior continua no ar"
+    fi
+  fi
+  if ! kill -0 "$API_PID" 2>/dev/null; then
+    echo "== $(date -Is) a API tinha parado; ligando de novo =="
+    cd "$APP/backend" && ligar_api
+  fi
+done
