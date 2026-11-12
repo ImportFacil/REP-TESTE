@@ -319,6 +319,27 @@ describe('conta e ordem e orçamentos', () => {
     expect(r.body.prestacao_contas).toMatchObject({ saldo_centavos: 500_000, resultado: 'devolver_ao_cliente' });
   });
 
+  it('rota da ordem: portos e data de embarque; a ordem mostra a rota, o prazo e a chegada prevista', async () => {
+    const com = await como(COM, 'equipe');
+    const antes = await api().get(`/equipe/ordens/${ordemId}`).set('Authorization', com).expect(200);
+    expect(antes.body.rota).toBeNull();
+    await api().put(`/equipe/ordens/${ordemId}/rota`).set('Authorization', await como(FIN, 'equipe')).send({ porto_embarque: 'CNSHA', porto_chegada: 'BRSSZ' }).expect(403);
+    await api().put(`/equipe/ordens/${ordemId}/rota`).set('Authorization', com).send({ porto_embarque: 'CNSHA', porto_chegada: 'XXXXX' }).expect(400);
+    await api().put(`/equipe/ordens/${ordemId}/rota`).set('Authorization', com).send({ porto_embarque: 'CNSHA', porto_chegada: 'CNSHA' }).expect(400);
+    const r = await api().put(`/equipe/ordens/${ordemId}/rota`).set('Authorization', com).send({ porto_embarque: 'cnsha', porto_chegada: 'BRSSZ', embarque_em: '2026-11-20' }).expect(200);
+    expect(r.body).toMatchObject({ porto_embarque: 'CNSHA', porto_chegada: 'BRSSZ' });
+    expect(r.body.rota).toMatchObject({ origem: { nome: 'Xangai' }, destino: { nome: 'Santos' }, velocidade_nos: 16, embarque_em: '2026-11-20' });
+    expect(r.body.rota.dias).toBeGreaterThan(25);
+    expect(r.body.rota.dias).toBeLessThan(35);
+    const chegada = new Date(new Date('2026-11-20T12:00:00Z').getTime() + Math.ceil(r.body.rota.dias) * 86_400_000).toISOString().slice(0, 10);
+    expect(r.body.rota.chegada_prevista).toBe(chegada);
+    // o cliente vê a mesma rota na ordem dele; sem data de embarque, só o prazo
+    const cliente = await api().get(`/ordens/${ordemId}`).set('Authorization', await como(COOP, 'cliente')).expect(200);
+    expect(cliente.body.rota.distancia_mn).toBe(r.body.rota.distancia_mn);
+    const sem = await api().put(`/equipe/ordens/${ordemId}/rota`).set('Authorization', com).send({ porto_embarque: 'CNNGB', porto_chegada: 'BRPNG' }).expect(200);
+    expect(sem.body.rota).toMatchObject({ origem: { nome: 'Ningbo' }, destino: { nome: 'Paranaguá' }, embarque_em: null, chegada_prevista: null });
+  });
+
   it('encomenda: recusar proposta; propostas vencidas expiram pela rotina', async () => {
     const auth = await como(HOSP, 'cliente');
     const o1 = await api().post('/orcamentos').set('Authorization', auth).send({ modalidade: 'encomenda', itens: [{ descricao: 'Monitor multiparamétrico', quantidade: 20 }] }).expect(201);

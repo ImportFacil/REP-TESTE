@@ -281,6 +281,9 @@ export interface OrdensImportacaoTabela {
   etapa: string;
   concluida: Generated<boolean>;
   cancelada: Generated<boolean>;
+  porto_embarque: string | null;
+  porto_chegada: string | null;
+  embarque_em: string | null;
   criado_em: Generated<Momento>;
   atualizado_em: Generated<Momento>;
 }

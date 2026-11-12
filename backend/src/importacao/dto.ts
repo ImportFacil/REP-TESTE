@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsOptional, IsString, Length, Matches, Max, MaxLength, Min, ValidateNested } from 'class-validator';
 
 export class ItemOrcamentoDto {
   @ApiPropertyOptional({ description: 'Produto do catálogo (ou deixe vazio e descreva o item)' }) @IsOptional() @Type(() => Number) @IsInt() @Min(1) produto_id?: number;
@@ -40,4 +40,10 @@ export class NumerarioDto {
 
 export class GastoDto extends NumerarioDto {
   @ApiProperty() @IsString() @Length(2, 300) descricao!: string;
+}
+
+export class RotaOrdemDto {
+  @ApiProperty({ example: 'CNSHA', description: 'Porto de embarque (UN/LOCODE)' }) @IsString() @Matches(/^[A-Za-z]{2}[A-Za-z0-9]{3}$/) porto_embarque!: string;
+  @ApiProperty({ example: 'BRSSZ', description: 'Porto de chegada (UN/LOCODE)' }) @IsString() @Matches(/^[A-Za-z]{2}[A-Za-z0-9]{3}$/) porto_chegada!: string;
+  @ApiPropertyOptional({ example: '2026-11-20', description: 'Data de embarque (prevista ou realizada)' }) @IsOptional() @Matches(/^\d{4}-\d{2}-\d{2}$/) embarque_em?: string | null;
 }

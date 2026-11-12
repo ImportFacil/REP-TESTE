@@ -414,6 +414,12 @@ async function principal(): Promise<void> {
       prazo_entrega_dias: 75, validade_dias: 15,
     }).catch((e) => console.warn('Proposta de demonstração não registrada:', (e as Error).message));
     await chamar('POST', `/orcamentos/${aceito.id}/aceitar`, imp.email, 'cliente').catch(() => undefined);
+    const ordemDemo = await db.selectFrom('ordens_importacao').select(['id', 'criado_em']).where('orcamento_id', '=', aceito.id).executeTakeFirst();
+    if (ordemDemo) {
+      await chamar('PUT', `/equipe/ordens/${ordemDemo.id}/rota`, ADMIN, 'equipe', {
+        porto_embarque: 'CNSHA', porto_chegada: 'BRSSZ', embarque_em: new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10),
+      }).catch(() => undefined);
+    }
     const hosp = DEMONSTRACAO.find((d) => d.tipo === 'hospital')!;
     await chamar('POST', '/orcamentos', hosp.email, 'cliente', { modalidade: 'encomenda', itens: [{ descricao: 'Monitor multiparamétrico', quantidade: 10 }] });
 

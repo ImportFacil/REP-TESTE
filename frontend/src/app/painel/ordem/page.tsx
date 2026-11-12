@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CorpoOrdem, type Ordem } from '@/components/Importacao';
+import { CampoPorto, type Porto } from '@/components/RotaMaritima';
 import { useEu } from '@/components/Shell';
 import { Aviso, Cabecalho, Campo, Carregando } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -22,6 +23,13 @@ export default function OrdemPainel() {
   const [gasto, setGasto] = useState({ etapa: 'cambio', valor: '', descricao: '' });
   const [motivo, setMotivo] = useState('');
   const [simulador, setSimulador] = useState(false);
+  const portos = useDados<Porto[]>(com ? '/equipe/importacao/portos' : null);
+  const [rota, setRota] = useState<{ origem: Porto | null; destino: Porto | null; embarque: string }>({ origem: null, destino: null, embarque: '' });
+  const idOrdem = o?.id;
+  useEffect(() => { // o formulário começa com a rota já salva na ordem
+    if (o) setRota({ origem: o.rota?.origem ?? null, destino: o.rota?.destino ?? null, embarque: o.rota?.embarque_em ?? (o.embarque_em ? String(o.embarque_em).slice(0, 10) : '') });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idOrdem, o?.porto_embarque, o?.porto_chegada, o?.embarque_em]);
   useEffect(() => { carregarConfig().then((c) => setSimulador(c.ambiente !== 'prod')).catch(() => undefined); }, []);
   if (erro) return <Aviso tipo="erro">{erro}</Aviso>;
   if (!o) return <Carregando />;
@@ -49,6 +57,19 @@ export default function OrdemPainel() {
         )}
         extra={aberta ? (
           <div className="pilha">
+            {com && (
+              <form className="cartao formulario" id="formRota" onSubmit={(e) => {
+                e.preventDefault();
+                if (!rota.origem || !rota.destino) return;
+                void acao.executar(async () => setDados(await api<Ordem>(`/equipe/ordens/${o.id}/rota`, { metodo: 'PUT', corpo: { porto_embarque: rota.origem!.codigo, porto_chegada: rota.destino!.codigo, embarque_em: rota.embarque || null } })), 'Rota da ordem salva.');
+              }}>
+                <h2>Rota marítima</h2>
+                <CampoPorto id="ordemOrigem" rotulo="Porto de embarque" porto={rota.origem} principais={portos.dados ?? []} escolher={(p) => setRota((r) => ({ ...r, origem: p }))} />
+                <CampoPorto id="ordemDestino" rotulo="Porto de chegada" porto={rota.destino} principais={portos.dados ?? []} escolher={(p) => setRota((r) => ({ ...r, destino: p }))} />
+                <Campo rotulo="Data de embarque (prevista ou realizada)"><input type="date" value={rota.embarque} onChange={(e) => setRota((r) => ({ ...r, embarque: e.target.value }))} /></Campo>
+                <div><button className="botao" disabled={acao.enviando || !rota.origem || !rota.destino}>{o.rota ? 'Atualizar rota' : 'Salvar rota'}</button></div>
+              </form>
+            )}
             {com && proxima && (
               <div className="cartao formulario">
                 <h2>Avançar para “{proxima.nome}”</h2>

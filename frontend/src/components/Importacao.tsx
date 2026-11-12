@@ -1,4 +1,5 @@
 'use client';
+import { GloboRota, n as nRota, type Rota } from '@/components/RotaMaritima';
 import type { ReactNode } from 'react';
 import { Copiar, Situacao } from './ui';
 import { ETAPA_NUMERARIO, MODALIDADE, SITUACAO_ORCAMENTO, data, dataHora, pct, reais } from '@/lib/formato';
@@ -16,6 +17,8 @@ export interface Ordem {
   numerarios: Array<{ id: number; etapa: string; valor_previsto_centavos: number; valor_pago_centavos: number; situacao: string; pago_em: string | null;
     cobranca: null | { situacao: string; expira_em: string | null; parcela_id: number; pix_copia_cola: string | null; situacao_parcela: string } }>;
   orcamento: Orcamento;
+  porto_embarque: string | null; porto_chegada: string | null; embarque_em: string | null;
+  rota: Rota | null;
   prestacao_contas: null | { por_etapa: Array<{ etapa: string; recebido_centavos: number; gasto_centavos: number; saldo_centavos: number }>; saldo_centavos: number; resultado: string;
     gastos: Array<{ id: number; etapa: string; descricao: string; valor_centavos: number; criado_em: string }> };
 }
@@ -77,6 +80,19 @@ export function CorpoOrdem({ o, acoesNumerario, extra }: { o: Ordem; acoesNumera
         {extra}
       </div>
       <div className="pilha">
+        {o.rota && (
+          <div className="cartao pilha rota" id="ordemRota">
+            <h2>Rota marítima: {o.rota.origem.nome} → {o.rota.destino.nome}</h2>
+            <div className="rota-numeros">
+              <div><b id="ordemPrazo">{nRota(o.rota.dias, 1)} dias</b><span>prazo estimado de viagem a {nRota(o.rota.velocidade_nos)} nós</span></div>
+              <div><b id="ordemChegada">{o.rota.chegada_prevista ? data(`${o.rota.chegada_prevista}T12:00:00`) : 'A definir'}</b><span>{o.rota.chegada_prevista ? `chegada prevista · embarque em ${data(`${o.rota.embarque_em}T12:00:00`)}` : 'chegada prevista: falta a data de embarque'}</span></div>
+              <div><b>{nRota(o.rota.distancia_mn)} mn</b><span>milhas náuticas ({nRota(o.rota.distancia_km)} km)</span></div>
+              <div><b>{o.rota.passagens.length ? o.rota.passagens.map((p) => p.nome).join(', ') : 'Nenhum'}</b><span>canais e estreitos no caminho</span></div>
+            </div>
+            <GloboRota rota={o.rota} altura={320} />
+            <p className="pequeno muted">Embarque em {o.rota.origem.nome}, {o.rota.origem.pais} ({o.rota.origem.codigo}); chegada em {o.rota.destino.nome}, {o.rota.destino.pais} ({o.rota.destino.codigo}). Estimativa pelo caminho comercial mais curto, com navegação contínua, sem escalas nem espera em porto.</p>
+          </div>
+        )}
         {o.modalidade === 'conta_e_ordem' && (
           <div className="cartao pilha">
             <h2>Numerário</h2>

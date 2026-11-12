@@ -83,6 +83,9 @@ export async function semearDemonstracao(db: Banco): Promise<void> {
     .values({ origem: 'equipe', empresa_id: null, nome: 'Laís De Martin', email: 'admin@importfacil.dev', papel: 'administrador', cognito_sub: 'dev-admin@importfacil.dev' })
     .onConflict((oc) => oc.columns(['origem', 'email']).doUpdateSet({ nome: 'Laís De Martin' })) // atualiza o nome em bancos de demonstração já semeados
     .execute();
+  // ordens de demonstração abertas antes de a ordem ter rota: Xangai → Santos, embarque 10 dias depois da abertura
+  await sql`UPDATE ordens_importacao SET porto_embarque = 'CNSHA', porto_chegada = 'BRSSZ', embarque_em = (criado_em + interval '10 days')::date
+            WHERE porto_embarque IS NULL AND porto_chegada IS NULL`.execute(db);
 }
 
 async function principal(): Promise<void> {

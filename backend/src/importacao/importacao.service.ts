@@ -6,6 +6,7 @@ import { BANCO, type Banco } from '../banco/banco.module';
 import type { EtapaNumerario, Modalidade } from '../banco/tipos';
 import { PagamentosService } from '../pagamentos/pagamentos.service';
 import { hojeBrasil, somarDias } from '../pagamentos/regras';
+import { calcularRota, porto } from './rotas';
 
 /** Etapas de cada modalidade, em ordem. */
 export const ETAPAS: Record<Modalidade, Array<{ id: string; nome: string; exige?: EtapaNumerario }>> = {
@@ -186,7 +187,41 @@ export class ImportacaoService {
       numerarios: numerarios.map((n) => ({ ...n, cobranca: cobrancas.find((c) => c.numerario_id === n.id) ?? null })),
       orcamento,
       prestacao_contas: o.modalidade === 'conta_e_ordem' ? await this.prestacao(id) : null,
+      rota: this.rotaDaOrdem(o),
     };
+  }
+
+  /** Rota pelo mar e prazo estimado da ordem (a 16 nós); com a data de embarque, a chegada prevista. */
+  private rotaDaOrdem(o: { porto_embarque: string | null; porto_chegada: string | null; embarque_em: string | Date | null }) {
+    if (!o.porto_embarque || !o.porto_chegada) return null;
+    try {
+      const r = calcularRota(o.porto_embarque, o.porto_chegada, 16);
+      const embarque = o.embarque_em ? (o.embarque_em instanceof Date ? o.embarque_em.toISOString() : String(o.embarque_em)).slice(0, 10) : null;
+      const chegada = embarque ? new Date(new Date(`${embarque}T12:00:00Z`).getTime() + Math.ceil(r.dias) * 86_400_000).toISOString().slice(0, 10) : null;
+      return { ...r, embarque_em: embarque, chegada_prevista: chegada };
+    } catch {
+      return null;
+    }
+  }
+
+  /** Define (ou troca) os portos e a data de embarque da ordem. */
+  async definirRota(id: number, d: { porto_embarque: string; porto_chegada: string; embarque_em?: string | null }, autor: UsuarioAutenticado, ip: string | null) {
+    const origem = porto(d.porto_embarque);
+    const destino = porto(d.porto_chegada);
+    if (!origem) throw new BadRequestException(`Porto de embarque desconhecido: ${d.porto_embarque}`);
+    if (!destino) throw new BadRequestException(`Porto de chegada desconhecido: ${d.porto_chegada}`);
+    if (origem.codigo === destino.codigo) throw new BadRequestException('Escolha portos diferentes para o embarque e a chegada.');
+    if (d.embarque_em && Number.isNaN(new Date(`${d.embarque_em}T12:00:00Z`).getTime())) throw new BadRequestException('Data de embarque inválida.');
+    calcularRota(origem.codigo, destino.codigo); // recusa pares de portos sem ligação pelo mar
+    await this.db.transaction().execute(async (trx) => {
+      const o = await trx.selectFrom('ordens_importacao').selectAll().where('id', '=', id).forUpdate().executeTakeFirst();
+      if (!o) throw new NotFoundException('Ordem não encontrada.');
+      const depois = { porto_embarque: origem.codigo, porto_chegada: destino.codigo, embarque_em: d.embarque_em || null };
+      await trx.updateTable('ordens_importacao').set(depois).where('id', '=', id).execute();
+      await this.auditoria.registrar({ usuario: autor, acao: 'ordem.rota', entidade: 'ordem_importacao', entidadeId: id,
+        antes: { porto_embarque: o.porto_embarque, porto_chegada: o.porto_chegada, embarque_em: o.embarque_em }, depois, ip }, trx);
+    });
+    return this.ordem(id);
   }
 
   /** Avança a etapa. Na conta e ordem, câmbio e DUIMP só avançam com o numerário da etapa pago. */

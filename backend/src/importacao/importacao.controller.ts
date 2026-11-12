@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SoCliente, SoEquipe, UsuarioAtual } from '../auth/decoradores';
 import type { UsuarioAutenticado } from '../auth/identidade';
 import { CancelarDto } from '../pedidos/dto';
-import { AvancarOrdemDto, GastoDto, NovoOrcamentoDto, NumerarioDto, PropostaDto } from './dto';
+import { AvancarOrdemDto, GastoDto, NovoOrcamentoDto, NumerarioDto, PropostaDto, RotaOrdemDto } from './dto';
 import { ImportacaoService } from './importacao.service';
 
 @ApiTags('Cliente · Orçamentos e ordens')
@@ -98,6 +98,13 @@ export class ImportacaoEquipeController {
   @SoEquipe('comercial', 'administrador')
   avancar(@UsuarioAtual() u: UsuarioAutenticado, @Param('id', ParseIntPipe) id: number, @Body() dto: AvancarOrdemDto, @Ip() ip: string) {
     return this.imp.avancar(id, dto.observacao, u, ip);
+  }
+
+  @Put('ordens/:id/rota')
+  @SoEquipe('comercial', 'administrador')
+  @ApiOperation({ summary: 'Porto de embarque, porto de chegada e data de embarque da ordem (rota e prazo estimado)' })
+  rota(@UsuarioAtual() u: UsuarioAutenticado, @Param('id', ParseIntPipe) id: number, @Body() dto: RotaOrdemDto, @Ip() ip: string) {
+    return this.imp.definirRota(id, dto, u, ip);
   }
 
   @Post('ordens/:id/cancelar')

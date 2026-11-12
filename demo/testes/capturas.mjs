@@ -343,6 +343,25 @@ try {
   checar('rotas-maritimas', /^1[01]\.\d{3} mn$/.test(milhas) && !/Suez/.test(passagens) && semSuez !== milhas,
     `Xangai → Santos: ${milhas}, ${dias}; globo 3D ${globo ? 'desenhado' : 'indisponível neste navegador'}; Xangai → Roterdã sem Suez: ${semSuez}`);
 } catch (e) { checar('rotas-maritimas', false, e.message.split('\n')[0]); }
+
+// Ordem de importação: portos e data de embarque; a ordem mostra a rota, o prazo e a chegada prevista
+try {
+  await visitar(page, '68-ordens', '/painel/ordens/', { espera: 'Ordens' });
+  await page.locator('.pn-tabela tbody tr').first().click();
+  await page.locator('#formRota').waitFor({ timeout: 15000 });
+  await page.locator('#ordemOrigem').fill('Ningbo — China (CNNGB)');
+  await page.locator('#ordemDestino').fill('Paranaguá — Brasil (BRPNG)');
+  await page.locator('#formRota input[type="date"]').fill('2026-12-01');
+  await page.locator('#formRota button').click();
+  await page.getByText('Rota da ordem salva.').waitFor({ timeout: 15000 });
+  const titulo = await page.locator('#ordemRota h2').innerText();
+  const prazo = await page.locator('#ordemPrazo').innerText();
+  const chegada = await page.locator('#ordemChegada').innerText();
+  await page.locator('#ordemRota .rota-globo-tela[data-pronto="1"] canvas').waitFor({ timeout: 20000 }).catch(() => undefined);
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: `${saida}/68-ordem-rota.png`, fullPage: true });
+  checar('ordem-rota', /Ningbo → Paranaguá/.test(titulo) && /^\d+(,\d)? dias$/.test(prazo) && /^\d{2}\/\d{2}\/\d{4}$/.test(chegada), `${titulo}: ${prazo}, chegada prevista ${chegada}`);
+} catch (e) { checar('ordem-rota', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Painel no celular: menu em gaveta e tabela em cartões
