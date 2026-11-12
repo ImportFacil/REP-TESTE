@@ -43,7 +43,33 @@ export function CampoPorto({ id, rotulo, porto, principais, escolher }: { id: st
   );
 }
 
-/** Globo 3D (Globe.gl, MIT) com a rota desenhada sobre o mar e os dois portos marcados. */
+const ALTURA_NUVENS = 0.004;
+const ALTURA_ROTA = 0.012; // acima das nuvens
+interface Camada { cor: string; traco: number; pulso?: boolean }
+/** Neon dourado: do halo mais largo e transparente ao miolo quase branco; por último, o pulso de luz. */
+const CAMADAS_NEON: Camada[] = [
+  { cor: 'rgba(255, 190, 40, 0.10)', traco: 22 },
+  { cor: 'rgba(255, 200, 60, 0.22)', traco: 13 },
+  { cor: 'rgba(255, 214, 90, 0.55)', traco: 7 },
+  { cor: '#ffe9a6', traco: 2.6 },
+  { cor: '#fffdf2', traco: 3.6, pulso: true },
+];
+
+/** Pino de localização dourado com o nome do porto (a ponta fica exatamente sobre o porto). */
+function pino(p: Porto & { papel: string }): HTMLElement {
+  const el = document.createElement('div');
+  el.innerHTML = `<div class="rota-pino">
+    <span class="rota-pino-rotulo"><small></small><b></b></span>
+    <svg viewBox="0 0 24 32" width="30" height="40" aria-hidden="true">
+      <path d="M12 31C12 31 2 19.5 2 11.5a10 10 0 1 1 20 0C22 19.5 12 31 12 31z" fill="#ffc83d" stroke="#fff6d6" stroke-width="1.6"/>
+      <circle cx="12" cy="11.5" r="4" fill="#3a2600"/>
+    </svg></div>`;
+  (el.querySelector('small') as HTMLElement).textContent = p.papel;
+  (el.querySelector('b') as HTMLElement).textContent = p.nome;
+  return el;
+}
+
+/** Globo 3D (Globe.gl, MIT): Terra com relevo e nuvens, a rota em neon dourado e um pino em cada porto. */
 export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number }) {
   const caixa = useRef<HTMLDivElement>(null);
   const globo = useRef<{ g: unknown } | null>(null);
@@ -55,25 +81,46 @@ export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number
     if (!el) return;
     let vivo = true;
     let limpar = () => {};
-    void import('globe.gl').then(({ default: Globe }) => {
+    void Promise.all([import('globe.gl'), import('three')]).then(([{ default: Globe }, THREE]) => {
       if (!vivo) return;
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const g: any = new (Globe as any)(el, { animateIn: false });
-        g.globeImageUrl('/globo/terra.jpg').backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#7fb2f0').atmosphereAltitude(0.12)
+        // Terra com relevo e camada de nuvens (modelo do exemplo "clouds" da Globe.gl)
+        g.globeImageUrl('/globo/terra-relevo.jpg').bumpImageUrl('/globo/topografia.png')
+          .backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#8ec5ff').atmosphereAltitude(0.16)
           .width(el.clientWidth).height(el.clientHeight)
-          .pathPoints('pontos').pathPointLat((p: number[]) => p[1]).pathPointLng((p: number[]) => p[0]).pathPointAlt(0.004)
-          .pathColor(() => ['#ffd24a', '#ff8a3c']).pathStroke(2.2).pathDashLength(0.02).pathDashGap(0.006).pathDashAnimateTime(60000).pathTransitionDuration(0)
-          .pointLat('lat').pointLng('lon').pointColor(() => '#ffffff').pointAltitude(0.012).pointRadius(0.45)
-          .labelLat('lat').labelLng('lon').labelText('nome').labelSize(1.3).labelDotRadius(0.35).labelColor(() => '#ffffff').labelAltitude(0.014).labelResolution(2);
+          // rota em neon dourado: três camadas (halo largo, brilho, miolo claro) e um pulso de luz percorrendo o trajeto
+          .pathPoints('pontos').pathPointLat((p: number[]) => p[1]).pathPointLng((p: number[]) => p[0]).pathPointAlt((p: number[]) => p[2])
+          .pathColor((d: Camada) => d.cor).pathStroke((d: Camada) => d.traco)
+          .pathDashLength((d: Camada) => (d.pulso ? 0.08 : 1)).pathDashGap((d: Camada) => (d.pulso ? 0.92 : 0))
+          .pathDashAnimateTime((d: Camada) => (d.pulso ? 9000 : 0)).pathTransitionDuration(0)
+          // pinos de localização nos portos de saída e de chegada
+          .htmlLat('lat').htmlLng('lon').htmlAltitude(ALTURA_ROTA).htmlElement((d: Porto & { papel: string }) => pino(d))
+          .htmlElementVisibilityModifier((e: HTMLElement, visivel: boolean) => { e.style.opacity = visivel ? '1' : '0'; });
         g.controls().autoRotate = false;
         g.controls().enableZoom = true;
+        let nuvens: { rotation: { y: number } } | null = null;
+        let quadro = 0;
+        new THREE.TextureLoader().load('/globo/nuvens.webp', (textura: unknown) => {
+          if (!vivo) return;
+          const malha = new THREE.Mesh(
+            new THREE.SphereGeometry(g.getGlobeRadius() * (1 + ALTURA_NUVENS), 75, 75),
+            new THREE.MeshPhongMaterial({ map: textura, transparent: true, opacity: 0.85 }),
+          );
+          g.scene().add(malha);
+          nuvens = malha;
+          el.dataset.nuvens = '1';
+        });
+        const parado = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const girar = () => { if (nuvens && !parado) nuvens.rotation.y += (-0.006 * Math.PI) / 180; quadro = requestAnimationFrame(girar); };
+        quadro = requestAnimationFrame(girar);
         const ro = new ResizeObserver(() => g.width(el.clientWidth).height(el.clientHeight));
         ro.observe(el);
         globo.current = { g };
         el.dataset.pronto = '1';
         setPronto(true);
-        limpar = () => { ro.disconnect(); g._destructor?.(); el.replaceChildren(); };
+        limpar = () => { cancelAnimationFrame(quadro); ro.disconnect(); g._destructor?.(); el.replaceChildren(); };
       } catch (e) { setErro((e as Error).message || 'sem suporte a 3D'); }
     }, (e: Error) => setErro(e.message));
     return () => { vivo = false; limpar(); globo.current = null; };
@@ -83,9 +130,11 @@ export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const g = globo.current?.g as any;
     if (!g || !rota) return;
-    g.pathsData([{ pontos: rota.linha }]).pointsData([rota.origem, rota.destino]).labelsData([rota.origem, rota.destino]);
+    // cada camada um pouco acima da anterior, para o miolo claro ficar por cima do halo
+    g.pathsData(CAMADAS_NEON.map((c, k) => ({ ...c, pontos: rota.linha.map(([lon, lat]) => [lon, lat, ALTURA_ROTA + k * 0.0015]) })))
+      .htmlElementsData([{ ...rota.origem, papel: 'Saída' }, { ...rota.destino, papel: 'Chegada' }]);
     const meio = rota.linha[Math.floor(rota.linha.length / 2)];
-    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: 2.4 }, 900);
+    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: 1.9 }, 900);
   }, [rota, pronto]);
 
   return (

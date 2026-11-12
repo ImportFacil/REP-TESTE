@@ -12,7 +12,7 @@
 
 .rota-colunas { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
 .rota .rota-mapa { padding: 0; overflow: hidden; }
-.rota-globo { position: relative; height: 520px; background: radial-gradient(circle at 50% 40%, #16304f 0%, #0a1626 70%); }
+.rota-globo { position: relative; height: 520px; background: radial-gradient(circle at 50% 45%, #0f2340 0%, #050b16 72%); }
 .rota-globo-tela { position: absolute; inset: 0; cursor: grab; }
 .rota-globo-tela:active { cursor: grabbing; }
 .rota-globo-dica { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: #c8d6ea; pointer-events: none; }
@@ -33,3 +33,10 @@
   .rota-form { grid-template-columns: 1fr; }
   .rota-trocar { justify-self: start; }
 }
+
+/* pino de localização dos portos: a ponta do pino fica sobre o porto */
+/* a Globe.gl centraliza o elemento no porto; o pino sobe metade da própria altura para a ponta tocar o porto */
+.rota-pino { display: flex; flex-direction: column; align-items: center; transform: translateY(-50%); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 0 6px rgba(255, 200, 61, .9)) drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.rota-pino-rotulo { display: flex; flex-direction: column; align-items: center; margin-bottom: 3px; padding: 3px 9px; border-radius: 8px; background: rgba(10, 18, 32, .82); border: 1px solid rgba(255, 200, 61, .7); color: #fff; line-height: 1.15; white-space: nowrap; }
+.rota-pino-rotulo small { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; color: #ffd66b; }
+.rota-pino-rotulo b { font-size: 0.82rem; }
