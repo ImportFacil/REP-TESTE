@@ -306,6 +306,7 @@ try {
   // ao abrir, os três câmbios vêm com o dólar do dia; com o câmbio da planilha (5,45) os números são os do protótipo
   await page.locator('#calcDolar').waitFor({ timeout: 15000 });
   const dolar = (await page.locator('#calcDolar b').innerText()).replace('R$', '').trim();
+  await page.waitForFunction((d) => ['cDI', 'cFr', 'cPg'].every((c) => document.getElementById(c)?.value === d), dolar, { timeout: 5000 }).catch(() => undefined);
   const cambios = await Promise.all(['#cDI', '#cFr', '#cPg'].map((c) => page.locator(c).inputValue()));
   for (const c of ['#cDI', '#cFr', '#cPg']) await page.locator(c).fill('5,45');
   await page.waitForTimeout(200);
