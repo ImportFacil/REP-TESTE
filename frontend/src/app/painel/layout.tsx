@@ -25,6 +25,7 @@ const MENU: ItemPainel[] = [
     { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
     { href: '/painel/ordem/', rotulo: 'Ordem', oculto: true },
     { href: '/painel/calculadora/', rotulo: 'Calculadora de importação' },
+    { href: '/painel/rotas/', rotulo: 'Rotas marítimas' },
   ] },
   { href: '/painel/catalogo', rotulo: 'Catálogo', icone: 'catalogo', filhos: [
     { href: '/painel/produtos/', rotulo: 'Produtos' },

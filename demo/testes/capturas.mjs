@@ -323,6 +323,26 @@ try {
   checar('calculadora', menu && cambios.every((c) => c === dolar) && /3\.978\.913,88/.test(desembolso) && depois !== desembolso && /^8806\./.test(codigo),
     `no menu Importação; abre com o dólar do dia (R$ ${dolar}); contêiner 20' a 5,45: desembolso ${desembolso}; com 4 unidades ${depois}; NCM sugerido ${codigo}`);
 } catch (e) { checar('calculadora', false, e.message.split('\n')[0]); }
+
+// Importação → Rotas marítimas: rota pelo mar (searoute) entre dois portos, no globo 3D
+try {
+  await visitar(page, '66-rotas-maritimas', '/painel/rotas/', { espera: 'Rotas marítimas' });
+  await page.locator('#rotaMilhas').waitFor({ timeout: 20000 });
+  const milhas = await page.locator('#rotaMilhas').innerText();
+  const dias = await page.locator('#rotaDias').innerText();
+  const globo = await page.locator('.rota-globo-tela[data-pronto="1"] canvas').waitFor({ timeout: 20000 }).then(() => true, () => false);
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: `${saida}/66-rotas-maritimas.png` });
+  await page.getByLabel('Evitar o Canal de Suez e o Mar Vermelho').check();
+  await page.locator('#rotaDestino').fill('Roterdã — Países Baixos (NLRTM)');
+  await page.waitForFunction((m) => document.getElementById('rotaMilhas')?.textContent !== m, milhas, { timeout: 20000 });
+  const semSuez = await page.locator('#rotaMilhas').innerText();
+  const passagens = await page.locator('.rota-passagens').innerText().catch(() => '');
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: `${saida}/67-rotas-sem-suez.png` });
+  checar('rotas-maritimas', /^1[01]\.\d{3} mn$/.test(milhas) && !/Suez/.test(passagens) && semSuez !== milhas,
+    `Xangai → Santos: ${milhas}, ${dias}; globo 3D ${globo ? 'desenhado' : 'indisponível neste navegador'}; Xangai → Roterdã sem Suez: ${semSuez}`);
+} catch (e) { checar('rotas-maritimas', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Painel no celular: menu em gaveta e tabela em cartões

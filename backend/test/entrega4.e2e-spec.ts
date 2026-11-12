@@ -133,6 +133,23 @@ describe('câmbio', () => {
   });
 });
 
+describe('rotas marítimas', () => {
+  it('a equipe consulta portos e a rota entre dois portos; clientes não', async () => {
+    const portos = await api().get('/equipe/importacao/portos').set('Authorization', await como(COM, 'equipe')).expect(200);
+    expect(portos.body[0]).toMatchObject({ codigo: 'BRSSZ', nome: 'Santos', pais: 'Brasil' });
+    const busca = await api().get('/equipe/importacao/portos?busca=xangai').set('Authorization', await como(COM, 'equipe')).expect(200);
+    expect(busca.body[0].codigo).toBe('CNSHA');
+    const r = await api().get('/equipe/importacao/rota?origem=CNSHA&destino=BRSSZ&velocidade=18').set('Authorization', await como(COM, 'equipe')).expect(200);
+    expect(r.body).toMatchObject({ origem: { codigo: 'CNSHA' }, destino: { codigo: 'BRSSZ' }, velocidade_nos: 18 });
+    expect(r.body.distancia_mn).toBeGreaterThan(10000);
+    expect(r.body.linha.length).toBeGreaterThan(20);
+    await api().get('/equipe/importacao/rota?origem=CNSHA&destino=XXXXX').set('Authorization', await como(COM, 'equipe')).expect(400);
+    await api().get('/equipe/importacao/rota?origem=CNSHA').set('Authorization', await como(COM, 'equipe')).expect(400);
+    await api().get('/equipe/importacao/rota?origem=CNSHA&destino=BRSSZ&velocidade=90').set('Authorization', await como(COM, 'equipe')).expect(400);
+    await api().get('/equipe/importacao/rota?origem=CNSHA&destino=BRSSZ').set('Authorization', await como(COOP, 'cliente')).expect(403);
+  });
+});
+
 describe('importação de produtos por planilha', () => {
   const planilha = [
     'codigo;nome;categoria;preco;estoque;multiplo;ativo',

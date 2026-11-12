@@ -1,0 +1,35 @@
+/* Rotas marítimas (Painel → Importação) */
+.rota .rota-caixa { padding: 18px; margin-bottom: 16px; }
+.rota .rota-caixa h2 { font-size: 1.1rem; margin: 0 0 12px; }
+.rota .rota-caixa h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; color: var(--texto-2); margin: 16px 0 6px; }
+.rota-form { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 170px; gap: 12px; align-items: flex-end; }
+.rota-campo { display: flex; flex-direction: column; gap: 5px; font-size: 0.88rem; font-weight: 600; min-width: 0; }
+.rota-campo input { width: 100%; }
+.rota-trocar { height: 42px; }
+.rota-evitar { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-size: 0.9rem; }
+.rota-evitar label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.rota-evitar input { width: 17px; height: 17px; accent-color: var(--azul); }
+
+.rota-colunas { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+.rota .rota-mapa { padding: 0; overflow: hidden; }
+.rota-globo { position: relative; height: 520px; background: radial-gradient(circle at 50% 40%, #16304f 0%, #0a1626 70%); }
+.rota-globo-tela { position: absolute; inset: 0; cursor: grab; }
+.rota-globo-tela:active { cursor: grabbing; }
+.rota-globo-dica { position: absolute; left: 12px; bottom: 10px; font-size: 0.78rem; color: #c8d6ea; pointer-events: none; }
+.rota-globo-erro { position: absolute; inset: auto 12px 36px 12px; margin: 0; padding: 10px 12px; border-radius: 8px; background: rgba(0, 0, 0, .55); color: #fff; font-size: 0.86rem; }
+
+.rota-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rota-numeros div { padding: 10px 12px; border-radius: 8px; background: var(--superficie-2); }
+.rota-numeros b { display: block; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.rota-numeros span { font-size: 0.8rem; color: var(--texto-2); }
+.rota-passagens { margin: 0; padding-left: 18px; font-size: 0.92rem; }
+.rota-nota { font-size: 0.82rem; color: var(--texto-2); background: var(--superficie-2); border-radius: 8px; padding: 10px 12px; margin: 0; }
+
+@media (max-width: 1000px) {
+  .rota-colunas { grid-template-columns: 1fr; }
+  .rota-globo { height: 380px; }
+}
+@media (max-width: 700px) {
+  .rota-form { grid-template-columns: 1fr; }
+  .rota-trocar { justify-self: start; }
+}
