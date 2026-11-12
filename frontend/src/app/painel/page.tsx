@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useEu } from '@/components/Shell';
+import { GraficoVendas } from '@/components/painel/GraficoVendas';
 import { Icone } from '@/components/painel/Icone';
 import { Situacao } from '@/components/ui';
 import { FORMA, NOMES_TIPO, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, reais } from '@/lib/formato';
@@ -36,40 +37,6 @@ function Numero({ icone, valor, rotulo, variacao, href }: { icone: string; valor
     </>
   );
   return href ? <Link href={href} className="pn-numero">{corpo}</Link> : <div className="pn-numero">{corpo}</div>;
-}
-
-/** Gráfico de vendas por dia (barras), em SVG, sem biblioteca. */
-function Grafico({ serie }: { serie: Resumo['serie'] }) {
-  const L = 360, A = 190, m = { e: 44, d: 6, t: 10, b: 34 };
-  const max = Math.max(1, ...serie.map((s) => s.vendas_centavos));
-  const passo = (L - m.e - m.d) / Math.max(1, serie.length);
-  const y = (v: number) => m.t + (A - m.t - m.b) * (1 - v / max);
-  const marcas = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
-  const curto = (c: number) => (c >= 100_000_000 ? `${(c / 100_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} mi` : c >= 100_000 ? `${Math.round(c / 100_000)} mil` : `${Math.round(c / 100)}`);
-  const cadaRotulo = Math.ceil(serie.length / 8);
-  return (
-    <svg className="pn-grafico" viewBox={`0 0 ${L} ${A}`} role="img" aria-label="Vendas por dia no período">
-      {marcas.map((v) => (
-        <g key={v}>
-          <line x1={m.e} x2={L - m.d} y1={y(v)} y2={y(v)} stroke="var(--borda)" strokeWidth={1} />
-          <text x={m.e - 6} y={y(v) + 3} textAnchor="end">{curto(v)}</text>
-        </g>
-      ))}
-      {serie.map((s, k) => {
-        const h = A - m.b - y(s.vendas_centavos);
-        return (
-          <g key={s.dia}>
-            <rect x={m.e + k * passo + passo * 0.15} y={y(s.vendas_centavos)} width={Math.max(1, passo * 0.7)} height={Math.max(0, h)} rx={2} fill="var(--azul)">
-              <title>{`${data(s.dia + 'T12:00:00')}: ${reais(s.vendas_centavos)} em ${s.pedidos} pedido(s)`}</title>
-            </rect>
-            {k % cadaRotulo === 0 && (
-              <text x={m.e + k * passo + passo / 2} y={A - m.b + 14} textAnchor="middle">{s.dia.slice(8, 10)}/{s.dia.slice(5, 7)}</text>
-            )}
-          </g>
-        );
-      })}
-    </svg>
-  );
 }
 
 export default function PainelDeControle() {
@@ -146,7 +113,7 @@ export default function PainelDeControle() {
               <span><span className="pequeno muted" style={{ display: 'block', fontWeight: 600 }}>Total de vendas</span><b style={{ fontSize: '1.2rem' }}>{r ? reais(r.geral.vendas_centavos) : '…'}</b></span>
               <span className="pequeno muted" style={{ textAlign: 'right' }}>{intervalo}<br />{r?.geral.pedidos ?? 0} pedidos</span>
             </div>
-            <div style={{ padding: '4px 10px 10px' }}>{r && <Grafico serie={r.serie} />}</div>
+            <div style={{ padding: '4px 10px 10px' }}>{r && <GraficoVendas titulo="Vendas por dia" resumo={reais(r.geral.vendas_centavos)} pontos={r.serie.map((d) => ({ tempo: d.dia, rotulo: `${d.dia.slice(8, 10)}/${d.dia.slice(5, 7)}`, valor: d.vendas_centavos, dica: `${data(d.dia + 'T12:00:00')}: ${reais(d.vendas_centavos)} em ${d.pedidos} pedido(s)` }))} />}</div>
           </div>
 
           <div className="pn-caixa" style={{ marginTop: 16 }}>

@@ -80,8 +80,11 @@ a.pn-lista-item:hover { background: var(--superficie-2); }
 .pn-cartao-cabecalho b { font-size: 0.98rem; }
 .pn-periodo { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--borda); border-radius: 8px; padding: 0 10px; background: var(--superficie); color: var(--texto); }
 .pn-periodo select { border: 0; background: transparent; color: inherit; font: inherit; padding: 9px 2px; }
-.pn-grafico { width: 100%; height: auto; display: block; }
-.pn-grafico text { fill: var(--texto-2); font-size: 10px; }
+/* gráficos (Lightweight Charts): a legenda fica sobre o gráfico, no canto de cima */
+.pn-grafico-lw { position: relative; width: 100%; }
+.pn-grafico-tela { position: absolute; inset: 0; }
+.pn-grafico-legenda { position: absolute; left: 4px; top: 6px; z-index: 3; font-size: 0.85rem; line-height: 1.3; color: var(--texto-2); pointer-events: none; max-width: calc(100% - 60px); }
+.pn-grafico-legenda strong { color: var(--texto); font-weight: 700; }
 
 /* grade de dados (lista no formato do Bagisto) */
 .pn-ferramentas { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }

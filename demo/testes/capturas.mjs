@@ -179,7 +179,8 @@ for (const [nome, caminho, espera] of [
 // Painel no formato do Bagisto: números, gráfico, filtros pelo endereço, exportação e seleção em lote
 try {
   await visitar(page, '41-painel-controle-completo', '/painel/', { espera: 'Total de vendas', cheia: true });
-  const barras = await page.locator('svg.pn-grafico rect').count();
+  await page.locator('.pn-grafico-lw canvas').first().waitFor({ timeout: 15000 });
+  const barras = Number(await page.locator('.pn-grafico-lw').first().getAttribute('data-pontos'));
   const vendas = await page.locator('.pn-numero strong').first().innerText();
   checar('painel-grafico-e-numeros', barras >= 28 && /R\$\s?[1-9]/.test(vendas), `gráfico com ${barras} dias, vendas ${vendas}`);
   await visitar(page, '42-pedidos-entregues', '/painel/pedidos/?situacao=entregue', { espera: 'Situação do pedido: Entregue' });

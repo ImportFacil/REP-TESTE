@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { GraficoBarras } from '@/components/painel/GraficoBarras';
+import { GraficoVendas } from '@/components/painel/GraficoVendas';
 import { RelatorioFinanceiro } from '@/components/painel/RelatorioFinanceiro';
 import { RelatorioPedidos } from '@/components/painel/RelatorioPedidos';
 import { useEu } from '@/components/Shell';
@@ -120,7 +120,7 @@ export default function Relatorios() {
           <div className="pn-dupla" style={{ marginBottom: 16 }}>
             <section className="pn-caixa" style={{ padding: 18 }}>
               <b>Vendas {AGRUPAR[agrupar].toLowerCase()}</b>
-              <GraficoBarras titulo="Vendas no período" barras={vendas.dados.serie.map((l) => ({ rotulo: rotuloPeriodo(l.periodo, agrupar), valor: l.vendas_centavos, dica: `${rotuloPeriodo(l.periodo, agrupar)}: ${reais(l.vendas_centavos)} em ${l.pedidos} pedido(s)` }))} />
+              <GraficoVendas titulo="Vendas no período" resumo={reais(vendas.dados.totais.vendas_centavos)} pontos={vendas.dados.serie.map((l) => ({ tempo: l.periodo, rotulo: rotuloPeriodo(l.periodo, agrupar), valor: l.vendas_centavos, dica: `${rotuloPeriodo(l.periodo, agrupar)}: ${reais(l.vendas_centavos)} em ${l.pedidos} pedido(s)` }))} />
             </section>
             <section className="pn-caixa" style={{ padding: 18 }}>
               <b>Por forma de pagamento</b>
@@ -142,7 +142,7 @@ export default function Relatorios() {
           ]} />
           <section className="pn-caixa" style={{ padding: 18, marginBottom: 16 }}>
             <b>Vendas por categoria</b>
-            <GraficoBarras titulo="Vendas por categoria" barras={produtos.dados.categorias.slice(0, 12).map((c) => ({ rotulo: c.categoria.split(' ')[0], valor: c.vendas_centavos, dica: `${c.categoria}: ${reais(c.vendas_centavos)} (${c.produtos} produto(s))` }))} />
+            <GraficoVendas titulo="Vendas por categoria" pontos={produtos.dados.categorias.slice(0, 12).map((c) => ({ rotulo: c.categoria.split(' ')[0], valor: c.vendas_centavos, dica: `${c.categoria}: ${reais(c.vendas_centavos)} (${c.produtos} produto(s))` }))} />
           </section>
           <Grade titulo="" linhas={produtos.dados.produtos} colunas={COL_PRODUTOS} chave={(l) => l.produto_id} aoClicar={(l) => router.push(`/painel/produto/?id=${l.produto_id}`)}
             ordemInicial={{ chave: 'vendas_centavos', dir: 'desc' }} nomeArquivo={`relatorio-produtos-${p.de}-a-${p.ate}`} vazio="Nenhum produto vendido no período." />
