@@ -5,7 +5,7 @@ const P: Record<string, string> = {
   catalogo: 'M3 5h18v14H3zM3 9h18M8 13h3',
   clientes: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0',
   empresas: 'M4 21V5l8-3 8 3v16M9 21v-5h6v5M8 8h2M14 8h2M8 12h2M14 12h2',
-  importacao: 'M2 18c2 2 4 2 6 0s4-2 6 0 4 2 6 0M4 15l-1-5h18l-2 5M8 10V5h8v5M12 2v3',
+  importacao: 'M2 6h20v12H2zM6 9v6M10 9v6M14 9v6M18 9v6', // contêiner
   financeiro: 'M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4 2 4M16 13h2',
   marketing: 'M3 10v4l11 5V5zM14 8a4 4 0 0 1 0 8M6 14v5h3',
   conteudo: 'M6 2h9l5 5v15H6zM14 2v6h6M9 13h7M9 17h5',
