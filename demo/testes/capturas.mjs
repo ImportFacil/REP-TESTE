@@ -102,6 +102,7 @@ for (const [nome, caminho, espera] of [
   ['22-loja-favoritos', '/loja/favoritos/', 'Favoritos'],
   ['23-loja-listas', '/loja/listas/', 'Reposição mensal'],
   ['24-loja-enderecos', '/loja/enderecos/', 'Armazém de grãos'],
+  ['24b-loja-pedidos-semana', '/loja/pedidos/?periodo=7d', 'Últimos 7 dias'],
 ]) await visitar(page, nome, caminho, { espera });
 try {
   await visitar(page, '28-loja-catalogo-filtros', '/loja/catalogo/?categoria=seguranca', { espera: 'Catálogo' });
@@ -225,6 +226,10 @@ for (const [nome, caminho, espera] of [
   ['87-config-importar', '/painel/importar/', 'Importar produtos'],
   ['88-config-auditoria', '/painel/auditoria/', 'Auditoria'],
   ['93-vendas-cotacoes', '/painel/cotacoes/', 'esperando resposta'],
+  ['96-relatorio-pedidos-24h', '/painel/relatorios/?aba=pedidos', 'Consolidado de pedidos'],
+  ['97-relatorio-pedidos-semana-hospital', '/painel/relatorios/?aba=pedidos&periodo=7d&perfil=hospital', 'Pedidos · Últimos 7 dias · Hospital'],
+  ['98-relatorio-financeiro-24h', '/painel/relatorios/?aba=financeiro', 'Recebido no período'],
+  ['99-relatorio-financeiro-semana', '/painel/relatorios/?aba=financeiro&periodo=7d', 'Financeiro · Últimos 7 dias'],
 ]) await visitar(page, nome, caminho, { espera });
 try {
   await visitar(page, '89-produto-estoque-locais', '/painel/produtos/?busca=MQ-EN01', { espera: 'Produtos' });
@@ -247,6 +252,24 @@ try {
   await page.screenshot({ path: `${saida}/95-cotacao-responder.png`, fullPage: true });
   checar('painel-cotacao-responder', (await page.locator('input[aria-label^="Preço proposto"]').count()) === 3, 'preço proposto para cada item');
 } catch (e) { checar('painel-cotacao', false, e.message.split('\n')[0]); }
+try {
+  const contar = async () => { await page.waitForLoadState('networkidle'); await page.waitForTimeout(500); return Number((await page.locator('.pn-cabecalho .sub').first().innerText()).match(/^(\d+)/)?.[1] ?? -1); };
+  await visitar(page, '100-pedidos-todos', '/painel/pedidos/', { espera: 'dos mais recentes' });
+  const todos = await contar();
+  const contagens = [];
+  for (const [rotulo, nome] of [['24 horas', '101-pedidos-24h'], ['48 horas', '102-pedidos-48h'], ['72 horas', '103-pedidos-72h'], ['Semana', '104-pedidos-semana']]) {
+    await page.getByRole('button', { name: rotulo, exact: true }).click();
+    contagens.push(await contar());
+    await page.screenshot({ path: `${saida}/${nome}.png`, fullPage: true });
+  }
+  const cresce = contagens.every((n, k) => n >= 0 && (k === 0 || n >= contagens[k - 1])) && contagens[3] <= todos;
+  checar('pedidos-por-janela', cresce, `todos ${todos}; 24h ${contagens[0]}, 48h ${contagens[1]}, 72h ${contagens[2]}, semana ${contagens[3]}`);
+  await page.getByRole('tab', { name: 'Hospitais' }).click();
+  const hosp = await contar();
+  const linhas = await page.locator('.pn-tabela tbody tr').allInnerTexts();
+  await page.screenshot({ path: `${saida}/105-pedidos-semana-hospitais.png`, fullPage: true });
+  checar('pedidos-por-perfil', hosp >= 0 && linhas.every((l) => /Hospital/.test(l) || /Nenhum/.test(l)), `${hosp} pedido(s) de hospitais na semana`);
+} catch (e) { checar('pedidos-janela', false, e.message.split('\n')[0]); }
 try {
   await visitar(page, '60-notas-lista', '/painel/notas/', { espera: 'Notas fiscais' });
   const notas = await page.locator('.pn-tabela tbody tr').count();

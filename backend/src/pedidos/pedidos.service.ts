@@ -8,6 +8,7 @@ import { CatalogoService } from '../catalogo/catalogo.service';
 import { LojaService } from '../loja/loja.service';
 import { MarketingService } from '../marketing/marketing.service';
 import { limites } from '../comum/paginacao';
+import { lerJanela } from '../comum/periodo';
 import { PagamentosService } from '../pagamentos/pagamentos.service';
 import { PoliticaService } from '../pagamentos/politica.service';
 import { descontoPix, dividir, parcelamentoCartao, vencimentosBoleto, hojeBrasil } from '../pagamentos/regras';
@@ -200,18 +201,38 @@ export class PedidosService {
     }).then((id) => this.detalhe(id, u.empresaId!));
   }
 
-  async listar(f: { empresaId?: string; situacao?: string; situacao_pagamento?: string; pagina?: number; por_pagina?: number }) {
+  /**
+   * Lista de pedidos, dos mais recentes para os mais antigos (ou pela ordem pedida).
+   * Filtros: situação, empresa, perfil do cliente, busca e janela de tempo (últimas N horas ou período de datas).
+   */
+  async listar(f: {
+    empresaId?: string; situacao?: string; situacao_pagamento?: string; pagina?: number; por_pagina?: number;
+    horas?: number; de?: string; ate?: string; tipo_cliente?: string; busca?: string; ordem?: 'recentes' | 'antigos' | 'maior_valor' | 'menor_valor';
+  }) {
     const { limite, deslocamento, pagina } = limites(f, 20);
+    const janela = lerJanela(f);
     let q = this.db.selectFrom('pedidos as p').innerJoin('empresas as e', 'e.id', 'p.empresa_id');
     if (f.empresaId) q = q.where('p.empresa_id', '=', f.empresaId);
     if (f.situacao) q = q.where('p.situacao', '=', f.situacao as never);
     if (f.situacao_pagamento) q = q.where('p.situacao_pagamento', '=', f.situacao_pagamento as never);
+    if (f.tipo_cliente) q = q.where('p.tipo_cliente', '=', f.tipo_cliente);
+    if (janela) q = q.where(sql<boolean>`p.criado_em BETWEEN ${janela.inicio}::timestamptz AND ${janela.fim}::timestamptz`);
+    if (f.busca?.trim()) {
+      const t = f.busca.trim();
+      const termo = `%${t.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+      q = q.where((eb) => eb.or([
+        ...(/^\d{1,12}$/.test(t) ? [eb('p.id', '=', Number(t))] : []),
+        eb('e.razao_social', 'ilike', termo), eb('p.ordem_compra', 'ilike', termo), eb('e.cnpj', 'like', `%${t.replace(/\D/g, '') || '§'}%`),
+      ]));
+    }
+    const ordem = { recentes: ['p.criado_em', 'desc'], antigos: ['p.criado_em', 'asc'], maior_valor: ['p.total_centavos', 'desc'], menor_valor: ['p.total_centavos', 'asc'] } as const;
+    const [col, dir] = ordem[f.ordem ?? 'recentes'];
     const [itens, total] = await Promise.all([
       q.selectAll('p').select(['e.razao_social', sql<number>`(select count(*)::int from pedido_itens i where i.pedido_id = p.id)`.as('qtd_itens')])
-        .orderBy('p.id', 'desc').limit(limite).offset(deslocamento).execute(),
+        .orderBy(col, dir).orderBy('p.id', 'desc').limit(limite).offset(deslocamento).execute(),
       q.select(sql<number>`count(*)::int`.as('n')).executeTakeFirstOrThrow(),
     ]);
-    return { itens, total: total.n, pagina, por_pagina: limite };
+    return { itens, total: total.n, pagina, por_pagina: limite, janela };
   }
 
   /** Detalhe do pedido. `empresaId` presente = acesso de cliente, preso à própria empresa. */

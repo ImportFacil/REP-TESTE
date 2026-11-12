@@ -160,3 +160,17 @@ a.pn-lista-item:hover { background: var(--superficie-2); }
 .pn-matriz td.sim { color: var(--verde); font-weight: 700; text-align: center; }
 .pn-matriz td.nao { color: var(--texto-2); text-align: center; }
 .pn-matriz th.papel { text-align: center; white-space: nowrap; }
+
+/* Atalhos de período (24h, 48h, 72h, semana…) */
+.pn-janela .pn-chips { margin: 0; align-items: center; }
+.pn-janela .pn-chip { padding: 6px 13px; background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); font-weight: 500; }
+.pn-janela .pn-chip.ativo { background: var(--azul); border-color: var(--azul); color: #fff; font-weight: 600; }
+@media print {
+  .pn-topo, .pn-menu, .pn-janela, .pn-ferramentas, .pn-paginacao, .nao-imprimir { display: none !important; }
+  .pn-conteudo { margin: 0 !important; padding: 0 !important; }
+  .pn-caixa { break-inside: avoid; box-shadow: none; }
+}
+.so-impressao { display: none; }
+table.impressao { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 14pt; }
+table.impressao th, table.impressao td { border: 1px solid #999; padding: 3pt 5pt; text-align: left; vertical-align: top; }
+@media print { .so-impressao { display: block; } }

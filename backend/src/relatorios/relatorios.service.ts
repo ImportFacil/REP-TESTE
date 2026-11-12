@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 import { BANCO, type Banco } from '../banco/banco.module';
-import { lerPeriodo } from '../comum/periodo';
+import { lerJanela, lerPeriodo, type Janela } from '../comum/periodo';
+import { hojeBrasil } from '../pagamentos/regras';
 
 export type Agrupamento = 'dia' | 'semana' | 'mes';
 const TRUNC: Record<Agrupamento, string> = { dia: 'day', semana: 'week', mes: 'month' };
@@ -109,4 +110,172 @@ export class RelatoriosService {
       },
     };
   }
+
+  // ======================= pedidos e financeiro por janela de tempo =======================
+
+  /** Janela pedida (últimas N horas ou período); sem nada, os últimos 7 dias. */
+  private janela(f: FiltroJanela): Janela {
+    return lerJanela(f) ?? lerJanela({ horas: 168 })!;
+  }
+
+  /**
+   * Relatório consolidado de pedidos: cada pedido com a descrição dos itens e a situação financeira dele
+   * (pago, em aberto, vencido, reembolsado), mais os totais por cliente e por perfil de cliente.
+   */
+  async pedidos(f: FiltroJanela) {
+    const j = this.janela(f);
+    const hoje = hojeBrasil();
+    const r = await sql<LinhaPedido>`
+      SELECT p.id, p.criado_em, p.empresa_id, e.razao_social, e.cnpj, p.tipo_cliente, u.nome AS comprador, p.situacao, p.situacao_pagamento,
+             p.forma_pagamento, p.parcelas, p.ordem_compra, p.cupom, p.cotacao_id,
+             p.subtotal_centavos, p.promocao_centavos, p.desconto_centavos, p.juros_centavos, p.total_centavos,
+             coalesce(fin.pago, 0)::bigint AS pago_centavos, coalesce(fin.aberto, 0)::bigint AS aberto_centavos,
+             coalesce(fin.vencido, 0)::bigint AS vencido_centavos, coalesce(ree.valor, 0)::bigint AS reembolsado_centavos,
+             -- sem cobrança em aberto: boleto ainda não faturado ou Pix que expirou sem pagamento
+             CASE WHEN p.situacao = 'cancelado' THEN 0
+                  ELSE greatest(p.total_centavos - coalesce(fin.pago, 0) - coalesce(fin.aberto, 0) - coalesce(ree.valor, 0), 0) END AS a_faturar_centavos,
+             coalesce(it.itens, '[]'::json) AS itens, coalesce(it.unidades, 0)::bigint AS unidades
+      FROM pedidos p
+      JOIN empresas e ON e.id = p.empresa_id
+      JOIN usuarios u ON u.id = p.comprador_id
+      LEFT JOIN LATERAL (
+        SELECT sum(coalesce(pa.valor_pago_centavos, pa.valor_centavos)) FILTER (WHERE pa.situacao = 'paga') AS pago,
+               sum(pa.valor_centavos) FILTER (WHERE pa.situacao IN ('aberta', 'vencida')) AS aberto,
+               sum(pa.valor_centavos) FILTER (WHERE pa.situacao IN ('aberta', 'vencida') AND pa.vencimento < ${hoje}::date) AS vencido
+        FROM cobrancas c JOIN parcelas pa ON pa.cobranca_id = c.id WHERE c.pedido_id = p.id AND c.situacao <> 'cancelada'
+      ) fin ON true
+      LEFT JOIN LATERAL (SELECT sum(valor_centavos) AS valor FROM reembolsos WHERE pedido_id = p.id) ree ON true
+      LEFT JOIN LATERAL (
+        SELECT json_agg(json_build_object('codigo', i.codigo, 'nome', i.nome, 'quantidade', i.quantidade, 'unidade', i.unidade,
+                                          'preco_unitario_centavos', i.preco_unitario_centavos, 'total_centavos', i.total_centavos) ORDER BY i.id) AS itens,
+               sum(i.quantidade) AS unidades
+        FROM pedido_itens i WHERE i.pedido_id = p.id
+      ) it ON true
+      WHERE p.criado_em BETWEEN ${j.inicio}::timestamptz AND ${j.fim}::timestamptz
+        ${f.tipo_cliente ? sql`AND p.tipo_cliente = ${f.tipo_cliente}` : sql``}
+        ${f.empresa_id ? sql`AND p.empresa_id = ${f.empresa_id}::uuid` : sql``}
+      ORDER BY p.criado_em DESC, p.id DESC
+      LIMIT 5000`.execute(this.db);
+    const pedidos = r.rows.map((x) => ({
+      ...x, pago_centavos: Number(x.pago_centavos), aberto_centavos: Number(x.aberto_centavos), vencido_centavos: Number(x.vencido_centavos),
+      reembolsado_centavos: Number(x.reembolsado_centavos), unidades: Number(x.unidades), a_faturar_centavos: Number(x.a_faturar_centavos),
+      descricao: x.itens.map((i) => `${i.quantidade} ${i.unidade} ${i.nome} (${i.codigo})`).join('; '),
+    }));
+    const validos = pedidos.filter((p) => p.situacao !== 'cancelado');
+    const somar = (lista: typeof pedidos) => ({
+      pedidos: lista.length, unidades: lista.reduce((s, p) => s + p.unidades, 0),
+      subtotal_centavos: lista.reduce((s, p) => s + p.subtotal_centavos, 0), descontos_centavos: lista.reduce((s, p) => s + p.promocao_centavos + p.desconto_centavos, 0),
+      juros_centavos: lista.reduce((s, p) => s + p.juros_centavos, 0), vendas_centavos: lista.reduce((s, p) => s + p.total_centavos, 0),
+      pago_centavos: lista.reduce((s, p) => s + p.pago_centavos, 0), aberto_centavos: lista.reduce((s, p) => s + p.aberto_centavos, 0),
+      vencido_centavos: lista.reduce((s, p) => s + p.vencido_centavos, 0), reembolsado_centavos: lista.reduce((s, p) => s + p.reembolsado_centavos, 0),
+      a_faturar_centavos: lista.reduce((s, p) => s + p.a_faturar_centavos, 0),
+      ticket_medio_centavos: lista.length ? Math.round(lista.reduce((s, p) => s + p.total_centavos, 0) / lista.length) : 0,
+    });
+    const agrupar = <K extends string>(chave: (p: (typeof pedidos)[number]) => K, extra: (p: (typeof pedidos)[number]) => Record<string, unknown>) => {
+      const m = new Map<K, typeof pedidos>();
+      for (const p of validos) m.set(chave(p), [...(m.get(chave(p)) ?? []), p]);
+      return [...m.entries()].map(([k, lista]) => ({ ...extra(lista[0]), ...somar(lista), ultimo_pedido: lista[0].criado_em, chave: k }))
+        .sort((a, b) => b.vendas_centavos - a.vendas_centavos);
+    };
+    return {
+      janela: j,
+      totais: { ...somar(validos), cancelados: pedidos.length - validos.length, cancelados_centavos: pedidos.filter((p) => p.situacao === 'cancelado').reduce((s, p) => s + p.total_centavos, 0) },
+      por_cliente: agrupar((p) => p.empresa_id, (p) => ({ empresa_id: p.empresa_id, razao_social: p.razao_social, cnpj: p.cnpj, tipo_cliente: p.tipo_cliente })),
+      por_tipo: agrupar((p) => p.tipo_cliente, (p) => ({ tipo_cliente: p.tipo_cliente })),
+      pedidos,
+    };
+  }
+
+  /**
+   * Financeiro de todos os clientes: o que venderam e o que pagaram na janela, e a posição de hoje
+   * (em aberto, vencido, a vencer em 7 dias, maior atraso, limite e crédito disponível).
+   */
+  async financeiro(f: FiltroJanela) {
+    const j = this.janela(f);
+    const hoje = hojeBrasil();
+    const r = await sql<LinhaFinanceiro>`
+      WITH parc AS (
+        SELECT coalesce(p.empresa_id, o.empresa_id) AS empresa_id, c.meio, pa.situacao, pa.vencimento, pa.valor_centavos
+        FROM parcelas pa JOIN cobrancas c ON c.id = pa.cobranca_id
+        LEFT JOIN pedidos p ON p.id = c.pedido_id
+        LEFT JOIN numerarios n ON n.id = c.numerario_id LEFT JOIN ordens_importacao o ON o.id = n.ordem_id
+        WHERE c.situacao <> 'cancelada'
+      ), receb AS (
+        SELECT coalesce(p.empresa_id, o.empresa_id) AS empresa_id, sum(pg.valor_centavos) AS valor, count(*) AS n
+        FROM pagamentos pg JOIN parcelas pa ON pa.id = pg.parcela_id JOIN cobrancas c ON c.id = pa.cobranca_id
+        LEFT JOIN pedidos p ON p.id = c.pedido_id
+        LEFT JOIN numerarios n ON n.id = c.numerario_id LEFT JOIN ordens_importacao o ON o.id = n.ordem_id
+        WHERE pg.pago_em BETWEEN ${j.inicio}::timestamptz AND ${j.fim}::timestamptz GROUP BY 1
+      ), vend AS (
+        SELECT empresa_id, count(*) AS pedidos, sum(total_centavos) AS valor FROM pedidos
+        WHERE situacao <> 'cancelado' AND criado_em BETWEEN ${j.inicio}::timestamptz AND ${j.fim}::timestamptz GROUP BY 1
+      ), ree AS (
+        SELECT p.empresa_id, sum(r.valor_centavos) AS valor FROM reembolsos r JOIN pedidos p ON p.id = r.pedido_id
+        WHERE r.criado_em BETWEEN ${j.inicio}::timestamptz AND ${j.fim}::timestamptz GROUP BY 1
+      ), aguard AS (
+        SELECT empresa_id, sum(total_centavos) AS valor FROM pedidos
+        WHERE forma_pagamento = 'boleto' AND situacao_pagamento = 'aguardando_faturamento' AND situacao <> 'cancelado' GROUP BY 1
+      )
+      SELECT e.id AS empresa_id, e.razao_social, e.cnpj, e.tipo_cliente, e.situacao AS situacao_empresa, cc.faixa,
+             CASE WHEN cc.situacao = 'aprovado' THEN cc.limite_aprovado_centavos ELSE 0 END AS limite_centavos,
+             coalesce(vend.pedidos, 0)::int AS pedidos, coalesce(vend.valor, 0)::bigint AS vendas_centavos,
+             coalesce(receb.valor, 0)::bigint AS recebido_centavos, coalesce(receb.n, 0)::int AS pagamentos,
+             coalesce(ree.valor, 0)::bigint AS reembolsos_centavos,
+             coalesce((SELECT sum(valor_centavos) FROM parc WHERE parc.empresa_id = e.id AND situacao IN ('aberta', 'vencida')), 0)::bigint AS aberto_centavos,
+             coalesce((SELECT sum(valor_centavos) FROM parc WHERE parc.empresa_id = e.id AND situacao IN ('aberta', 'vencida') AND vencimento < ${hoje}::date), 0)::bigint AS vencido_centavos,
+             coalesce((SELECT sum(valor_centavos) FROM parc WHERE parc.empresa_id = e.id AND situacao IN ('aberta', 'vencida')
+                        AND vencimento BETWEEN ${hoje}::date AND ${hoje}::date + 7), 0)::bigint AS a_vencer_7d_centavos,
+             coalesce((SELECT max(${hoje}::date - vencimento) FROM parc WHERE parc.empresa_id = e.id AND situacao IN ('aberta', 'vencida') AND vencimento < ${hoje}::date), 0)::int AS maior_atraso_dias,
+             (coalesce(aguard.valor, 0) + coalesce((SELECT sum(valor_centavos) FROM parc WHERE parc.empresa_id = e.id AND meio = 'boleto' AND situacao IN ('aberta', 'vencida')), 0))::bigint AS credito_usado_centavos
+      FROM empresas e
+      LEFT JOIN cadastros_credito cc ON cc.empresa_id = e.id
+      LEFT JOIN vend ON vend.empresa_id = e.id LEFT JOIN receb ON receb.empresa_id = e.id
+      LEFT JOIN ree ON ree.empresa_id = e.id LEFT JOIN aguard ON aguard.empresa_id = e.id
+      WHERE true ${f.tipo_cliente ? sql`AND e.tipo_cliente = ${f.tipo_cliente}` : sql``} ${f.empresa_id ? sql`AND e.id = ${f.empresa_id}::uuid` : sql``}
+      ORDER BY vencido_centavos DESC, aberto_centavos DESC, e.razao_social`.execute(this.db);
+    const n = (v: unknown) => Number(v ?? 0);
+    const clientes = r.rows.map((x) => {
+      const limite = n(x.limite_centavos);
+      const usado = n(x.credito_usado_centavos);
+      return {
+        ...x, limite_centavos: limite, vendas_centavos: n(x.vendas_centavos), recebido_centavos: n(x.recebido_centavos), reembolsos_centavos: n(x.reembolsos_centavos),
+        aberto_centavos: n(x.aberto_centavos), vencido_centavos: n(x.vencido_centavos), a_vencer_7d_centavos: n(x.a_vencer_7d_centavos),
+        credito_usado_centavos: usado, credito_disponivel_centavos: Math.max(0, limite - usado),
+      };
+    });
+    const soma = (k: keyof (typeof clientes)[number]) => clientes.reduce((s, c) => s + Number(c[k] ?? 0), 0);
+    const porTipo = new Map<string, { tipo_cliente: string; empresas: number; vendas_centavos: number; recebido_centavos: number; aberto_centavos: number; vencido_centavos: number }>();
+    for (const c of clientes) {
+      const t = porTipo.get(c.tipo_cliente) ?? { tipo_cliente: c.tipo_cliente, empresas: 0, vendas_centavos: 0, recebido_centavos: 0, aberto_centavos: 0, vencido_centavos: 0 };
+      t.empresas++; t.vendas_centavos += c.vendas_centavos; t.recebido_centavos += c.recebido_centavos; t.aberto_centavos += c.aberto_centavos; t.vencido_centavos += c.vencido_centavos;
+      porTipo.set(c.tipo_cliente, t);
+    }
+    return {
+      janela: j,
+      totais: {
+        empresas: clientes.length, pedidos: soma('pedidos'), vendas_centavos: soma('vendas_centavos'), recebido_centavos: soma('recebido_centavos'),
+        reembolsos_centavos: soma('reembolsos_centavos'), aberto_centavos: soma('aberto_centavos'), vencido_centavos: soma('vencido_centavos'),
+        a_vencer_7d_centavos: soma('a_vencer_7d_centavos'), limite_centavos: soma('limite_centavos'), credito_disponivel_centavos: soma('credito_disponivel_centavos'),
+        empresas_com_atraso: clientes.filter((c) => c.vencido_centavos > 0).length,
+      },
+      por_tipo: [...porTipo.values()].sort((a, b) => b.vendas_centavos - a.vendas_centavos),
+      clientes,
+    };
+  }
+}
+
+export interface FiltroJanela { horas?: number; de?: string; ate?: string; tipo_cliente?: string; empresa_id?: string }
+
+interface LinhaPedido {
+  id: number; criado_em: string; empresa_id: string; razao_social: string; cnpj: string; tipo_cliente: string; comprador: string; situacao: string; situacao_pagamento: string;
+  forma_pagamento: string; parcelas: number; ordem_compra: string | null; cupom: string | null; cotacao_id: number | null;
+  subtotal_centavos: number; promocao_centavos: number; desconto_centavos: number; juros_centavos: number; total_centavos: number;
+  pago_centavos: string; aberto_centavos: string; vencido_centavos: string; reembolsado_centavos: string; unidades: string; a_faturar_centavos: string;
+  itens: Array<{ codigo: string; nome: string; quantidade: number; unidade: string; preco_unitario_centavos: number; total_centavos: number }>;
+}
+
+interface LinhaFinanceiro {
+  empresa_id: string; razao_social: string; cnpj: string; tipo_cliente: string; situacao_empresa: string; faixa: string | null; limite_centavos: string;
+  pedidos: number; vendas_centavos: string; recebido_centavos: string; pagamentos: number; reembolsos_centavos: string; aberto_centavos: string;
+  vencido_centavos: string; a_vencer_7d_centavos: string; maior_atraso_dias: number; credito_usado_centavos: string;
 }

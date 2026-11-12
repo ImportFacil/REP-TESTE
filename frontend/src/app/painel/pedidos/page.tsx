@@ -1,20 +1,22 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEu } from '@/components/Shell';
+import { FiltroJanela, useJanela } from '@/components/painel/FiltroJanela';
 import { Grade, type Coluna } from '@/components/painel/Grade';
 import { Situacao } from '@/components/ui';
 import { api } from '@/lib/api';
-import { FORMA, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, data, reais } from '@/lib/formato';
+import { FORMA, NOMES_TIPO, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, dataHora, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
-interface Linha { id: number; razao_social: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string; ordem_compra: string | null; cotacao_id: number | null }
+interface Linha { id: number; razao_social: string; tipo_cliente: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string; ordem_compra: string | null; cotacao_id: number | null }
 
 const COLUNAS: Coluna<Linha>[] = [
   { chave: 'id', titulo: 'Nº', ordenavel: true, render: (p) => <b>{p.id}</b> },
   { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'opcoes',
     render: (p) => <>{p.razao_social}{(p.ordem_compra || p.cotacao_id) && <div className="pequeno muted">{p.ordem_compra ? `OC ${p.ordem_compra}` : ''}{p.ordem_compra && p.cotacao_id ? ' · ' : ''}{p.cotacao_id ? `cotação ${p.cotacao_id}` : ''}</div>}</> },
   { chave: 'ordem_compra', titulo: 'Ordem de compra', filtro: 'texto', oculta: true },
-  { chave: 'criado_em', titulo: 'Data', ordenavel: true, filtro: 'data', render: (p) => data(p.criado_em), valorCsv: (p) => data(p.criado_em) },
+  { chave: 'tipo_cliente', titulo: 'Perfil', filtro: 'opcoes', opcoes: NOMES_TIPO, render: (p) => NOMES_TIPO[p.tipo_cliente] ?? p.tipo_cliente, valorCsv: (p) => NOMES_TIPO[p.tipo_cliente] ?? p.tipo_cliente },
+  { chave: 'criado_em', titulo: 'Data e hora', ordenavel: true, filtro: 'data', render: (p) => dataHora(p.criado_em), valorCsv: (p) => dataHora(p.criado_em) },
   { chave: 'forma_pagamento', titulo: 'Pagamento', filtro: 'opcoes', opcoes: FORMA,
     render: (p) => <>{FORMA[p.forma_pagamento]}{p.forma_pagamento !== 'pix' ? ` ${p.parcelas}×` : ''}</>, valorCsv: (p) => `${FORMA[p.forma_pagamento]} ${p.parcelas}x` },
   { chave: 'situacao_pagamento', titulo: 'Situação do pagamento', filtro: 'opcoes', opcoes: SITUACAO_PAGAMENTO,
@@ -28,7 +30,8 @@ const COLUNAS: Coluna<Linha>[] = [
 export default function PedidosPainel() {
   const router = useRouter();
   const { eu } = useEu();
-  const { dados, carregando, recarregar } = useDados<{ itens: Linha[]; total: number }>('/equipe/pedidos?por_pagina=1000');
+  const { janela, mudar, consulta, pronto } = useJanela('todos', true);
+  const { dados, carregando, recarregar } = useDados<{ itens: Linha[]; total: number; janela: { rotulo: string } | null }>(pronto ? `/equipe/pedidos?por_pagina=1000&${consulta}` : null);
   const fin = ['financeiro', 'administrador'].includes(eu.usuario.papel);
   const emLote = async (linhas: Linha[], caminho: (p: Linha) => string) => {
     const erros: string[] = [];
@@ -39,13 +42,14 @@ export default function PedidosPainel() {
   return (
     <Grade
       titulo="Pedidos"
-      sub={dados ? `${dados.total} pedido(s)` : ' '}
+      sub={dados ? `${dados.total} pedido(s)${dados.janela ? ` · ${dados.janela.rotulo}` : ''}${janela.tipo ? ` · ${NOMES_TIPO[janela.tipo]}` : ''}, dos mais recentes para os mais antigos${dados.total > 1000 ? ' (os 1.000 mais recentes aparecem aqui; use o período para ver os outros)' : ''}` : ' '}
+      topo={<FiltroJanela janela={janela} mudar={mudar} comTodos />}
       linhas={dados?.itens}
       carregando={carregando}
       colunas={COLUNAS}
       chave={(p) => p.id}
       aoClicar={(p) => router.push(`/painel/pedido/?id=${p.id}`)}
-      ordemInicial={{ chave: 'id', dir: 'desc' }}
+      ordemInicial={{ chave: 'criado_em', dir: 'desc' }}
       nomeArquivo="pedidos"
       vazio="Nenhum pedido."
       acoesLote={[

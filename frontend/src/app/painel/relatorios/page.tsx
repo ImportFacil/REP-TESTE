@@ -2,13 +2,16 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { GraficoBarras } from '@/components/painel/GraficoBarras';
+import { RelatorioFinanceiro } from '@/components/painel/RelatorioFinanceiro';
+import { RelatorioPedidos } from '@/components/painel/RelatorioPedidos';
+import { useEu } from '@/components/Shell';
 import { Grade, type Coluna } from '@/components/painel/Grade';
 import { Aviso, Carregando } from '@/components/ui';
 import { data, dataHora, FORMA, NOMES_TIPO, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 import { PERIODOS, ROTULO_PERIODO } from '@/lib/periodos';
 
-type Aba = 'vendas' | 'produtos' | 'clientes';
+type Aba = 'vendas' | 'pedidos' | 'financeiro' | 'produtos' | 'clientes';
 interface LinhaVendas { periodo: string; pedidos: number; subtotal_centavos: number; promocoes_centavos: number; descontos_pix_centavos: number; juros_centavos: number; vendas_centavos: number; reembolsos_centavos: number; liquido_centavos: number; ticket_medio_centavos: number }
 interface Vendas {
   periodo: { de: string; ate: string; agrupar: string };
@@ -22,7 +25,7 @@ interface Produtos { produtos: LinhaProduto[]; categorias: Array<{ categoria_id:
 interface LinhaCliente { empresa_id: string; razao_social: string; cnpj: string; tipo_cliente: string; situacao: string; pedidos: number; vendas_centavos: number; ticket_medio_centavos: number; ultimo_pedido: string | null; primeiro_pedido: string | null }
 interface Clientes { clientes: LinhaCliente[]; totais: { empresas: number; compraram: number; primeira_compra_no_periodo: number; novas_empresas: number; vendas_centavos: number } }
 
-const ABAS: Record<Aba, string> = { vendas: 'Vendas', produtos: 'Produtos', clientes: 'Clientes' };
+const ABAS: Record<Aba, string> = { vendas: 'Vendas', pedidos: 'Pedidos por cliente', financeiro: 'Financeiro dos clientes', produtos: 'Produtos', clientes: 'Clientes' };
 const AGRUPAR: Record<string, string> = { dia: 'Por dia', semana: 'Por semana', mes: 'Por mês' };
 const csv = (c: number) => (c / 100).toFixed(2).replace('.', ',');
 const rotuloPeriodo = (p: string, g: string) => (g === 'mes' ? `${p.slice(5, 7)}/${p.slice(2, 4)}` : `${p.slice(8, 10)}/${p.slice(5, 7)}`);
@@ -70,6 +73,8 @@ const COL_CLIENTES: Coluna<LinhaCliente>[] = [
 /** Relatórios (como no Bagisto): vendas, produtos e clientes de um período, com gráfico e exportação. */
 export default function Relatorios() {
   const router = useRouter();
+  const { eu } = useEu();
+  const fin = ['financeiro', 'administrador'].includes(eu.usuario.papel);
   const [aba, setAba] = useState<Aba>('vendas');
   const [periodo, setPeriodo] = useState('30');
   const [agrupar, setAgrupar] = useState('dia');
@@ -85,20 +90,25 @@ export default function Relatorios() {
   const clientes = useDados<Clientes>(aba === 'clientes' ? `/equipe/relatorios/clientes?${qs}` : null);
   const erro = vendas.erro ?? produtos.erro ?? clientes.erro;
   const trocar = (a: Aba) => { setAba(a); history.replaceState(null, '', `?aba=${a}`); };
+  const abas = (Object.keys(ABAS) as Aba[]).filter((a) => a !== 'financeiro' || fin);
+  const janelaPropria = aba === 'pedidos' || aba === 'financeiro';
 
   return (
     <>
       <div className="pn-cabecalho">
         <div><h1>Relatórios</h1><p className="sub muted">Pedidos cancelados não contam como venda. Valores do período escolhido, no fuso de Brasília.</p></div>
-        <div className="pn-cabecalho-acoes" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div className="pn-cabecalho-acoes" style={{ display: janelaPropria ? 'none' : 'flex', flexWrap: 'wrap', gap: 8 }}>
           <select style={{ width: 'auto' }} value={periodo} onChange={(e) => setPeriodo(e.target.value)} aria-label="Período">{Object.entries(ROTULO_PERIODO).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           {aba === 'vendas' && <select style={{ width: 'auto' }} value={agrupar} onChange={(e) => setAgrupar(e.target.value)} aria-label="Agrupar">{Object.entries(AGRUPAR).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>}
         </div>
       </div>
-      <div className="pn-abas" role="tablist" style={{ marginBottom: 16 }}>
-        {(Object.keys(ABAS) as Aba[]).map((a) => <button key={a} role="tab" aria-selected={aba === a} className={`botao ${aba === a ? '' : 'leve'}`} onClick={() => trocar(a)}>{ABAS[a]}</button>)}
+      <div className="pn-abas nao-imprimir" role="tablist" style={{ marginBottom: 16 }}>
+        {abas.map((a) => <button key={a} role="tab" aria-selected={aba === a} className={`botao ${aba === a ? '' : 'leve'}`} onClick={() => trocar(a)}>{ABAS[a]}</button>)}
       </div>
       <Aviso tipo="erro">{erro}</Aviso>
+
+      {aba === 'pedidos' && <RelatorioPedidos />}
+      {aba === 'financeiro' && fin && <RelatorioFinanceiro />}
 
       {aba === 'vendas' && (!vendas.dados ? <Carregando /> : (
         <>
