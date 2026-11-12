@@ -34,9 +34,44 @@
   .rota-trocar { justify-self: start; }
 }
 
-/* pino de localização dos portos: a ponta do pino fica sobre o porto */
-/* a Globe.gl centraliza o elemento no porto; o pino sobe metade da própria altura para a ponta tocar o porto */
-.rota-pino { display: flex; flex-direction: column; align-items: center; transform: translateY(-50%); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 0 6px rgba(255, 200, 61, .9)) drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
-.rota-pino-rotulo { display: flex; flex-direction: column; align-items: center; margin-bottom: 3px; padding: 3px 9px; border-radius: 8px; background: rgba(10, 18, 32, .82); border: 1px solid rgba(255, 200, 61, .7); color: #fff; line-height: 1.15; white-space: nowrap; }
-.rota-pino-rotulo small { font-size: 0.62rem; text-transform: uppercase; letter-spacing: .06em; color: #ffd66b; }
-.rota-pino-rotulo b { font-size: 0.82rem; }
+/* pino de localização dos portos: branco e pequeno. A Globe.gl centraliza o elemento no porto;
+   o pino sobe metade da própria altura para a ponta tocar o porto. */
+.rota-pino { display: flex; flex-direction: column; align-items: center; transform: translateY(-50%); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); }
+.rota-pino-rotulo { margin-bottom: 2px; padding: 1px 7px; border-radius: 6px; background: rgba(0, 0, 17, .7); color: #fff; font-size: 0.72rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
+
+/* ---------- página Rotas marítimas: o globo é o fundo de toda a área da página ---------- */
+.rota-fundo, .rota-cena { position: fixed; top: var(--pn-topo); right: 0; bottom: 0; left: var(--pn-menu); }
+.pn-recolhido .rota-fundo, .pn-recolhido .rota-cena { left: var(--pn-menu-recolhido); }
+.rota-fundo { z-index: 1; background: #000011; }
+.rota-globo-fundo { height: 100%; background: #000011; }
+.rota-cena {
+  z-index: 2; overflow-y: auto; padding: 20px 24px 16px; display: flex; flex-direction: column; gap: 14px;
+  pointer-events: none; /* o arrasto passa para o globo; só os painéis recebem o clique */
+  color: #fff;
+  --texto: #ffffff; --texto-2: #b9c6da; --borda: rgba(255, 255, 255, .22); --superficie: rgba(255, 255, 255, .08); --superficie-2: rgba(255, 255, 255, .08);
+}
+.rota-cena > * > *, .rota-rodape { pointer-events: auto; }
+.rota-topo { display: flex; flex-direction: column; gap: 12px; }
+.rota-titulo h1 { margin: 0; font-size: 1.5rem; text-shadow: 0 1px 6px rgba(0, 0, 0, .8); }
+.rota-titulo p { margin: 4px 0 0; color: #c9d4e6; font-size: 0.95rem; text-shadow: 0 1px 6px rgba(0, 0, 0, .9); }
+.rota-vidro { background: rgba(6, 10, 26, .66); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 16px 18px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.rota-cena input { color: #fff; color-scheme: dark; }
+.rota-cena input::placeholder { color: #8f9db3; }
+.rota-cena .rota-trocar { height: 42px; width: 44px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .08); color: #fff; font-size: 1.2rem; cursor: pointer; }
+.rota-cena .rota-trocar:hover { background: rgba(255, 255, 255, .18); }
+.rota-cena .rota-evitar input { accent-color: #ffc83d; }
+.rota-erro { border-color: rgba(255, 120, 120, .6); color: #ffd4d4; }
+.rota-meio { flex: 1; display: flex; justify-content: flex-end; align-items: flex-start; min-height: 0; }
+.rota-resultado { width: min(340px, 100%); }
+.rota-resultado h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.rota-resultado h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .04em; color: #ffd66b; margin: 14px 0 6px; }
+.rota-resultado .rota-numeros b { color: #fff; }
+.rota-fraco, .rota-portos { margin: 0; font-size: 0.88rem; color: #c9d4e6; }
+.rota-portos b { color: #fff; }
+.rota-rodape { margin: 0; max-width: 760px; font-size: 0.76rem; line-height: 1.45; color: #a9b6cb; text-shadow: 0 1px 4px rgba(0, 0, 0, .9); }
+@media (max-width: 900px) {
+  .rota-fundo, .rota-cena, .pn-recolhido .rota-fundo, .pn-recolhido .rota-cena { left: 0; }
+  .rota-cena { padding: 14px; }
+  .rota-meio { justify-content: stretch; align-items: flex-end; min-height: 46vh; }
+  .rota-resultado { width: 100%; }
+}

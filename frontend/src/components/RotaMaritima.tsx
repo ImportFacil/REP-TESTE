@@ -45,32 +45,31 @@ export function CampoPorto({ id, rotulo, porto, principais, escolher }: { id: st
 
 const ALTURA_NUVENS = 0.004;
 const ALTURA_ROTA = 0.012; // acima das nuvens
-interface Camada { cor: string; traco: number; pulso?: boolean }
-/** Neon dourado: do halo mais largo e transparente ao miolo quase branco; por último, o pulso de luz. */
+interface Camada { cor: string; traco: number; base?: boolean }
+/** Neon dourado: halo contínuo em três camadas e, por cima, o miolo claro em traços que correm pela rota. */
 const CAMADAS_NEON: Camada[] = [
-  { cor: 'rgba(255, 190, 40, 0.10)', traco: 22 },
-  { cor: 'rgba(255, 200, 60, 0.22)', traco: 13 },
-  { cor: 'rgba(255, 214, 90, 0.55)', traco: 7 },
-  { cor: '#ffe9a6', traco: 2.6 },
-  { cor: '#fffdf2', traco: 3.6, pulso: true },
+  { cor: 'rgba(255, 190, 40, 0.10)', traco: 22, base: true },
+  { cor: 'rgba(255, 200, 60, 0.20)', traco: 13, base: true },
+  { cor: 'rgba(255, 210, 80, 0.40)', traco: 7, base: true },
+  { cor: '#fff1b8', traco: 3.2 },
 ];
 
-/** Pino de localização dourado com o nome do porto (a ponta fica exatamente sobre o porto). */
+/** Pino de localização branco e pequeno, com o nome do porto (a ponta fica exatamente sobre o porto). */
 function pino(p: Porto & { papel: string }): HTMLElement {
   const el = document.createElement('div');
   el.innerHTML = `<div class="rota-pino">
-    <span class="rota-pino-rotulo"><small></small><b></b></span>
-    <svg viewBox="0 0 24 32" width="30" height="40" aria-hidden="true">
-      <path d="M12 31C12 31 2 19.5 2 11.5a10 10 0 1 1 20 0C22 19.5 12 31 12 31z" fill="#ffc83d" stroke="#fff6d6" stroke-width="1.6"/>
-      <circle cx="12" cy="11.5" r="4" fill="#3a2600"/>
+    <span class="rota-pino-rotulo"></span>
+    <svg viewBox="0 0 24 32" width="18" height="24" aria-hidden="true">
+      <path d="M12 31C12 31 2 19.5 2 11.5a10 10 0 1 1 20 0C22 19.5 12 31 12 31z" fill="#ffffff" stroke="rgba(0,0,17,.55)" stroke-width="1.2"/>
+      <circle cx="12" cy="11.5" r="3.6" fill="#000011"/>
     </svg></div>`;
-  (el.querySelector('small') as HTMLElement).textContent = p.papel;
-  (el.querySelector('b') as HTMLElement).textContent = p.nome;
+  (el.querySelector('.rota-pino-rotulo') as HTMLElement).textContent = p.nome;
+  (el.firstElementChild as HTMLElement).title = `${p.papel}: ${p.nome}`;
   return el;
 }
 
 /** Globo 3D (Globe.gl, MIT): Terra com relevo e nuvens, a rota em neon dourado e um pino em cada porto. */
-export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number }) {
+export function GloboRota({ rota, altura, fundo }: { rota: Rota | null; altura?: number; /** Ocupa todo o espaço do pai e gira sozinho, como no exemplo "clouds" da Globe.gl. */ fundo?: boolean }) {
   const caixa = useRef<HTMLDivElement>(null);
   const globo = useRef<{ g: unknown } | null>(null);
   const [erro, setErro] = useState('');
@@ -88,17 +87,19 @@ export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number
         const g: any = new (Globe as any)(el, { animateIn: false });
         // Terra com relevo e camada de nuvens (modelo do exemplo "clouds" da Globe.gl)
         g.globeImageUrl('/globo/terra-relevo.jpg').bumpImageUrl('/globo/topografia.png')
-          .backgroundColor('rgba(0,0,0,0)').showAtmosphere(true).atmosphereColor('#8ec5ff').atmosphereAltitude(0.16)
+          .backgroundColor(fundo ? '#000011' : 'rgba(0,0,0,0)')
           .width(el.clientWidth).height(el.clientHeight)
           // rota em neon dourado: três camadas (halo largo, brilho, miolo claro) e um pulso de luz percorrendo o trajeto
           .pathPoints('pontos').pathPointLat((p: number[]) => p[1]).pathPointLng((p: number[]) => p[0]).pathPointAlt((p: number[]) => p[2])
           .pathColor((d: Camada) => d.cor).pathStroke((d: Camada) => d.traco)
-          .pathDashLength((d: Camada) => (d.pulso ? 0.08 : 1)).pathDashGap((d: Camada) => (d.pulso ? 0.92 : 0))
-          .pathDashAnimateTime((d: Camada) => (d.pulso ? 9000 : 0)).pathTransitionDuration(0)
+          // o mesmo movimento do globo anterior: traços curtos correndo da saída para a chegada
+          .pathDashLength((d: Camada) => (d.base ? 1 : 0.02)).pathDashGap((d: Camada) => (d.base ? 0 : 0.006))
+          .pathDashAnimateTime((d: Camada) => (d.base ? 0 : 60000)).pathTransitionDuration(0)
           // pinos de localização nos portos de saída e de chegada
           .htmlLat('lat').htmlLng('lon').htmlAltitude(ALTURA_ROTA).htmlElement((d: Porto & { papel: string }) => pino(d))
           .htmlElementVisibilityModifier((e: HTMLElement, visivel: boolean) => { e.style.opacity = visivel ? '1' : '0'; });
-        g.controls().autoRotate = false;
+        g.controls().autoRotate = !!fundo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        g.controls().autoRotateSpeed = 0.35;
         g.controls().enableZoom = true;
         let nuvens: { rotation: { y: number } } | null = null;
         let quadro = 0;
@@ -134,15 +135,15 @@ export function GloboRota({ rota, altura }: { rota: Rota | null; altura?: number
     g.pathsData(CAMADAS_NEON.map((c, k) => ({ ...c, pontos: rota.linha.map(([lon, lat]) => [lon, lat, ALTURA_ROTA + k * 0.0015]) })))
       .htmlElementsData([{ ...rota.origem, papel: 'Saída' }, { ...rota.destino, papel: 'Chegada' }]);
     const meio = rota.linha[Math.floor(rota.linha.length / 2)];
-    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: 1.9 }, 900);
-  }, [rota, pronto]);
+    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: fundo ? 3.7 : 1.9 }, 900);
+  }, [rota, pronto, fundo]);
 
   return (
-    <div className="rota-globo" style={altura ? { height: altura } : undefined}>
+    <div className={fundo ? 'rota-globo rota-globo-fundo' : 'rota-globo'} style={altura ? { height: altura } : undefined}>
       <div ref={caixa} className="rota-globo-tela" role="img"
         aria-label={rota ? `Globo com a rota marítima de ${rota.origem.nome} a ${rota.destino.nome}: ${n(rota.distancia_mn)} milhas náuticas` : 'Globo terrestre'} />
       {erro && <p className="rota-globo-erro">Este navegador não conseguiu desenhar o globo 3D ({erro}). Os números da rota continuam valendo.</p>}
-      <span className="rota-globo-dica">Arraste para girar · role para aproximar</span>
+      {!fundo && <span className="rota-globo-dica">Arraste para girar · role para aproximar</span>}
     </div>
   );
 }
