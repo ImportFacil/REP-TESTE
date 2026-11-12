@@ -19,22 +19,12 @@ export interface ItemPainel {
 
 interface Avisos { geral: { parcelas_vencidas: number }; contagens?: Record<string, number> }
 
-/** Tema escolhido no Painel (claro/escuro); sem escolha, segue o aparelho. */
-function useTema() {
-  const [tema, setTema] = useState<'claro' | 'escuro' | ''>('');
+/** Sem botão de tema no Painel: segue o aparelho. Apaga a escolha antiga de claro/escuro de quem já tinha usado o botão. */
+function useTemaDoAparelho() {
   useEffect(() => {
-    let t = '';
-    try { t = localStorage.getItem('importfacil:tema') ?? ''; } catch { /* sem armazenamento */ }
-    if (t === 'claro' || t === 'escuro') { setTema(t); document.documentElement.dataset.tema = t; }
+    try { localStorage.removeItem('importfacil:tema'); } catch { /* sem armazenamento */ }
+    delete document.documentElement.dataset.tema;
   }, []);
-  const alternar = () => {
-    const atual = tema || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro');
-    const novo = atual === 'escuro' ? 'claro' : 'escuro';
-    setTema(novo);
-    document.documentElement.dataset.tema = novo;
-    try { localStorage.setItem('importfacil:tema', novo); } catch { /* sem armazenamento */ }
-  };
-  return { escuro: tema === 'escuro', alternar };
 }
 
 /** Estrutura do Painel da equipe no formato do Bagisto: barra superior, menu lateral com grupos e o conteúdo. */
@@ -49,7 +39,7 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
   const [recolhido, setRecolhido] = useState(false);  // menu só com ícones
   const [menuUsuario, setMenuUsuario] = useState(false);
   const [notificacoes, setNotificacoes] = useState(false);
-  const { escuro, alternar } = useTema();
+  useTemaDoAparelho();
   const { dados: avisos } = useDados<Avisos>('/equipe/painel/avisos');
 
   useEffect(() => { setAberto(false); setMenuUsuario(false); setNotificacoes(false); }, [caminho]);
@@ -109,8 +99,6 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
         <Busca itens={visiveis} />
         <div className="pn-topo-acoes">
           {ambiente && <span className="pn-ambiente">{ambiente === 'demonstracao' ? 'Demonstração' : ambiente === 'local' ? 'Ambiente local' : ambiente === 'homolog' ? 'Homologação' : ambiente}</span>}
-          <button className="pn-icone-botao" onClick={alternar} aria-label={escuro ? 'Usar tema claro' : 'Usar tema escuro'} title="Tema claro ou escuro"><Icone nome={escuro ? 'sol' : 'lua'} /></button>
-          <Link className="pn-icone-botao" href="/app/" aria-label="Baixar o app" title="Baixar o app"><Icone nome="celular" /></Link>
           <div className="pn-suspenso-ancora">
             <button className="pn-icone-botao" onClick={() => { setNotificacoes(!notificacoes); setMenuUsuario(false); }} aria-label={`Avisos: ${totalAlertas}`} aria-expanded={notificacoes} title="Avisos">
               <Icone nome="sino" />{totalAlertas > 0 && <span className="pn-bolinha">{totalAlertas > 99 ? '99+' : totalAlertas}</span>}
