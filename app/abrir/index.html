@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImportFácil — abrir o protótipo</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f6f5f1; color: #1c2430; }
+  main { max-width: 460px; padding: 28px 24px; text-align: center; }
+  h1 { font-size: 1.3rem; margin: 0 0 10px; }
+  p { line-height: 1.5; color: #4a5565; }
+  a.botao { display: inline-block; margin-top: 14px; padding: 12px 20px; border-radius: 8px; background: #2a78d6; color: #fff; text-decoration: none; font-weight: 600; }
+  small { display: block; margin-top: 18px; color: #6b7482; }
+  @media (prefers-color-scheme: dark) { body { background: #12171f; color: #e8ecf2; } p { color: #aab3c0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="titulo">Procurando o protótipo…</h1>
+  <p id="texto">Um instante.</p>
+  <a id="botao" class="botao" hidden>Abrir o protótipo</a>
+  <small id="pe"></small>
+</main>
+<script>
+/* Endereço fixo do protótipo: lê o estado publicado pelo Codespace (ramo app-endereco) e leva ao link que está no ar.
+   O link do túnel muda cada vez que o Codespace liga; este endereço não muda. */
+(function () {
+  var ESTADO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/estado.json';
+  var el = function (id) { return document.getElementById(id); };
+  function mostrar(titulo, texto) { el('titulo').textContent = titulo; el('texto').textContent = texto; }
+  function ver() {
+    fetch(ESTADO + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      var base = d.link_alternativo || d.url;
+      var minutos = Math.round((Date.now() - new Date(d.atualizado).getTime()) / 60000);
+      el('pe').textContent = 'Último sinal do Codespace: há ' + minutos + ' min.';
+      if (d.fase === 'no_ar' && base) {
+        var destino = base + '/entrar/';
+        el('botao').href = destino; el('botao').hidden = false;
+        if (minutos <= 20) { mostrar('Abrindo o protótipo…', 'Se não abrir sozinho, use o botão.'); location.replace(destino); }
+        else mostrar('O Codespace pode estar desligado', 'O último sinal dele é antigo. Tente o botão; se der erro, ligue o Codespace em github.com/codespaces e volte aqui em 3 minutos.');
+      } else if (d.fase === 'instalando') {
+        mostrar('O protótipo está ligando', 'Esta página tenta de novo sozinha a cada 20 segundos.'); setTimeout(ver, 20000);
+      } else {
+        mostrar('O protótipo está desligado', 'Ligue o Codespace em github.com/codespaces e volte aqui em 3 minutos.'); setTimeout(ver, 30000);
+      }
+    }).catch(function () { mostrar('Não consegui consultar o endereço', 'Confira a conexão e recarregue a página.'); });
+  }
+  ver();
+})();
+</script>
+</body>
+</html>
