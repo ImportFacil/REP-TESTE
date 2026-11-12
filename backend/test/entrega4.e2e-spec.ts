@@ -127,6 +127,9 @@ describe('câmbio', () => {
     expect(h.body).toHaveLength(2);
     const atual = await api().get('/equipe/configuracoes/cambio/atual').set('Authorization', await como(COM, 'equipe')).expect(200);
     expect(atual.body).toEqual([{ moeda: 'USD', data: '2026-11-10', taxa: 5.3875 }]);
+    // dólar do dia da calculadora: nos testes o Banco Central não é consultado, então vale a última cotação cadastrada
+    const dia = await api().get('/equipe/configuracoes/cambio/dolar-do-dia').set('Authorization', await como(COM, 'equipe')).expect(200);
+    expect(dia.body).toEqual({ moeda: 'USD', data: '2026-11-10', taxa: 5.3875, fonte: 'PTAX venda', origem: 'cadastro' });
   });
 });
 

@@ -114,6 +114,10 @@ export class ConfiguracoesController {
   @ApiOperation({ summary: 'Cotação mais recente de cada moeda' })
   cambioAtual() { return this.cfg.cambioAtual(); }
 
+  @Get('cambio/dolar-do-dia')
+  @ApiOperation({ summary: 'Dólar do dia (PTAX de venda do Banco Central; sem resposta, a última cotação cadastrada)' })
+  dolarDoDia() { return this.cfg.dolarDoDia(); }
+
   @Post('cambio')
   @SoEquipe('financeiro', 'administrador')
   registrarCambio(@UsuarioAtual() u: UsuarioAutenticado, @Body() d: CambioDto, @Ip() ip: string) { return this.cfg.registrarCambio(d, u, ip); }

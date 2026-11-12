@@ -303,6 +303,12 @@ try {
   await page.evaluate(() => localStorage.removeItem('importfacil:calculadora'));
   await page.reload(); await page.getByText('Resumo do embarque').waitFor();
   const linha = (t) => page.locator('.calc-linha', { hasText: t }).first().locator('span').last().innerText();
+  // ao abrir, os três câmbios vêm com o dólar do dia; com o câmbio da planilha (5,45) os números são os do protótipo
+  await page.locator('#calcDolar').waitFor({ timeout: 15000 });
+  const dolar = (await page.locator('#calcDolar b').innerText()).replace('R$', '').trim();
+  const cambios = await Promise.all(['#cDI', '#cFr', '#cPg'].map((c) => page.locator(c).inputValue()));
+  for (const c of ['#cDI', '#cFr', '#cPg']) await page.locator(c).fill('5,45');
+  await page.waitForTimeout(200);
   const desembolso = await linha('Desembolso total');
   const menu = await page.locator('.pn-menu').getByRole('link', { name: 'Calculadora de importação' }).isVisible();
   await page.screenshot({ path: `${saida}/64-calculadora.png`, fullPage: true });
@@ -312,8 +318,8 @@ try {
   await page.locator('.calc-ncm-op').first().waitFor({ timeout: 15000 });
   const codigo = await page.locator('.calc-ncm-op .calc-ncm-cod').first().innerText();
   await page.screenshot({ path: `${saida}/65-calculadora-ncm.png` });
-  checar('calculadora', menu && /3\.978\.913,88/.test(desembolso) && depois !== desembolso && /^8806\./.test(codigo),
-    `no menu Importação; contêiner 20': desembolso ${desembolso}; com 4 unidades ${depois}; NCM sugerido ${codigo}`);
+  checar('calculadora', menu && cambios.every((c) => c === dolar) && /3\.978\.913,88/.test(desembolso) && depois !== desembolso && /^8806\./.test(codigo),
+    `no menu Importação; abre com o dólar do dia (R$ ${dolar}); contêiner 20' a 5,45: desembolso ${desembolso}; com 4 unidades ${depois}; NCM sugerido ${codigo}`);
 } catch (e) { checar('calculadora', false, e.message.split('\n')[0]); }
 await ctx.close();
 

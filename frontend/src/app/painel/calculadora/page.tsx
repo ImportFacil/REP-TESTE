@@ -114,14 +114,21 @@ export default function Calculadora() {
   const [abas, setAbas] = useState<{ arquivo: string; abas: Array<{ nome: string; R: AbaLida }> } | null>(null);
   const [buscaNcm, setBuscaNcm] = useState<number | null>(null);
   const [tabela, setTabela] = useState<TabelaNcm | null>(null);
-  const cambio = useDados<Array<{ moeda: string; data: string; taxa: number }>>('/equipe/configuracoes/cambio/atual');
-  const dolar = cambio.dados?.find((c) => c.moeda === 'USD');
+  // dólar do dia: PTAX de venda do Banco Central (sem resposta, a última cotação de Configurações → Câmbio)
+  const { dados: dolar } = useDados<{ data: string; taxa: number; fonte: string; origem: 'banco_central' | 'cadastro' } | null>('/equipe/configuracoes/cambio/dolar-do-dia');
+  const dolarAplicado = useRef(false);
 
   useEffect(() => {
     try { const r = restaurar(JSON.parse(localStorage.getItem(CHAVE) ?? 'null')); if (r) setS(r); } catch { /* sem armazenamento */ }
     setLido(true);
     carregarNcm().then(setTabela, () => undefined);
   }, []);
+  // Ao abrir, os três câmbios já vêm com o dólar do dia (dá para trocar depois; uma planilha anexada traz os dela).
+  useEffect(() => {
+    if (!lido || !dolar || dolarAplicado.current) return;
+    dolarAplicado.current = true;
+    setS((a) => ({ ...a, cambioDI: dolar.taxa, cambioFrete: dolar.taxa, cambioPag: dolar.taxa }));
+  }, [lido, dolar]);
   useEffect(() => { if (lido) { try { localStorage.setItem(CHAVE, JSON.stringify(s)); } catch { /* sem armazenamento */ } } }, [s, lido]);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(''), 6000); return () => clearTimeout(t); }, [aviso]);
 
@@ -228,10 +235,14 @@ export default function Calculadora() {
             </div>
             <div className="linha" style={{ flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
               {dolar
-                ? <button className="botao secundario pequeno" onClick={() => mudar({ cambioDI: dolar.taxa, cambioFrete: dolar.taxa, cambioPag: dolar.taxa })}>Usar o dólar do dia: R$ {num(dolar.taxa, 4)} ({data(`${dolar.data}T12:00:00`)})</button>
-                : <span className="pequeno muted">Sem cotação do dólar em Configurações → Câmbio.</span>}
+                ? <>
+                  <span className="pequeno" id="calcDolar">Dólar do dia: <b>R$ {num(dolar.taxa, 4)}</b> · {dolar.origem === 'banco_central' ? 'PTAX de venda do Banco Central' : 'última cotação de Configurações → Câmbio'} de {data(`${dolar.data}T12:00:00`)}</span>
+                  {(s.cambioDI !== dolar.taxa || s.cambioFrete !== dolar.taxa || s.cambioPag !== dolar.taxa)
+                    && <button className="botao secundario pequeno" onClick={() => mudar({ cambioDI: dolar.taxa, cambioFrete: dolar.taxa, cambioPag: dolar.taxa })}>Voltar ao dólar do dia</button>}
+                </>
+                : <span className="pequeno muted">Sem cotação do dólar: informe o câmbio ou cadastre em Configurações → Câmbio.</span>}
             </div>
-            <p className="pequeno muted calc-pe">A diferença entre o câmbio da DI e o do pagamento entra como variação cambial.</p>
+            <p className="pequeno muted calc-pe">Ao abrir a calculadora, os três câmbios vêm com o dólar do dia. A diferença entre o câmbio da DI e o do pagamento entra como variação cambial.</p>
           </section>
 
           <section className="pn-caixa calc-caixa">

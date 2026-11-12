@@ -1,5 +1,6 @@
 import { calcularTributos, escolherRegra, ratear, type RegraImposto } from './impostos';
 import { diferencas, lerCsv, lerLinhas, lerPreco } from './planilha';
+import { lerPtax } from './ptax';
 
 const REGRAS: RegraImposto[] = [
   { id: 1, nome: 'Nacional', ncm_prefixo: null, uf: null, origem: 'nacional', aliquota_federal_bp: 1345, aliquota_estadual_bp: 1800 },
@@ -61,5 +62,19 @@ describe('planilha de produtos', () => {
 
   it('a prévia mostra só o que muda', () => {
     expect(diferencas({ nome: 'Luva', estoque: 10, ativo: true }, { nome: 'Luva', estoque: 12, ativo: true })).toEqual({ estoque: { de: 10, para: 12 } });
+  });
+});
+
+describe('PTAX do Banco Central (dólar do dia da calculadora de importação)', () => {
+  it('fica com a cotação de venda mais recente, com 4 casas', () => {
+    expect(lerPtax({ value: [
+      { cotacaoVenda: 5.3412, dataHoraCotacao: '2026-11-10 13:04:28.123' },
+      { cotacaoVenda: 5.35678, dataHoraCotacao: '2026-11-11 13:09:01.456' },
+    ] })).toEqual({ data: '2026-11-11', taxa: 5.3568 });
+  });
+  it('resposta vazia ou estranha não vira cotação', () => {
+    expect(lerPtax({ value: [] })).toBeNull();
+    expect(lerPtax({ erro: 'x' })).toBeNull();
+    expect(lerPtax({ value: [{ cotacaoVenda: 0, dataHoraCotacao: '2026-11-11 13:00:00' }] })).toBeNull();
   });
 });

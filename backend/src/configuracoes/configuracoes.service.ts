@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
 import { sql } from 'kysely';
 import { AuditoriaService } from '../auditoria/auditoria.service';
@@ -7,12 +7,15 @@ import type { UsuarioAutenticado } from '../auth/identidade';
 import { BANCO, type Banco } from '../banco/banco.module';
 import { classificarProdutosSemFamilia } from '../catalogo/familias';
 import { diferencas, lerLinhas, type LinhaLida } from './planilha';
+import { buscarPtaxDolar } from './ptax';
 
 export interface DadosRegra { nome: string; ncm_prefixo?: string | null; uf?: string | null; origem?: 'nacional' | 'importado' | null; aliquota_federal_bp: number; aliquota_estadual_bp: number; ativo?: boolean }
 export interface DadosLocal { codigo: string; nome: string; cidade: string; uf: string; prioridade?: number; ativo?: boolean }
 
 const PAPEIS = ['comercial', 'financeiro', 'administrador', 'comprador', 'aprovador'] as const;
 const CAMPOS_PRODUTO = ['nome', 'categoria_id', 'preco_tabela_centavos', 'estoque', 'multiplo_venda', 'unidade', 'marca', 'ncm', 'ativo'] as const;
+
+const FONTE_PTAX = 'PTAX venda (Banco Central, automática)';
 
 /** Configurações no formato do Bagisto: permissões, impostos, locais de estoque, câmbio e importação de produtos. */
 @Injectable()
@@ -161,6 +164,30 @@ export class ConfiguracoesService {
     const r = await sql<{ moeda: string; data: string; taxa: number }>`
       SELECT DISTINCT ON (moeda) moeda, data, taxa FROM cotacoes_cambio ORDER BY moeda, data DESC`.execute(this.db);
     return r.rows.map((x) => ({ ...x, taxa: Number(x.taxa) }));
+  }
+
+  private readonly log = new Logger('Cambio');
+  private ptax: { em: number; valor: { data: string; taxa: number } | null } | null = null;
+
+  /**
+   * O dólar do dia para a calculadora de importação: a PTAX de venda mais recente do Banco Central
+   * (consultada no máximo a cada 30 minutos e gravada no histórico de câmbio). Sem resposta do Banco Central,
+   * vale a última cotação cadastrada em Configurações → Câmbio.
+   */
+  async dolarDoDia(buscar: () => Promise<{ data: string; taxa: number } | null> = buscarPtaxDolar) {
+    if (!this.ptax || Date.now() - this.ptax.em > (this.ptax.valor ? 30 : 2) * 60_000) {
+      this.ptax = { em: Date.now(), valor: await buscar().catch(() => null) };
+      const v = this.ptax.valor;
+      this.log.log(v ? `Dólar do dia: PTAX de venda ${v.taxa} (${v.data}), Banco Central` : 'Dólar do dia: sem resposta do Banco Central; vale a última cotação cadastrada');
+      if (v) {
+        await this.db.insertInto('cotacoes_cambio').values({ moeda: 'USD', data: v.data, taxa: v.taxa, fonte: FONTE_PTAX, criado_por: null })
+          .onConflict((oc) => oc.columns(['moeda', 'data']).doUpdateSet({ taxa: v.taxa, fonte: FONTE_PTAX, criado_por: null }).where('cotacoes_cambio.taxa', '<>', v.taxa))
+          .execute();
+      }
+    }
+    if (this.ptax.valor) return { moeda: 'USD', ...this.ptax.valor, fonte: FONTE_PTAX, origem: 'banco_central' as const };
+    const c = await this.db.selectFrom('cotacoes_cambio').select(['data', 'taxa', 'fonte']).where('moeda', '=', 'USD').orderBy('data', 'desc').limit(1).executeTakeFirst();
+    return c ? { moeda: 'USD', data: String(c.data), taxa: Number(c.taxa), fonte: c.fonte, origem: 'cadastro' as const } : null;
   }
 
   /** Registra (ou corrige) a cotação do dia; a correção fica na auditoria. */
