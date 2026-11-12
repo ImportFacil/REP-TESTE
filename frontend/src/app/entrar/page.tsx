@@ -12,7 +12,7 @@ const DEMO = [
   { email: 'compras@revenda-demo.com.br', nome: 'Revenda Ferramentas', origem: 'cliente' },
   { email: 'compras@construtora-demo.com.br', nome: 'Construtora Horizonte', origem: 'cliente' },
   { email: 'compras@hospital-demo.com.br', nome: 'Hospital Santa Clara', origem: 'cliente' },
-  { email: 'admin@importfacil.dev', nome: 'Equipe ImportFácil (administrador)', origem: 'equipe' },
+  { email: 'admin@importfacil.dev', nome: 'Equipe ImportFácil: Laís De Martin (administradora)', origem: 'equipe' },
 ] as const;
 
 export default function Entrar() {

@@ -80,8 +80,8 @@ export async function semearDemonstracao(db: Banco): Promise<void> {
   }
   await db
     .insertInto('usuarios')
-    .values({ origem: 'equipe', empresa_id: null, nome: 'Administrador (demonstração)', email: 'admin@importfacil.dev', papel: 'administrador', cognito_sub: 'dev-admin@importfacil.dev' })
-    .onConflict((oc) => oc.columns(['origem', 'email']).doNothing())
+    .values({ origem: 'equipe', empresa_id: null, nome: 'Laís De Martin', email: 'admin@importfacil.dev', papel: 'administrador', cognito_sub: 'dev-admin@importfacil.dev' })
+    .onConflict((oc) => oc.columns(['origem', 'email']).doUpdateSet({ nome: 'Laís De Martin' })) // atualiza o nome em bancos de demonstração já semeados
     .execute();
 }
 
