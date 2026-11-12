@@ -53,6 +53,12 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
   const { dados: avisos } = useDados<Avisos>('/equipe/painel/avisos');
 
   useEffect(() => { setAberto(false); setMenuUsuario(false); setNotificacoes(false); }, [caminho]);
+  // Esc fecha a gaveta do menu e os menus suspensos
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => { if (e.key === 'Escape') { setAberto(false); setMenuUsuario(false); setNotificacoes(false); } };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, []);
   useEffect(() => {
     try { setRecolhido(localStorage.getItem('importfacil:menu-recolhido') === '1'); } catch { /* sem armazenamento */ }
   }, []);
@@ -62,9 +68,22 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
   };
 
   const pode = (papeis?: string[]) => !papeis || papeis.includes(usuario.papel);
-  const visiveis = itens.filter((i) => pode(i.papeis)).map((i) => ({ ...i, filhos: i.filhos?.filter((f) => pode(f.papeis)) }));
+  const visiveis = itens.filter((i) => pode(i.papeis)).map((i) => ({ ...i, filhos: i.filhos?.filter((f) => pode(f.papeis)) }))
+    .filter((i) => !i.filhos || i.filhos.some((f) => !f.oculto)); // grupo sem nenhuma página permitida some do menu
   const ativo = (href: string) => (href === '/painel/' ? caminho === '/painel/' || caminho === '/painel' : caminho.startsWith(href));
   const grupoAtivo = (i: ItemPainel) => ativo(i.href) || !!i.filhos?.some((f) => ativo(f.href));
+  // Grupos abertos no menu: o da página atual começa aberto; clicar no grupo abre ou fecha as subcategorias (sem sair da página).
+  const [gruposAbertos, setGruposAbertos] = useState<string[]>([]);
+  const grupoDaPagina = visiveis.find((i) => i.filhos?.length && grupoAtivo(i))?.href;
+  useEffect(() => {
+    if (grupoDaPagina) setGruposAbertos((g) => (g.includes(grupoDaPagina) ? g : [...g, grupoDaPagina]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grupoDaPagina]);
+  const alternarGrupo = (href: string) => {
+    // no computador com o menu só de ícones, clicar no grupo mostra os nomes e já abre o grupo
+    if (recolhido && window.matchMedia('(min-width: 901px)').matches) { recolher(); setGruposAbertos((g) => (g.includes(href) ? g : [...g, href])); return; }
+    setGruposAbertos((g) => (g.includes(href) ? g.filter((x) => x !== href) : [...g, href]));
+  };
 
   const lista = (avisos?.contagens ?? {}) as Record<string, number>;
   const alertas = [
@@ -79,7 +98,9 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
   return (
     <div className={`pn ${recolhido ? 'pn-recolhido' : ''}`}>
       <header className="pn-topo">
-        <button className="pn-icone-botao pn-so-celular" onClick={() => setAberto(true)} aria-label="Abrir menu"><Icone nome="menu" /></button>
+        <button className="pn-icone-botao pn-so-celular" onClick={() => setAberto(!aberto)} aria-label={aberto ? 'Fechar menu' : 'Abrir menu'} aria-expanded={aberto} aria-controls="pn-menu">
+          <Icone nome={aberto ? 'fechar' : 'menu'} />
+        </button>
         <Link href="/painel/" className="pn-logo" aria-label="ImportFácil, Painel de controle">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/globo-192.png" alt="" width={32} height={32} />
@@ -121,19 +142,33 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
       </header>
 
       {aberto && <div className="pn-veu" onClick={() => setAberto(false)} />}
-      <nav className={`pn-menu ${aberto ? 'pn-aberto' : ''}`} aria-label="Menu do Painel">
+      <nav id="pn-menu" className={`pn-menu ${aberto ? 'pn-aberto' : ''}`} aria-label="Menu do Painel">
+        <div className="pn-menu-cabecalho pn-so-celular">
+          <b>Menu</b>
+          <button className="pn-icone-botao" onClick={() => setAberto(false)} aria-label="Fechar menu"><Icone nome="fechar" /></button>
+        </div>
         <div className="pn-menu-rolagem">
           {visiveis.map((i) => {
             const g = grupoAtivo(i);
-            const destino = i.filhos?.length ? i.filhos[0].href : i.href;
+            const temFilhos = !!i.filhos?.some((f) => !f.oculto);
+            const expandido = temFilhos && gruposAbertos.includes(i.href);
+            const idFilhos = `pn-filhos-${i.href.replace(/\W+/g, '-')}`;
             return (
               <div key={i.href} className="pn-grupo">
-                <Link href={destino} className={`pn-item ${g ? 'pn-ativo' : ''}`} title={recolhido ? i.rotulo : undefined} aria-current={g && !i.filhos?.length ? 'page' : undefined}>
-                  <Icone nome={i.icone} /><span className="pn-rotulo">{i.rotulo}</span>
-                </Link>
-                {g && !!i.filhos?.length && (
-                  <div className="pn-filhos">
-                    {i.filhos.filter((f) => !f.oculto).map((f) => (
+                {temFilhos ? (
+                  <button type="button" className={`pn-item pn-item-grupo ${g ? 'pn-ativo' : ''}`} title={recolhido ? i.rotulo : undefined}
+                    aria-expanded={expandido} aria-controls={idFilhos} onClick={() => alternarGrupo(i.href)}>
+                    <Icone nome={i.icone} /><span className="pn-rotulo">{i.rotulo}</span>
+                    <span className="pn-seta"><Icone nome={expandido ? 'acima' : 'abaixo'} tamanho={16} /></span>
+                  </button>
+                ) : (
+                  <Link href={i.href} className={`pn-item ${g ? 'pn-ativo' : ''}`} title={recolhido ? i.rotulo : undefined} aria-current={g ? 'page' : undefined}>
+                    <Icone nome={i.icone} /><span className="pn-rotulo">{i.rotulo}</span>
+                  </Link>
+                )}
+                {expandido && (
+                  <div className="pn-filhos" id={idFilhos}>
+                    {(i.filhos ?? []).filter((f) => !f.oculto).map((f) => (
                       <Link key={f.href} href={f.href} className={`pn-filho ${ativo(f.href) ? 'pn-filho-ativo' : ''}`} aria-current={ativo(f.href) ? 'page' : undefined}>{f.rotulo}</Link>
                     ))}
                   </div>

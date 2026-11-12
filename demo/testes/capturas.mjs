@@ -280,6 +280,16 @@ try {
   await page.screenshot({ path: `${saida}/61-pedido-vendas.png`, fullPage: true });
   checar('pedido-bloco-de-vendas', /\d{4} \d{4}|\d{44}/.test(await page.locator('.codigo-copia').first().innerText()), 'pedido mostra nota com chave, envio e reembolsos');
   await visitar(page, '62-produtos-lista', '/painel/produtos/', { espera: 'Produtos' });
+  {
+    const antes = page.url(); const grupo = page.locator('.pn-menu').getByRole('button', { name: 'Marketing' });
+    await grupo.click(); await page.waitForTimeout(200);
+    const abriu = await page.locator('.pn-menu').getByRole('link', { name: 'Newsletter' }).isVisible();
+    await page.screenshot({ path: `${saida}/62b-menu-grupos.png` });
+    await grupo.click(); await page.waitForTimeout(200);
+    const fechou = !(await page.locator('.pn-menu').getByRole('link', { name: 'Newsletter' }).count());
+    checar('menu-grupos', abriu && fechou && page.url() === antes && await page.locator('.pn-menu').getByRole('link', { name: 'Atributos', exact: true }).isVisible(),
+      'grupo do menu abre e fecha as subcategorias sem sair da página; o grupo da página atual fica aberto');
+  }
   await page.locator('.pn-tabela tbody tr').first().click();
   await page.getByRole('heading', { name: 'Atributos' }).waitFor({ timeout: 15000 });
   const campos = await page.locator('section:has(h2:text-is("Atributos")) label.campo').count();
@@ -296,6 +306,18 @@ try {
   await page.getByRole('button', { name: 'Abrir menu' }).click(); await page.waitForTimeout(400);
   await page.screenshot({ path: `${saida}/45-celular-menu.png` });
   checar('celular-menu', await page.locator('.pn-menu.pn-aberto').isVisible(), 'menu do Painel abre em gaveta');
+  // o mesmo botão vira ✕ e fecha; clicar no grupo mostra as subcategorias sem sair da página
+  await page.locator('.pn-topo').getByRole('button', { name: 'Fechar menu' }).click(); await page.waitForTimeout(400);
+  const fechou = !(await page.locator('.pn-menu.pn-aberto').count());
+  await page.getByRole('button', { name: 'Abrir menu' }).click(); await page.waitForTimeout(400);
+  const antes = page.url();
+  await page.locator('.pn-menu').getByRole('button', { name: 'Vendas' }).click(); await page.waitForTimeout(300);
+  const sub = await page.locator('.pn-menu .pn-filhos').getByRole('link', { name: 'Notas fiscais' }).isVisible();
+  await page.screenshot({ path: `${saida}/45b-celular-menu-vendas.png` });
+  checar('celular-menu-grupos', fechou && sub && page.url() === antes, 'botão ✕ fecha o menu; Vendas abre as subcategorias sem sair da página');
+  await page.locator('.pn-menu .pn-filhos').getByRole('link', { name: 'Notas fiscais' }).click();
+  await page.waitForURL(/\/painel\/notas\//, { timeout: 15000 }); await page.waitForTimeout(400);
+  checar('celular-menu-navega', page.url().includes('/painel/notas/') && !(await page.locator('.pn-menu.pn-aberto').count()), 'subcategoria abre a página e a gaveta fecha');
 } catch (e) { checar('celular-menu', false, e.message.split('\n')[0]); }
 await visitar(page, '46-celular-pedidos', '/painel/pedidos/', { espera: 'Pedidos' });
 await ctx.close();

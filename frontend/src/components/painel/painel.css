@@ -174,3 +174,14 @@ a.pn-lista-item:hover { background: var(--superficie-2); }
 table.impressao { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 14pt; }
 table.impressao th, table.impressao td { border: 1px solid #999; padding: 3pt 5pt; text-align: left; vertical-align: top; }
 @media print { .so-impressao { display: block; } }
+
+/* Grupos do menu: abrem e fecham as subcategorias no próprio menu */
+.pn-item-grupo { width: 100%; border: 0; background: none; cursor: pointer; font: inherit; font-weight: 600; font-size: 0.95rem; text-align: left; }
+.pn-item-grupo .pn-seta { margin-left: auto; display: inline-flex; opacity: 0.75; }
+.pn-recolhido .pn-seta { display: none; }
+.pn-item.pn-ativo.pn-item-grupo[aria-expanded="false"] { background: var(--azul-claro); color: var(--azul); }
+.pn-menu-cabecalho { display: none; }
+@media (max-width: 900px) {
+  .pn-recolhido .pn-seta { display: inline-flex; }
+  .pn-menu-cabecalho { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 0 26px; }
+}
