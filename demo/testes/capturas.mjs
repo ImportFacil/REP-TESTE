@@ -296,6 +296,25 @@ try {
   await page.screenshot({ path: `${saida}/63-produto-atributos.png`, fullPage: true });
   checar('produto-atributos-da-familia', campos >= 2, `${campos} campo(s) de atributo no produto`);
 } catch (e) { checar('vendas-catalogo', false, e.message.split('\n')[0]); }
+
+// Importação → Calculadora de importação: mesmos números do protótipo, recalcula ao digitar, busca de NCM
+try {
+  await visitar(page, '64-calculadora', '/painel/calculadora/', { espera: 'Resumo do embarque' });
+  await page.evaluate(() => localStorage.removeItem('importfacil:calculadora'));
+  await page.reload(); await page.getByText('Resumo do embarque').waitFor();
+  const linha = (t) => page.locator('.calc-linha', { hasText: t }).first().locator('span').last().innerText();
+  const desembolso = await linha('Desembolso total');
+  const menu = await page.locator('.pn-menu').getByRole('link', { name: 'Calculadora de importação' }).isVisible();
+  await page.screenshot({ path: `${saida}/64-calculadora.png`, fullPage: true });
+  await page.locator('#ci0_qtd').fill('4'); await page.waitForTimeout(200);
+  const depois = await linha('Desembolso total');
+  await page.getByRole('button', { name: 'Buscar NCM do item 1' }).click();
+  await page.locator('.calc-ncm-op').first().waitFor({ timeout: 15000 });
+  const codigo = await page.locator('.calc-ncm-op .calc-ncm-cod').first().innerText();
+  await page.screenshot({ path: `${saida}/65-calculadora-ncm.png` });
+  checar('calculadora', menu && /3\.978\.913,88/.test(desembolso) && depois !== desembolso && /^8806\./.test(codigo),
+    `no menu Importação; contêiner 20': desembolso ${desembolso}; com 4 unidades ${depois}; NCM sugerido ${codigo}`);
+} catch (e) { checar('calculadora', false, e.message.split('\n')[0]); }
 await ctx.close();
 
 // Painel no celular: menu em gaveta e tabela em cartões

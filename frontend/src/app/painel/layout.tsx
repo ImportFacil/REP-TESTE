@@ -51,6 +51,7 @@ const MENU: ItemPainel[] = [
     { href: '/painel/orcamento/', rotulo: 'Orçamento', oculto: true },
     { href: '/painel/ordens/', rotulo: 'Ordens de importação' },
     { href: '/painel/ordem/', rotulo: 'Ordem', oculto: true },
+    { href: '/painel/calculadora/', rotulo: 'Calculadora de importação' },
   ] },
   { href: '/painel/financeiro', rotulo: 'Financeiro', icone: 'financeiro', filhos: [
     { href: '/painel/recebiveis/', rotulo: 'Recebíveis', papeis: FIN },
