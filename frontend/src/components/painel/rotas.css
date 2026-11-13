@@ -60,7 +60,7 @@
 .rota-consulta h1 { margin: 0; font-size: 1.25rem; }
 .rota-sub { margin: 3px 0 14px; font-size: 0.84rem; color: #c9d4e6; }
 .rota-form { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
-.rota-campo { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; }
+.rota-cena .rota-campo { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; }
 .rota-cena input { color: #fff; color-scheme: dark; font-size: 0.88rem; padding: 8px 10px; text-overflow: ellipsis; }
 .rota-cena input::placeholder { color: #8f9db3; }
 .rota-trocar { align-self: center; height: 32px; width: 38px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .08); color: #fff; font-size: 1rem; cursor: pointer; }
@@ -72,10 +72,10 @@
 .rota-nota { margin: 14px 0 0; padding: 12px 0 0; border-radius: 0; background: none; border-top: 1px solid rgba(255, 255, 255, .12); font-size: 0.72rem; line-height: 1.45; color: #a9b6cb; }
 .rota-resultado h2 { margin: 0 0 12px; font-size: 1.05rem; }
 .rota-resultado h3 { font-size: 0.74rem; text-transform: uppercase; letter-spacing: .04em; color: #ffd66b; margin: 14px 0 6px; }
-.rota-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.rota-numeros div { padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, .08); }
-.rota-numeros b { display: block; font-size: 1rem; color: #fff; font-variant-numeric: tabular-nums; }
-.rota-numeros span { font-size: 0.72rem; color: #b9c6da; }
+.rota-cena .rota-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rota-cena .rota-numeros div { padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, .08); }
+.rota-cena .rota-numeros b { display: block; font-size: 1rem; color: #fff; font-variant-numeric: tabular-nums; }
+.rota-cena .rota-numeros span { font-size: 0.72rem; color: #b9c6da; }
 .rota-passagens { margin: 0; padding-left: 18px; font-size: 0.85rem; }
 .rota-fraco, .rota-portos { margin: 0; font-size: 0.84rem; color: #c9d4e6; }
 .rota-portos b { color: #fff; }
