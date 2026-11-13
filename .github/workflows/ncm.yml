@@ -33,7 +33,7 @@ jobs:
           node scripts/ncm/atualizar.mjs frontend/public/ncm.json
       - name: Gravar no repositório, se mudou
         run: |
-          if git diff --quiet -- frontend/public/ncm.json && git ls-files --error-unmatch frontend/public/ncm.json >/dev/null 2>&1 && git ls-files --error-unmatch prototipo-ncm.json >/dev/null 2>&1; then
+          if git diff --quiet -- frontend/public/ncm.json && git ls-files --error-unmatch frontend/public/ncm.json >/dev/null 2>&1; then
             echo "Tabela NCM sem mudanças."; exit 0
           fi
           git config user.name "github-actions[bot]"
