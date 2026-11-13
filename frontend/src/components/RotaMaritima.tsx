@@ -12,7 +12,8 @@ export interface Rota {
   embarque_em?: string | null; chegada_prevista?: string | null;
 }
 export const n = (v: number, casas = 0) => v.toLocaleString('pt-BR', { maximumFractionDigits: casas });
-const rotuloPorto = (p: Porto) => `${p.nome} — ${p.pais} (${p.codigo})`;
+/** Texto do campo: nome e código (o país aparece ao lado, na lista de sugestões), para caber inteiro no campo. */
+const rotuloPorto = (p: Porto) => `${p.nome} (${p.codigo})`;
 
 /** Campo de porto: os principais já vêm na lista; digitando, busca entre os ~1.600 portos (nome, país ou código). */
 export function CampoPorto({ id, rotulo, porto, principais, escolher }: { id: string; rotulo: string; porto: Porto | null; principais: Porto[]; escolher: (p: Porto) => void }) {
@@ -38,7 +39,7 @@ export function CampoPorto({ id, rotulo, porto, principais, escolher }: { id: st
           if (p) escolher(p);
         }}
         onBlur={() => { if (porto) setTexto(rotuloPorto(porto)); }} />
-      <datalist id={`${id}-lista`}>{opcoes.map((p) => <option key={p.codigo} value={rotuloPorto(p)} />)}</datalist>
+      <datalist id={`${id}-lista`}>{opcoes.map((p) => <option key={p.codigo} value={rotuloPorto(p)} label={p.pais} />)}</datalist>
     </label>
   );
 }
