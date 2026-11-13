@@ -5,7 +5,7 @@ import {
   registerDecorator, type ValidationOptions,
 } from 'class-validator';
 import { cnpjValido, normalizarCnpj } from '../comum/cnpj';
-import { Ordenacao, Paginacao } from '../comum/paginacao';
+import { Ordenacao } from '../comum/paginacao';
 import { PAPEIS_CLIENTE, PAPEIS_EQUIPE, type PapelCliente, type PapelEquipe, type SituacaoEmpresa } from '../banco/tipos';
 
 const aparar = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
