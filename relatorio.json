@@ -1,0 +1,936 @@
+{
+  "base": "http://localhost:8000",
+  "paginas": [
+    {
+      "nome": "api-saude",
+      "caminho": "/api/saude → 200",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "app-manifesto",
+      "caminho": "/manifest.webmanifest → 200",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "app-service-worker",
+      "caminho": "/sw.js → 200",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "01-celular-baixar-app",
+      "caminho": "/app/",
+      "status": 200,
+      "ok": true,
+      "titulo": "App ImportFácil no celular",
+      "espera": "App ImportFácil no celular",
+      "errosJs": []
+    },
+    {
+      "nome": "02-celular-entrar",
+      "caminho": "/entrar/",
+      "status": 200,
+      "ok": true,
+      "titulo": "",
+      "espera": "ImportFácil",
+      "errosJs": []
+    },
+    {
+      "nome": "10-loja-inicio",
+      "caminho": "/loja/",
+      "status": 200,
+      "ok": true,
+      "titulo": "",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "11-loja-catalogo",
+      "caminho": "/loja/catalogo/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Catálogo",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "12-loja-carrinho",
+      "caminho": "/loja/carrinho/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Carrinho",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "13-loja-pedidos",
+      "caminho": "/loja/pedidos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Pedidos",
+      "errosJs": []
+    },
+    {
+      "nome": "14-loja-orcamentos",
+      "caminho": "/loja/orcamentos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Orçamentos",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "15-loja-ordens",
+      "caminho": "/loja/ordens/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Ordens de importação",
+      "espera": "Ordens",
+      "errosJs": []
+    },
+    {
+      "nome": "16-loja-financeiro",
+      "caminho": "/loja/financeiro/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Financeiro",
+      "espera": "Financeiro",
+      "errosJs": []
+    },
+    {
+      "nome": "17-loja-credito",
+      "caminho": "/loja/credito/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Cadastro e crédito",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "18-loja-conta",
+      "caminho": "/loja/conta/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Conta e usuários",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "19-loja-catalogo-produtos",
+      "caminho": "/loja/catalogo/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Catálogo",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "loja-rodape",
+      "caminho": "rodapé com páginas e newsletter",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "loja-produto-avaliacoes",
+      "caminho": "formulário ou avaliação própria no produto",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "loja-carrinho-cupom",
+      "caminho": "A promoção vale a partir de R$ 5.000,00 em produtos.",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "22-loja-favoritos",
+      "caminho": "/loja/favoritos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Favoritos",
+      "espera": "Favoritos",
+      "errosJs": []
+    },
+    {
+      "nome": "23-loja-listas",
+      "caminho": "/loja/listas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Listas de compra",
+      "espera": "Reposição mensal",
+      "errosJs": []
+    },
+    {
+      "nome": "24-loja-enderecos",
+      "caminho": "/loja/enderecos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Endereços de entrega",
+      "espera": "Armazém de grãos",
+      "errosJs": []
+    },
+    {
+      "nome": "24b-loja-pedidos-semana",
+      "caminho": "/loja/pedidos/?periodo=7d",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Últimos 7 dias",
+      "errosJs": []
+    },
+    {
+      "nome": "28-loja-catalogo-filtros",
+      "caminho": "/loja/catalogo/?categoria=seguranca",
+      "status": 200,
+      "ok": true,
+      "titulo": "Catálogo",
+      "espera": "Catálogo",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-filtro-atributo",
+      "caminho": "13 → 1 produto(s) com o filtro",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "loja-comparar",
+      "caminho": "2 produto(s) lado a lado",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "31-loja-pedido-rapido",
+      "caminho": "/loja/pedido-rapido/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedido rápido",
+      "espera": "Pedido rápido",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-pedido-rapido",
+      "caminho": "código inexistente e múltiplo errado apontados",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "33-loja-lista",
+      "caminho": "/loja/listas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Listas de compra",
+      "espera": "Reposição mensal",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-lista",
+      "caminho": "lista com 5 produtos",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "35-loja-aprovacoes",
+      "caminho": "/loja/aprovacoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Aprovações de compra",
+      "espera": "Esperando aprovação",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-aprovacao",
+      "caminho": "requisição com a ordem de compra, pronta para aprovar",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "37-loja-cotacoes",
+      "caminho": "/loja/cotacoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Cotações de preço",
+      "espera": "Respondida",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-cotacao-respondida",
+      "caminho": "cotação respondida com economia sobre a tabela",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "39-loja-conta-limites",
+      "caminho": "/loja/conta/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Conta e usuários",
+      "espera": "Limite de compra dos compradores",
+      "errosJs": []
+    },
+    {
+      "nome": "loja-limite-comprador",
+      "caminho": "limite da compradora na conta",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "25-pagina-indice",
+      "caminho": "/pagina/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Informações",
+      "espera": "Perguntas frequentes",
+      "errosJs": []
+    },
+    {
+      "nome": "26-pagina-sobre",
+      "caminho": "/pagina/?p=sobre",
+      "status": 200,
+      "ok": true,
+      "titulo": "Sobre a ImportFácil",
+      "espera": "O que fazemos",
+      "errosJs": []
+    },
+    {
+      "nome": "27-pagina-privacidade",
+      "caminho": "/pagina/?p=politica-de-privacidade",
+      "status": 200,
+      "ok": true,
+      "titulo": "Política de privacidade",
+      "espera": "Seus direitos",
+      "errosJs": []
+    },
+    {
+      "nome": "30-painel-inicio",
+      "caminho": "/painel/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Oi, Laís!",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "31-painel-pedidos",
+      "caminho": "/painel/pedidos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Pedidos",
+      "errosJs": []
+    },
+    {
+      "nome": "32-painel-orcamentos",
+      "caminho": "/painel/orcamentos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Orçamentos de importação",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "33-painel-ordens",
+      "caminho": "/painel/ordens/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Ordens de importação",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "34-painel-empresas",
+      "caminho": "/painel/empresas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Empresas",
+      "espera": "Empresas",
+      "errosJs": []
+    },
+    {
+      "nome": "35-painel-credito",
+      "caminho": "/painel/credito/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Crédito",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "36-painel-recebiveis",
+      "caminho": "/painel/recebiveis/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Recebíveis",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "37-painel-precos",
+      "caminho": "/painel/precos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Grupos de clientes",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "38-painel-condicoes",
+      "caminho": "/painel/condicoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Condições de pagamento",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "39-painel-equipe",
+      "caminho": "/painel/equipe/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Equipe",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "40-painel-auditoria",
+      "caminho": "/painel/auditoria/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Auditoria",
+      "espera": null,
+      "errosJs": []
+    },
+    {
+      "nome": "41-painel-controle-completo",
+      "caminho": "/painel/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Oi, Laís!",
+      "espera": "Total de vendas",
+      "errosJs": []
+    },
+    {
+      "nome": "painel-grafico-e-numeros",
+      "caminho": "gráfico com 30 dias, vendas R$ 1.797.755,81",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "42-pedidos-entregues",
+      "caminho": "/painel/pedidos/?situacao=entregue",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Situação do pedido: Entregue",
+      "errosJs": []
+    },
+    {
+      "nome": "grade-filtro-pelo-endereco",
+      "caminho": "10 linha(s), todas entregues",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "grade-exportar-csv",
+      "caminho": "pedidos-2026-11-13.csv com 41 linha(s)",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "grade-selecao-em-lote",
+      "caminho": "barra de ações em lote ao marcar um pedido",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "50-vendas-notas",
+      "caminho": "/painel/notas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Notas fiscais",
+      "espera": "Notas fiscais",
+      "errosJs": []
+    },
+    {
+      "nome": "51-vendas-envios",
+      "caminho": "/painel/envios/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Envios",
+      "espera": "Envios",
+      "errosJs": []
+    },
+    {
+      "nome": "52-vendas-reembolsos",
+      "caminho": "/painel/reembolsos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Reembolsos",
+      "espera": "Reembolsos",
+      "errosJs": []
+    },
+    {
+      "nome": "53-vendas-transacoes",
+      "caminho": "/painel/transacoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Transações",
+      "espera": "Transações",
+      "errosJs": []
+    },
+    {
+      "nome": "54-catalogo-produtos",
+      "caminho": "/painel/produtos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Produtos",
+      "espera": "Produtos",
+      "errosJs": []
+    },
+    {
+      "nome": "55-catalogo-categorias",
+      "caminho": "/painel/categorias/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Categorias",
+      "espera": "Categorias",
+      "errosJs": []
+    },
+    {
+      "nome": "56-catalogo-atributos",
+      "caminho": "/painel/atributos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Atributos",
+      "espera": "Atributos",
+      "errosJs": []
+    },
+    {
+      "nome": "57-catalogo-familias",
+      "caminho": "/painel/familias/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Famílias de atributos",
+      "espera": "Famílias de atributos",
+      "errosJs": []
+    },
+    {
+      "nome": "58-clientes-grupos",
+      "caminho": "/painel/precos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Grupos de clientes",
+      "espera": "Grupos de clientes",
+      "errosJs": []
+    },
+    {
+      "nome": "59-catalogo-novo-produto",
+      "caminho": "/painel/produto/?novo=1",
+      "status": 200,
+      "ok": true,
+      "titulo": "Criar produto",
+      "espera": "Criar produto",
+      "errosJs": []
+    },
+    {
+      "nome": "70-clientes-usuarios",
+      "caminho": "/painel/usuarios/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Usuários dos clientes",
+      "espera": "Usuários dos clientes",
+      "errosJs": []
+    },
+    {
+      "nome": "71-clientes-avaliacoes",
+      "caminho": "/painel/avaliacoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Avaliações",
+      "espera": "aguardando moderação",
+      "errosJs": []
+    },
+    {
+      "nome": "72-marketing-promocoes",
+      "caminho": "/painel/promocoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Promoções e cupons",
+      "espera": "PARCEIRO5",
+      "errosJs": []
+    },
+    {
+      "nome": "73-marketing-newsletter",
+      "caminho": "/painel/newsletter/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Newsletter",
+      "espera": "inscrito(s) ativo(s)",
+      "errosJs": []
+    },
+    {
+      "nome": "74-marketing-modelos",
+      "caminho": "/painel/modelos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Modelos de e-mail",
+      "espera": "Pedido enviado",
+      "errosJs": []
+    },
+    {
+      "nome": "75-marketing-modelo",
+      "caminho": "/painel/modelo/?codigo=parcela_em_atraso",
+      "status": 200,
+      "ok": true,
+      "titulo": "Parcela em atraso",
+      "espera": "Cooperativa Agro Sorriso",
+      "errosJs": []
+    },
+    {
+      "nome": "76-marketing-caixa-de-saida",
+      "caminho": "/painel/caixa-de-saida/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Caixa de saída",
+      "espera": "Na fila",
+      "errosJs": []
+    },
+    {
+      "nome": "77-conteudo-paginas",
+      "caminho": "/painel/paginas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Páginas",
+      "espera": "Trocas e devoluções",
+      "errosJs": []
+    },
+    {
+      "nome": "78-conteudo-pagina",
+      "caminho": "/painel/pagina/?novo=1",
+      "status": 200,
+      "ok": true,
+      "titulo": "Criar página",
+      "espera": "Prévia",
+      "errosJs": []
+    },
+    {
+      "nome": "80-relatorios-vendas",
+      "caminho": "/painel/relatorios/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Ticket médio",
+      "errosJs": []
+    },
+    {
+      "nome": "81-relatorios-produtos",
+      "caminho": "/painel/relatorios/?aba=produtos",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Vendas por categoria",
+      "errosJs": []
+    },
+    {
+      "nome": "82-relatorios-clientes",
+      "caminho": "/painel/relatorios/?aba=clientes",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Empresas que compraram",
+      "errosJs": []
+    },
+    {
+      "nome": "83-config-permissoes",
+      "caminho": "/painel/permissoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Papéis e permissões",
+      "espera": "Papéis e permissões",
+      "errosJs": []
+    },
+    {
+      "nome": "84-config-impostos",
+      "caminho": "/painel/impostos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Impostos",
+      "espera": "Padrão: mercadoria nacional",
+      "errosJs": []
+    },
+    {
+      "nome": "85-config-locais",
+      "caminho": "/painel/locais/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Locais de estoque",
+      "espera": "Depósito avançado",
+      "errosJs": []
+    },
+    {
+      "nome": "86-config-cambio",
+      "caminho": "/painel/cambio/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Câmbio",
+      "espera": "Dólar (USD)",
+      "errosJs": []
+    },
+    {
+      "nome": "87-config-importar",
+      "caminho": "/painel/importar/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Importar produtos",
+      "espera": "Importar produtos",
+      "errosJs": []
+    },
+    {
+      "nome": "88-config-auditoria",
+      "caminho": "/painel/auditoria/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Auditoria",
+      "espera": "Auditoria",
+      "errosJs": []
+    },
+    {
+      "nome": "93-vendas-cotacoes",
+      "caminho": "/painel/cotacoes/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Cotações de preço",
+      "espera": "esperando resposta",
+      "errosJs": []
+    },
+    {
+      "nome": "96-relatorio-pedidos-24h",
+      "caminho": "/painel/relatorios/?aba=pedidos",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Consolidado de pedidos",
+      "errosJs": []
+    },
+    {
+      "nome": "97-relatorio-pedidos-semana-hospital",
+      "caminho": "/painel/relatorios/?aba=pedidos&periodo=7d&perfil=hospital",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Pedidos · Últimos 7 dias · Hospital",
+      "errosJs": []
+    },
+    {
+      "nome": "98-relatorio-financeiro-24h",
+      "caminho": "/painel/relatorios/?aba=financeiro",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Recebido no período",
+      "errosJs": []
+    },
+    {
+      "nome": "99-relatorio-financeiro-semana",
+      "caminho": "/painel/relatorios/?aba=financeiro&periodo=7d",
+      "status": 200,
+      "ok": true,
+      "titulo": "Relatórios",
+      "espera": "Financeiro · Últimos 7 dias",
+      "errosJs": []
+    },
+    {
+      "nome": "89-produto-estoque-locais",
+      "caminho": "/painel/produtos/?busca=MQ-EN01",
+      "status": 200,
+      "ok": true,
+      "titulo": "Produtos",
+      "espera": "Produtos",
+      "errosJs": []
+    },
+    {
+      "nome": "produto-estoque-por-local",
+      "caminho": "2 local(is) de estoque no produto",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "91-importar-previa",
+      "caminho": "/painel/importar/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Importar produtos",
+      "espera": "Importar produtos",
+      "errosJs": []
+    },
+    {
+      "nome": "importar-previa",
+      "caminho": "3 linha(s): 1 nova(s), 0 alteração(ões), 1 sem mudança, 1 com erro (ficam de fora).",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "94-cotacoes-lista",
+      "caminho": "/painel/cotacoes/?situacao=solicitada",
+      "status": 200,
+      "ok": true,
+      "titulo": "Cotações de preço",
+      "espera": "Cotações de preço",
+      "errosJs": []
+    },
+    {
+      "nome": "painel-cotacao-responder",
+      "caminho": "preço proposto para cada item",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "100-pedidos-todos",
+      "caminho": "/painel/pedidos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Pedidos",
+      "errosJs": []
+    },
+    {
+      "nome": "pedidos-por-janela",
+      "caminho": "todos 65; 24h 3, 48h 3, 72h 5, semana 10",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "pedidos-por-perfil",
+      "caminho": "4 pedido(s) de hospitais na semana",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "60-notas-lista",
+      "caminho": "/painel/notas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Notas fiscais",
+      "espera": "Notas fiscais",
+      "errosJs": []
+    },
+    {
+      "nome": "vendas-notas-emitidas",
+      "caminho": "10 nota(s) na primeira página",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "pedido-bloco-de-vendas",
+      "caminho": "pedido mostra nota com chave, envio e reembolsos",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "62-produtos-lista",
+      "caminho": "/painel/produtos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Produtos",
+      "espera": "Produtos",
+      "errosJs": []
+    },
+    {
+      "nome": "menu-grupos",
+      "caminho": "grupo do menu abre e fecha as subcategorias sem sair da página; o grupo da página atual fica aberto",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "produto-atributos-da-familia",
+      "caminho": "8 campo(s) de atributo no produto",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "64-calculadora",
+      "caminho": "/painel/calculadora/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Calculadora de importação",
+      "espera": "Resumo do embarque",
+      "errosJs": []
+    },
+    {
+      "nome": "calculadora",
+      "caminho": "no menu Importação; abre com o dólar do dia (R$ 5,6518); contêiner 20' a 5,45: desembolso R$ 3.978.913,88; com 4 unidades R$ 4.445.710,96; NCM sugerido 8806.91.00",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "66-rotas-maritimas",
+      "caminho": "/painel/rotas/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Rotas marítimas",
+      "espera": "Rotas marítimas",
+      "errosJs": []
+    },
+    {
+      "nome": "rotas-maritimas",
+      "caminho": "Xangai → Santos: 11.102 mn, 28,9 dias; globo 3D desenhado; Xangai → Roterdã sem Suez: 13.669 mn",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "68-ordens",
+      "caminho": "/painel/ordens/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Ordens de importação",
+      "espera": "Ordens",
+      "errosJs": []
+    },
+    {
+      "nome": "ordem-rota",
+      "caminho": "Rota marítima: Ningbo → Paranaguá: 28,6 dias, chegada prevista 30/12/2026",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "44-celular-painel",
+      "caminho": "/painel/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Oi, Laís!",
+      "espera": "Total de vendas",
+      "errosJs": []
+    },
+    {
+      "nome": "celular-menu",
+      "caminho": "menu do Painel abre em gaveta",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "celular-menu-grupos",
+      "caminho": "botão ✕ fecha o menu; Vendas abre as subcategorias sem sair da página",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "celular-menu-navega",
+      "caminho": "subcategoria abre a página e a gaveta fecha",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "nome": "46-celular-pedidos",
+      "caminho": "/painel/pedidos/",
+      "status": 200,
+      "ok": true,
+      "titulo": "Pedidos",
+      "espera": "Pedidos",
+      "errosJs": []
+    }
+  ],
+  "erros": []
+}
