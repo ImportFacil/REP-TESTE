@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Imagem da API ImportFácil. A mesma imagem vai para homologação e, depois da aprovação, para produção.
+# Imagem da API Export Fácil. A mesma imagem vai para homologação e, depois da aprovação, para produção.
 
 FROM node:22-bookworm-slim AS build
 WORKDIR /app

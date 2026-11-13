@@ -1,10 +1,10 @@
-# ImportFácil
+# Export Fácil
 
-Plataforma B2B da ImportFácil: loja para clientes empresariais, crédito, pedidos, pagamentos, importação,
+Plataforma B2B da Export Fácil: loja para clientes empresariais, crédito, pedidos, pagamentos, importação,
 Painel da equipe e app para celular.
 
-**▶ Protótipo navegável (24 telas, simulação): https://importfacil.github.io/REP-TESTE/**
-**▶ App da loja no celular (QR code): https://importfacil.github.io/REP-TESTE/app/**
+**▶ Protótipo navegável (24 telas, simulação): https://importfacil.github.io/Export-F-cil-PROTOTIPE/**
+**▶ App da loja no celular (QR code): https://importfacil.github.io/Export-F-cil-PROTOTIPE/app/**
 
 ## O que tem neste repositório
 
@@ -13,19 +13,19 @@ Painel da equipe e app para celular.
 | `backend/` | API em NestJS + PostgreSQL: contas e papéis, catálogo e preços por tipo de cliente, crédito (faixas A/B/C), pedidos, pagamentos, importação (orçamentos, ordens, numerário), auditoria e rotinas. Veja [`backend/README.md`](backend/README.md) |
 | `frontend/` | Site em Next.js: a loja (`/loja`), o Painel da equipe (`/painel`) e a página do app (`/app`). Instalável no celular |
 | `demo/` | Demonstração num endereço só: banco + API servindo o site, com login de demonstração sem senha |
-| `.devcontainer/importfacil/` | Abre a demonstração no GitHub Codespaces |
+| `.devcontainer/exportfacil/` | Abre a demonstração no GitHub Codespaces |
 | `infra/` | Terraform da AWS (homologação e produção) |
 | `index.html` | Protótipo de todas as telas |
 | `.github/workflows/` | `entrega.yml` (testes e deploy na AWS), `demo.yml` (demonstração com capturas), `ncm.yml` (tabela NCM semanal) |
 
-A loja feita no Bagisto ficou guardada no ramo [`bagisto`](https://github.com/ImportFacil/REP-TESTE/tree/bagisto).
+A loja feita no Bagisto ficou guardada no ramo [`bagisto`](https://github.com/ImportFacil/Export-F-cil-PROTOTIPE/tree/bagisto).
 Ela serve de referência para o que está sendo trazido para cá, como o formato do Painel.
 
 ## Abrir a demonstração
 
-- **Codespaces:** [abrir a demonstração](https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fimportfacil%2Fdevcontainer.json). Quando estiver no ar, leia o QR em https://importfacil.github.io/REP-TESTE/app/ com o celular. A cada início, o Codespace baixa a versão mais nova sozinho.
+- **Codespaces:** [abrir a demonstração](https://codespaces.new/ImportFacil/Export-F-cil-PROTOTIPE?devcontainer_path=.devcontainer%2Fexportfacil%2Fdevcontainer.json). Quando estiver no ar, leia o QR em https://importfacil.github.io/Export-F-cil-PROTOTIPE/app/ com o celular. A cada início, o Codespace baixa a versão mais nova sozinho.
 - **Docker no computador:** `cd demo && docker compose up --build`, depois http://localhost:8000.
-- **Entrar:** em `/entrar`, escolha uma das 5 empresas de demonstração ou "Equipe ImportFácil (administrador)". Não precisa de senha.
+- **Entrar:** em `/entrar`, escolha uma das 5 empresas de demonstração ou "Equipe Export Fácil (administrador)". Não precisa de senha.
 
 ## O que já está pronto
 
@@ -44,9 +44,9 @@ Ela serve de referência para o que está sendo trazido para cá, como o formato
 
 ## Próximas fases
 
-Dependem de contas e credenciais que só a ImportFácil pode criar:
+Dependem de contas e credenciais que só a Export Fácil pode criar:
 
 1. **Pagamentos reais pelo Asaas:** conta no Asaas (sandbox e produção) e a chave de API, guardada como segredo do GitHub/AWS. O sistema já fala com um gateway simulado pela mesma interface.
 2. **NF-e:** certificado digital A1 da empresa e um emissor (o ERP ou um serviço de NF-e). As notas de hoje são numeradas aqui, com chave simulada.
 3. **E-mails de verdade:** Amazon SES com o domínio verificado. Até lá os avisos ficam na Caixa de saída do Painel.
-4. **Homologação na AWS:** conta AWS criada pela ImportFácil; os workflows de entrega já estão prontos e esperam as credenciais.
+4. **Homologação na AWS:** conta AWS criada pela Export Fácil; os workflows de entrega já estão prontos e esperam as credenciais.

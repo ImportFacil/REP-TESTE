@@ -1,8 +1,9 @@
 :root {
-  --azul: #2a78d6;
-  --azul-escuro: #1d5fae;
-  --azul-claro: #e8f1fc;
-  --fundo: #f4f2ec;
+  /* Export Fácil: bege no lugar do azul da ImportFácil (os nomes --azul* ficaram para não mexer em todas as telas) */
+  --azul: #8a6a3f;
+  --azul-escuro: #6b5230;
+  --azul-claro: #f1e6d3;
+  --fundo: #f5efe4;
   --superficie: #ffffff;
   --superficie-2: #f8f7f3;
   --borda: #e3e0d6;
@@ -23,9 +24,9 @@
 /* Tema escuro: segue o aparelho, a não ser que a pessoa escolha no Painel (html[data-tema]). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="claro"]) {
-    --azul: #5b9bf0;
-    --azul-escuro: #8bb8f5;
-    --azul-claro: #1b2b42;
+    --azul: #a98455;
+    --azul-escuro: #e9d5b1;
+    --azul-claro: #3a2f20;
     --fundo: #12151b;
     --superficie: #1b1f27;
     --superficie-2: #20252e;
@@ -43,9 +44,9 @@
   }
 }
 :root[data-tema="escuro"] {
-  --azul: #5b9bf0;
-  --azul-escuro: #8bb8f5;
-  --azul-claro: #1b2b42;
+  --azul: #a98455;
+  --azul-escuro: #e9d5b1;
+  --azul-claro: #3a2f20;
   --fundo: #12151b;
   --superficie: #1b1f27;
   --superficie-2: #20252e;

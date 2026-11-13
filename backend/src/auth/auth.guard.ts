@@ -49,9 +49,9 @@ export class AuthGuard implements CanActivate {
       .where('u.origem', '=', identidade.origem)
       .executeTakeFirst();
 
-    if (!linha || !linha.ativo) throw new ForbiddenException('Usuário sem acesso à ImportFácil.');
+    if (!linha || !linha.ativo) throw new ForbiddenException('Usuário sem acesso à Export Fácil.');
     if (linha.origem === 'cliente' && linha.situacao === 'inativa') {
-      throw new ForbiddenException('O cadastro da sua empresa está inativo. Fale com a ImportFácil.');
+      throw new ForbiddenException('O cadastro da sua empresa está inativo. Fale com a Export Fácil.');
     }
 
     const usuario: UsuarioAutenticado = {

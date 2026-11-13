@@ -104,7 +104,7 @@ export class PedidosService {
   }
 
   async criar(u: UsuarioAutenticado, dto: NovoPedido, ip: string | null, origem: OrigemPedido = {}) {
-    if (u.situacaoEmpresa !== 'ativa') throw new ForbiddenException('A empresa está bloqueada para novos pedidos. Fale com a ImportFácil.');
+    if (u.situacaoEmpresa !== 'ativa') throw new ForbiddenException('A empresa está bloqueada para novos pedidos. Fale com a Export Fácil.');
     const cot = await this.cotarParaPedido(u, dto.itens, origem.precosNegociados);
     if (!cot.pode_fechar) {
       throw new BadRequestException({
@@ -190,9 +190,9 @@ export class PedidosService {
       ].join('') }).execute();
 
       if (dto.forma_pagamento === 'pix') {
-        await this.pagamentos.criarPix(trx, { pedidoId: pedido.id }, total, `Pedido ${pedido.id} ImportFácil`);
+        await this.pagamentos.criarPix(trx, { pedidoId: pedido.id }, total, `Pedido ${pedido.id} Export Fácil`);
       } else if (dto.forma_pagamento === 'cartao') {
-        const r = await this.pagamentos.cobrarCartao(trx, pedido.id, total, parcelas, dto.token_cartao!, `Pedido ${pedido.id} ImportFácil`);
+        const r = await this.pagamentos.cobrarCartao(trx, pedido.id, total, parcelas, dto.token_cartao!, `Pedido ${pedido.id} Export Fácil`);
         if (!r.aprovado) throw new HttpException(r.motivo, HttpStatus.PAYMENT_REQUIRED);
         await trx.insertInto('pedido_eventos').values({ pedido_id: pedido.id, tipo: 'pagamento', usuario_id: null, descricao: 'Cartão aprovado.' }).execute();
       }
@@ -266,7 +266,7 @@ export class PedidosService {
       if (!p) throw new NotFoundException('Pedido não encontrado.');
       if (p.forma_pagamento !== 'pix' || p.situacao_pagamento !== 'pix_expirado') throw new BadRequestException('Só pedidos com Pix expirado ganham um novo Pix.');
       await this.pagamentos.cancelarPendentes(trx, { pedidoId: id });
-      await this.pagamentos.criarPix(trx, { pedidoId: id }, p.total_centavos, `Pedido ${id} ImportFácil`);
+      await this.pagamentos.criarPix(trx, { pedidoId: id }, p.total_centavos, `Pedido ${id} Export Fácil`);
       await trx.updateTable('pedidos').set({ situacao_pagamento: 'aguardando_pagamento' }).where('id', '=', id).execute();
       await trx.insertInto('pedido_eventos').values({ pedido_id: id, tipo: 'novo_pix', usuario_id: u.id, descricao: 'Novo Pix gerado.' }).execute();
     });
@@ -310,7 +310,7 @@ export class PedidosService {
       if (p.forma_pagamento !== 'boleto' || p.situacao_pagamento !== 'aguardando_faturamento' || p.situacao === 'cancelado') {
         throw new BadRequestException('Só pedidos no boleto aguardando faturamento podem ser faturados.');
       }
-      await this.pagamentos.criarBoletos(trx, id, p.total_centavos, p.parcelas, `Pedido ${id} ImportFácil`);
+      await this.pagamentos.criarBoletos(trx, id, p.total_centavos, p.parcelas, `Pedido ${id} Export Fácil`);
       await trx.updateTable('pedidos').set({ situacao_pagamento: 'em_aberto', faturado_em: new Date() }).where('id', '=', id).execute();
       await trx.insertInto('pedido_eventos').values({ pedido_id: id, tipo: 'faturado', usuario_id: autor.id, descricao: `Faturado: ${p.parcelas} boleto(s) emitido(s).` }).execute();
       await this.auditoria.registrar({ usuario: autor, acao: 'pedido.faturar', entidade: 'pedido', entidadeId: id, ip }, trx);

@@ -198,7 +198,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
       criado_em   timestamptz NOT NULL DEFAULT now()
     )`.execute(db);
 
-  // Numerário (conta e ordem): o cliente adianta o dinheiro de cada etapa antes de a ImportFácil avançar.
+  // Numerário (conta e ordem): o cliente adianta o dinheiro de cada etapa antes de a Export Fácil avançar.
   await sql`
     CREATE TABLE numerarios (
       id                      bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

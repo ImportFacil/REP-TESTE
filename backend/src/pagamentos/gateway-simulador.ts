@@ -17,7 +17,7 @@ export class GatewaySimulador implements GatewayPagamento {
 
   async criarPix(valor: number): Promise<ParcelaCriada> {
     const id = this.id('pix');
-    return { id_gateway: id, pix_copia_cola: `00020126SIMULADOR-IMPORTFACIL-${id}-${valor}5204000053039865802BR6304ABCD` };
+    return { id_gateway: id, pix_copia_cola: `00020126SIMULADOR-EXPORTFACIL-${id}-${valor}5204000053039865802BR6304ABCD` };
   }
 
   async criarBoletos(parcelas: Array<{ valor: number; vencimento: string }>): Promise<ParcelaCriada[]> {

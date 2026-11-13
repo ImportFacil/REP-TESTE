@@ -56,7 +56,7 @@ export default function Credito() {
         <Situacao valor={d.cadastro.situacao} nomes={SITUACAO_CADASTRO} />
       </Cabecalho>
       <ResumoLimite d={d} />
-      {d.cadastro.parecer && <div style={{ marginTop: 16 }}><Aviso tipo={d.cadastro.situacao === 'aprovado' ? 'ok' : d.cadastro.situacao === 'reprovado' ? 'erro' : 'atencao'}>Parecer da ImportFácil: {d.cadastro.parecer}</Aviso></div>}
+      {d.cadastro.parecer && <div style={{ marginTop: 16 }}><Aviso tipo={d.cadastro.situacao === 'aprovado' ? 'ok' : d.cadastro.situacao === 'reprovado' ? 'erro' : 'atencao'}>Parecer da Export Fácil: {d.cadastro.parecer}</Aviso></div>}
       {d.cadastro.situacao === 'em_analise' && <div style={{ marginTop: 16 }}><Aviso tipo="info">Cadastro em análise desde {data(d.cadastro.enviado_em)}. O financeiro responde por aqui.</Aviso></div>}
       {!aprovador && <div style={{ marginTop: 16 }}><Aviso tipo="info">Só o aprovador da empresa preenche e envia o cadastro.</Aviso></div>}
 
@@ -64,7 +64,7 @@ export default function Credito() {
         <form className="cartao formulario" onSubmit={(e) => { e.preventDefault(); void gravar(); }}>
           <h2>Dados financeiros</h2>
           <Campo rotulo="Faturamento mensal médio (R$)"><input inputMode="decimal" value={form.faturamento} disabled={!editavel} onChange={(e) => setForm({ ...form, faturamento: e.target.value })} required /></Campo>
-          <Campo rotulo="Compras mensais previstas na ImportFácil (R$)" dica="A partir de R$ 400.000,00 por mês a empresa pode importar por conta e ordem.">
+          <Campo rotulo="Compras mensais previstas na Export Fácil (R$)" dica="A partir de R$ 400.000,00 por mês a empresa pode importar por conta e ordem.">
             <input inputMode="decimal" value={form.compras} disabled={!editavel} onChange={(e) => setForm({ ...form, compras: e.target.value })} />
           </Campo>
           <Campo rotulo="Limite de crédito desejado (R$)" dica="Acima de R$ 100.000,00 pedimos balanço e DRE."><input inputMode="decimal" value={form.limite} disabled={!editavel} onChange={(e) => setForm({ ...form, limite: e.target.value })} required /></Campo>

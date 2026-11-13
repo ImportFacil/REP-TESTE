@@ -1,4 +1,4 @@
-# API ImportFácil
+# API Export Fácil
 
 NestJS (TypeScript) + PostgreSQL, com consultas pelo [Kysely](https://kysely.dev) e migrações versionadas.
 
@@ -45,7 +45,7 @@ Para chamar a API como um cliente ou como a equipe, gere um token de desenvolvim
 
 ```bash
 npm run token-dev -- compras@coop-demo.com.br cliente
-npm run token-dev -- admin@importfacil.dev equipe
+npm run token-dev -- admin@exportfacil.dev equipe
 ```
 
 ## Testes

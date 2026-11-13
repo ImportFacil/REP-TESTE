@@ -3,16 +3,16 @@
 #   endereco.json  {url, link_alternativo, codespace, atualizado}
 #   estado.json    {url, link_alternativo, fase: instalando|no_ar|parou, porta: public|private|?, atualizado, log: [...]}
 # link_alternativo: o túnel da Cloudflare ligado pelo demo/iniciar.sh (não passa pelo encaminhamento de portas do GitHub).
-# A página do QR (importfacil.github.io/REP-TESTE/app/) lê esses arquivos; a equipe usa o log para diagnosticar.
+# A página do QR (importfacil.github.io/Export-F-cil-PROTOTIPE/app/) lê esses arquivos; a equipe usa o log para diagnosticar.
 # Também torna a porta 8000 pública assim que a loja sobe. Roda em segundo plano enquanto o Codespace estiver ligado.
 set -u
 [ -n "${CODESPACE_NAME:-}" ] || { echo "Fora do Codespaces."; exit 0; }
 
 dominio="${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-app.github.dev}"
 url="https://${CODESPACE_NAME}-8000.${dominio}"
-repo="${GITHUB_REPOSITORY:-ImportFacil/REP-TESTE}"
-LOG=/tmp/importfacil.log
-tunel() { cat /tmp/importfacil-tunel.url 2>/dev/null | head -1; }
+repo="${GITHUB_REPOSITORY:-ImportFacil/Export-F-cil-PROTOTIPE}"
+LOG=/tmp/exportfacil.log
+tunel() { cat /tmp/exportfacil-tunel.url 2>/dev/null | head -1; }
 
 no_ar() { (exec 3<>/dev/tcp/127.0.0.1/8000) 2>/dev/null; }
 

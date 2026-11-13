@@ -30,7 +30,7 @@ export function Rodape() {
   return (
     <footer className="rodape">
       <div className="rodape-paginas">
-        <b>ImportFácil</b>
+        <b>Export Fácil</b>
         <nav aria-label="Páginas institucionais">{paginas.map((p) => <Link key={p.slug} href={`/pagina/?p=${p.slug}`}>{p.titulo}</Link>)}</nav>
       </div>
       <form className="rodape-news" onSubmit={(e) => { e.preventDefault(); void inscrever(); }}>

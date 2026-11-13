@@ -1,8 +1,8 @@
 {
-  "name": "importfacil-site",
+  "name": "exportfacil-site",
   "version": "0.1.0",
   "private": true,
-  "description": "Site da ImportFácil: loja B2B e Painel da equipe (Next.js, exportado como páginas estáticas)",
+  "description": "Site da Export Fácil: loja B2B e Painel da equipe (Next.js, exportado como páginas estáticas)",
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",

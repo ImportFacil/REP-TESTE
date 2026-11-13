@@ -27,7 +27,7 @@ O que já foi ajustado para gastar menos em homologação:
 Criar a conta envolve cartão, senha e confirmação por telefone, por isso só você pode fazer.
 
 1. Em https://aws.amazon.com/free, clique em **Criar uma conta gratuita**.
-2. Use um e-mail da empresa que não seja pessoal, por exemplo `aws@importfacil.com.br`. Ele vira o dono da conta.
+2. Use um e-mail da empresa que não seja pessoal, por exemplo `aws@exportfacil.com.br`. Ele vira o dono da conta.
 3. Na escolha de plano, marque **Plano gratuito** (Free plan).
 4. **Importante:** se a AWS oferecer o caminho novo com "AWS Builder ID" ou "projetos", escolha a opção avançada (**Sign up for AWS (advanced)**), com e-mail e senha de usuário raiz. O caminho novo coloca tudo em Ohio (EUA), não deixa escolher São Paulo e não permite o WAF da produção.
 5. Ative a verificação em 2 etapas (MFA) do usuário raiz: menu do nome da conta › **Security credentials**.
@@ -53,7 +53,7 @@ Faça tudo na região **América do Sul (São Paulo)**.
 3. Cole e tecle Enter:
 
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/ImportFacil/REP-TESTE/main/infra/cloudshell/criar-homologacao.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/ImportFacil/Export-F-cil-PROTOTIPE/main/infra/cloudshell/criar-homologacao.sh | bash
    ```
 
 4. Responda `s` e informe o e-mail que vai receber os alertas.
@@ -63,7 +63,7 @@ Faça tudo na região **América do Sul (São Paulo)**.
 
 ### 4. Ligar o GitHub à AWS (você, ou eu com a sua permissão)
 
-No repositório **ImportFacil/REP-TESTE**:
+No repositório **ImportFacil/Export-F-cil-PROTOTIPE**:
 
 1. Abra **Settings › Secrets and variables › Actions › aba Variables › New repository variable** e crie:
    - `AWS_PAPEL_BUILD`
@@ -106,17 +106,17 @@ A AWS religa sozinha um banco parado depois de 7 dias. O desligamento das 20h ro
 ## Quando os créditos estiverem acabando
 
 1. Passe a conta ao **plano pago**: Billing › **Upgrade plan**. A conta, os dados e o saldo de créditos continuam.
-2. Peça créditos do **AWS Activate**. Contas no plano gratuito não podem pedir, mas no plano pago a ImportFácil pode se inscrever no Activate Founders (US$ 1.000, sem investidor). Exige site e e-mail com o domínio da empresa. Se houver investidor, aceleradora ou parceiro da AWS, há programas com mais crédito.
+2. Peça créditos do **AWS Activate**. Contas no plano gratuito não podem pedir, mas no plano pago a Export Fácil pode se inscrever no Activate Founders (US$ 1.000, sem investidor). Exige site e e-mail com o domínio da empresa. Se houver investidor, aceleradora ou parceiro da AWS, há programas com mais crédito.
 
 ## Criar a produção (perto do lançamento)
 
 A produção custa cerca de US$ 245 por mês. Ela tem NAT, banco maior, backup de 35 dias, WAF e worker separado. Já precisa estar no plano pago.
 
-1. **Domínio:** de preferência, tenha o domínio (ex.: `importfacil.com.br`) no Route 53 e o Amazon SES configurado para os e-mails do login.
+1. **Domínio:** de preferência, tenha o domínio (ex.: `exportfacil.com.br`) no Route 53 e o Amazon SES configurado para os e-mails do login.
 2. **No CloudShell (São Paulo):**
 
    ```bash
-   cd ~/REP-TESTE && git pull
+   cd ~/Export-F-cil-PROTOTIPE && git pull
    cd infra/ambientes/prod
    cp prod.tfvars.exemplo prod.tfvars   # preencha: imagem_api (igual à homologação), imagem_tag_inicial (o commit em homologação), e-mail e domínio
    ~/bin/terraform init -backend-config=../backend.hcl

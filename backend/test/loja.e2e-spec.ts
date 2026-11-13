@@ -15,11 +15,11 @@ import { lerConfig } from '../src/config';
 
 /** Fase 2, a loja no formato do Bagisto: filtros por atributo, ordenação, favoritos, endereços de entrega e listas de compra. */
 
-const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/importfacil_teste';
+const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/exportfacil_teste';
 const SEGREDO = 'segredo-dos-testes';
 const config = lerConfig({
   AMBIENTE: 'teste', DATABASE_URL: URL, AUTH_SEGREDO_DEV: SEGREDO, LIMITE_REQ_MINUTO: '10000',
-  PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'importfacil-arquivos-')),
+  PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'exportfacil-arquivos-')),
 });
 
 let app: INestApplication;
@@ -28,7 +28,7 @@ let api: () => ReturnType<typeof request>;
 const COOP = 'compras@coop-demo.com.br';
 const COMPRADOR = 'joao@coop-demo.com.br';
 const HOSP = 'compras@hospital-demo.com.br';
-const ADMIN = 'admin@importfacil.dev';
+const ADMIN = 'admin@exportfacil.dev';
 const como = async (email: string, origem: 'cliente' | 'equipe') => `Bearer ${await gerarTokenDev(SEGREDO, `dev-${email}`, origem)}`;
 const produto = (codigo: string) => db.selectFrom('produtos').select(['id', 'estoque', 'multiplo_venda']).where('codigo', '=', codigo).executeTakeFirstOrThrow();
 const ENDERECO = { cep: '78890-000', logradouro: 'Rodovia BR-163', numero: 'km 740', bairro: 'Distrito Industrial', cidade: 'Sorriso', uf: 'mt' };

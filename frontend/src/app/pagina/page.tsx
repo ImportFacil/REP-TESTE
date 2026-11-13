@@ -28,7 +28,7 @@ export default function PaginaDeConteudo() {
   useEffect(() => {
     setPagina(null);
     setErro(null);
-    if (slug) apiPublica<Pagina>(`/conteudo/paginas/${encodeURIComponent(slug)}`).then((p) => { setPagina(p); document.title = `${p.titulo} · ImportFácil`; }).catch((e: Error) => setErro(e.message));
+    if (slug) apiPublica<Pagina>(`/conteudo/paginas/${encodeURIComponent(slug)}`).then((p) => { setPagina(p); document.title = `${p.titulo} · Export Fácil`; }).catch((e: Error) => setErro(e.message));
   }, [slug]);
 
   return (
@@ -36,7 +36,7 @@ export default function PaginaDeConteudo() {
       <header className="linha entre" style={{ padding: '14px 0', borderBottom: '1px solid var(--borda)', marginBottom: 24 }}>
         <Link href="/pagina/" className="marca" style={{ padding: 0, textDecoration: 'none', color: 'inherit' }}>
           <div className="marca-icone">IF</div>
-          <div><b>ImportFácil</b><span>Loja B2B e importação</span></div>
+          <div><b>Export Fácil</b><span>Loja B2B e importação</span></div>
         </Link>
         <Link className="botao secundario" href={voltar.href}>{voltar.rotulo}</Link>
       </header>

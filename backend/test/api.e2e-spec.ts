@@ -14,7 +14,7 @@ import { Migrator } from 'kysely';
  * Testes de ponta a ponta contra um PostgreSQL de verdade.
  * Usa TESTE_DATABASE_URL (o banco é recriado do zero a cada execução).
  */
-const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/importfacil_teste';
+const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/exportfacil_teste';
 const SEGREDO = 'segredo-dos-testes';
 const config = lerConfig({ AMBIENTE: 'teste', DATABASE_URL: URL, AUTH_SEGREDO_DEV: SEGREDO, LIMITE_REQ_MINUTO: '10000' });
 
@@ -23,7 +23,7 @@ let db: Banco;
 const token = (email: string, origem: 'cliente' | 'equipe') => gerarTokenDev(SEGREDO, `dev-${email}`, origem);
 const COOP = 'compras@coop-demo.com.br';
 const HOSP = 'compras@hospital-demo.com.br';
-const ADMIN = 'admin@importfacil.dev';
+const ADMIN = 'admin@exportfacil.dev';
 let api: () => ReturnType<typeof request>;
 const como = async (email: string, origem: 'cliente' | 'equipe') => `Bearer ${await token(email, origem)}`;
 
@@ -178,8 +178,8 @@ describe('Painel da equipe', () => {
 
   it('financeiro não muda tabela de preço; administrador muda, com antes e depois na auditoria', async () => {
     await api().post('/equipe/usuarios').set('Authorization', await como(ADMIN, 'equipe'))
-      .send({ nome: 'Fábio Financeiro', email: 'fin@importfacil.dev', papel: 'financeiro' }).expect(201);
-    await api().put('/equipe/tabelas-preco/cooperativa').set('Authorization', await como('fin@importfacil.dev', 'equipe'))
+      .send({ nome: 'Fábio Financeiro', email: 'fin@exportfacil.dev', papel: 'financeiro' }).expect(201);
+    await api().put('/equipe/tabelas-preco/cooperativa').set('Authorization', await como('fin@exportfacil.dev', 'equipe'))
       .send({ desconto_bp: 2500 }).expect(403);
 
     await api().put('/equipe/tabelas-preco/cooperativa').set('Authorization', await como(ADMIN, 'equipe'))
@@ -221,7 +221,7 @@ describe('Painel da equipe', () => {
   });
 
   it('somente o administrador lê a auditoria', async () => {
-    await api().get('/equipe/auditoria').set('Authorization', await como('fin@importfacil.dev', 'equipe')).expect(403);
+    await api().get('/equipe/auditoria').set('Authorization', await como('fin@exportfacil.dev', 'equipe')).expect(403);
     const r = await api().get('/equipe/auditoria?entidade=empresa').set('Authorization', await como(ADMIN, 'equipe')).expect(200);
     expect(r.body.length).toBeGreaterThan(0);
   });

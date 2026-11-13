@@ -70,14 +70,14 @@ export function Shell({ origem, secoes = [], painel, children }: { origem: Orige
     <div className="app">
       <div className="topo-movel">
         <button className="botao secundario pequeno" onClick={() => setAberta(true)} aria-label="Abrir menu">☰</button>
-        <b>ImportFácil</b>
+        <b>Export Fácil</b>
       </div>
       {aberta && <div className="veu" onClick={() => setAberta(false)} />}
       <nav className={`lateral ${aberta ? 'aberta' : ''}`} aria-label="Menu principal">
         <div className="marca">
           <div className="marca-icone">IF</div>
           <div>
-            <b>ImportFácil</b>
+            <b>Export Fácil</b>
             <span>{eu.empresa ? eu.empresa.razao_social : 'Painel da equipe'}</span>
           </div>
         </div>

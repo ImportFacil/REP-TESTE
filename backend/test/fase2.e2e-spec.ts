@@ -18,12 +18,12 @@ import { hojeBrasil, somarDias } from '../src/pagamentos/regras';
 import { RotinasService } from '../src/rotinas/rotinas.service';
 
 /** Fase 2: crédito, pedidos, pagamentos (gateway simulado), orçamentos, ordens e rotinas. */
-const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/importfacil_teste';
+const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/exportfacil_teste';
 const SEGREDO = 'segredo-dos-testes';
 const SEGREDO_WEBHOOK = 'segredo-webhook-testes';
 const config = lerConfig({
   AMBIENTE: 'teste', DATABASE_URL: URL, AUTH_SEGREDO_DEV: SEGREDO, LIMITE_REQ_MINUTO: '10000',
-  WEBHOOK_SEGREDO_SIMULADOR: SEGREDO_WEBHOOK, PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'importfacil-arquivos-')),
+  WEBHOOK_SEGREDO_SIMULADOR: SEGREDO_WEBHOOK, PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'exportfacil-arquivos-')),
 });
 
 let app: INestApplication;
@@ -31,9 +31,9 @@ let db: Banco;
 let api: () => ReturnType<typeof request>;
 const COOP = 'compras@coop-demo.com.br';
 const HOSP = 'compras@hospital-demo.com.br';
-const ADMIN = 'admin@importfacil.dev';
-const FIN = 'financeiro@importfacil.dev';
-const COM = 'comercial@importfacil.dev';
+const ADMIN = 'admin@exportfacil.dev';
+const FIN = 'financeiro@exportfacil.dev';
+const COM = 'comercial@exportfacil.dev';
 const como = async (email: string, origem: 'cliente' | 'equipe') => `Bearer ${await gerarTokenDev(SEGREDO, `dev-${email}`, origem)}`;
 const idProduto = async (codigo: string) => (await db.selectFrom('produtos').select(['id', 'estoque']).where('codigo', '=', codigo).executeTakeFirstOrThrow());
 const PDF = Buffer.from('%PDF-1.4\n% documento de teste\n');

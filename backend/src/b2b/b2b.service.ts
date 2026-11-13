@@ -266,7 +266,7 @@ export class B2bService {
   private async cotacaoNaoRespondida(u: UsuarioAutenticado, id: number) {
     const x = await this.db.selectFrom('cotacoes').select('situacao').where('id', '=', id).where('empresa_id', '=', u.empresaId!).executeTakeFirst();
     if (!x) return new NotFoundException('Cotação não encontrada.');
-    if (x.situacao === 'expirada') return new ConflictException('A validade da cotação venceu. Peça à ImportFácil para responder de novo.');
+    if (x.situacao === 'expirada') return new ConflictException('A validade da cotação venceu. Peça à Export Fácil para responder de novo.');
     if (x.situacao === 'solicitada') return new ConflictException('A cotação ainda não foi respondida.');
     return new ConflictException(`A cotação já está ${x.situacao}.`);
   }

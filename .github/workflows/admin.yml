@@ -30,7 +30,7 @@ jobs:
     environment: ${{ inputs.ambiente == 'prod' && 'producao' || inputs.ambiente }}
     timeout-minutes: 30
     env:
-      PREFIXO: /importfacil/${{ inputs.ambiente }}
+      PREFIXO: /exportfacil/${{ inputs.ambiente }}
       EMAIL: ${{ inputs.email }}
       NOME: ${{ inputs.nome }}
     steps:

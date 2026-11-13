@@ -4,7 +4,7 @@
 locals {
   grupos = {
     clientes = { mfa = "OPTIONAL", rotulo = "Clientes" }
-    equipe   = { mfa = "ON", rotulo = "Equipe ImportFácil" } # verificação em 2 etapas obrigatória
+    equipe   = { mfa = "ON", rotulo = "Equipe Export Fácil" } # verificação em 2 etapas obrigatória
   }
   # O site volta do login em /auth/retorno/ e, ao sair, vai para a página inicial.
   urls_retorno = distinct(compact([
@@ -41,9 +41,9 @@ resource "aws_cognito_user_pool" "grupo" {
   admin_create_user_config {
     allow_admin_create_user_only = true
     invite_message_template {
-      email_subject = "Seu acesso à ImportFácil"
-      email_message = "Olá! Seu acesso à ImportFácil foi criado. Usuário: {username} · Senha temporária: {####} · Entre em ${local.url_site} e troque a senha no primeiro acesso."
-      sms_message   = "ImportFácil: usuário {username}, senha temporária {####}"
+      email_subject = "Seu acesso à Export Fácil"
+      email_message = "Olá! Seu acesso à Export Fácil foi criado. Usuário: {username} · Senha temporária: {####} · Entre em ${local.url_site} e troque a senha no primeiro acesso."
+      sms_message   = "Export Fácil: usuário {username}, senha temporária {####}"
     }
   }
 

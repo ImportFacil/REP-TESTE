@@ -12,7 +12,7 @@ import { calcularRota, porto } from './rotas';
 export const ETAPAS: Record<Modalidade, Array<{ id: string; nome: string; exige?: EtapaNumerario }>> = {
   encomenda: [
     { id: 'pedido_confirmado', nome: 'Pedido confirmado' },
-    { id: 'pagamento_fornecedor', nome: 'Pagamento ao fornecedor (ImportFácil)' },
+    { id: 'pagamento_fornecedor', nome: 'Pagamento ao fornecedor (Export Fácil)' },
     { id: 'producao', nome: 'Produção' },
     { id: 'embarque', nome: 'Embarque' },
     { id: 'transito', nome: 'Em trânsito' },
@@ -20,7 +20,7 @@ export const ETAPAS: Record<Modalidade, Array<{ id: string; nome: string; exige?
     { id: 'entrega', nome: 'Entrega' },
     { id: 'concluida', nome: 'Concluída' },
   ],
-  // Na conta e ordem a ImportFácil nunca adianta dinheiro próprio: câmbio e DUIMP esperam o numerário.
+  // Na conta e ordem a Export Fácil nunca adianta dinheiro próprio: câmbio e DUIMP esperam o numerário.
   conta_e_ordem: [
     { id: 'pedido_confirmado', nome: 'Pedido confirmado' },
     { id: 'cambio_fechado', nome: 'Câmbio fechado', exige: 'cambio' },

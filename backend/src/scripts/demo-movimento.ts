@@ -21,10 +21,10 @@ import { hojeBrasil, somarDias } from '../pagamentos/regras';
 import { RotinasService } from '../rotinas/rotinas.service';
 
 const DIAS = 90;
-const ADMIN = 'admin@importfacil.dev';
+const ADMIN = 'admin@exportfacil.dev';
 const EQUIPE_EXTRA = [
-  { email: 'financeiro@importfacil.dev', nome: 'Fernanda Lima (financeiro)', papel: 'financeiro' },
-  { email: 'comercial@importfacil.dev', nome: 'Carlos Souza (comercial)', papel: 'comercial' },
+  { email: 'financeiro@exportfacil.dev', nome: 'Fernanda Lima (financeiro)', papel: 'financeiro' },
+  { email: 'comercial@exportfacil.dev', nome: 'Carlos Souza (comercial)', papel: 'comercial' },
 ];
 /** Crédito de cada empresa de demonstração (o hospital compra só no Pix e no cartão). */
 const CREDITO: Record<string, { faixa: 'A' | 'B'; limite: number; faturamento: number } | undefined> = {

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Sobe a demonstração ImportFácil: espera o banco, aplica as migrações, carrega os dados de demonstração
+# Sobe a demonstração Export Fácil: espera o banco, aplica as migrações, carrega os dados de demonstração
 # (só o que falta) e liga a API servindo o site na porta 8000.
 # No Codespaces, antes de tudo baixa o código mais novo do repositório e remonta o que mudou.
 set -euo pipefail
 trap 'echo "[iniciar.sh] falhou na linha $LINENO: $BASH_COMMAND" >&2' ERR
 echo "[iniciar.sh] começando $(date -Is)"
-APP=/opt/importfacil
+APP=/opt/exportfacil
 
 if [ -z "${APP_URL:-}" ]; then
   if [ -n "${CODESPACE_NAME:-}" ]; then
@@ -60,9 +60,9 @@ atualizar_do_repositorio
 
 # ---------- Configuração da demonstração ----------
 export AMBIENTE=local AUTH_MODO=dev AUTH_SEGREDO_DEV="${AUTH_SEGREDO_DEV:-segredo-da-demonstracao}"
-export DATABASE_URL="${DATABASE_URL:-postgres://importfacil:importfacil@db:5432/importfacil}"
+export DATABASE_URL="${DATABASE_URL:-postgres://exportfacil:exportfacil@db:5432/exportfacil}"
 export PORTA=8000 PREFIXO_API=api PASTA_SITE="$APP/frontend/out" WORKER_NA_API=true
-export CORS_ORIGENS="$APP_URL" SALTOS_PROXY="${SALTOS_PROXY:-1}" PASTA_ARQUIVOS=/opt/importfacil/arquivos
+export CORS_ORIGENS="$APP_URL" SALTOS_PROXY="${SALTOS_PROXY:-1}" PASTA_ARQUIVOS=/opt/exportfacil/arquivos
 printf '{"ambiente":"demonstracao","api":"/api","auth":"dev"}\n' > "$APP/frontend/out/config.json"
 
 cd "$APP/backend"
@@ -83,7 +83,7 @@ ligar_api
 REPO=$(ls -d /workspaces/*/backend 2>/dev/null | head -1 | xargs -r dirname)
 
 # Link alternativo que não passa pelo encaminhamento de portas do GitHub: túnel rápido da Cloudflare
-# (sem conta; o endereço *.trycloudflare.com muda a cada vez que o túnel liga). Vai para /tmp/importfacil-tunel.url.
+# (sem conta; o endereço *.trycloudflare.com muda a cada vez que o túnel liga). Vai para /tmp/exportfacil-tunel.url.
 CLOUDFLARED_VERSAO=2026.10.0
 CLOUDFLARED_SHA256=d33ff2d14475178d2012c2c56beba87389ac5ded27649519f198a7d3134a99db
 TUNEL_PID=""
@@ -104,21 +104,21 @@ ligar_tunel() {
       || { rm -f "$bin.baixando"; echo "aviso: não foi possível baixar o cloudflared; só o link do GitHub fica disponível"; return 0; }
   fi
   for pid in $(processos_com "[c]loudflared tunnel"); do kill "$pid" 2>/dev/null || true; done
-  rm -f /tmp/importfacil-tunel.url
-  "$bin" tunnel --no-autoupdate --protocol http2 --url http://localhost:8000 > /tmp/importfacil-tunel.log 2>&1 &
+  rm -f /tmp/exportfacil-tunel.url
+  "$bin" tunnel --no-autoupdate --protocol http2 --url http://localhost:8000 > /tmp/exportfacil-tunel.log 2>&1 &
   TUNEL_PID=$!
   for _ in $(seq 1 30); do
-    link=$(grep -oE 'https://[a-z0-9]+(-[a-z0-9]+)+\.trycloudflare\.com' /tmp/importfacil-tunel.log 2>/dev/null | head -1 || true)
+    link=$(grep -oE 'https://[a-z0-9]+(-[a-z0-9]+)+\.trycloudflare\.com' /tmp/exportfacil-tunel.log 2>/dev/null | head -1 || true)
     [ -n "$link" ] && break; sleep 2
   done
-  if [ -n "$link" ]; then echo "$link" > /tmp/importfacil-tunel.url; echo "Link alternativo (fora do GitHub): ${link}/entrar/"
+  if [ -n "$link" ]; then echo "$link" > /tmp/exportfacil-tunel.url; echo "Link alternativo (fora do GitHub): ${link}/entrar/"
   else echo "aviso: o túnel da Cloudflare não respondeu; só o link do GitHub fica disponível"; fi
 }
 ligar_tunel
 # usa sempre o informar-estado.sh mais novo do repositório (ele publica os dois links no ramo app-endereco)
-if [ -n "$REPO" ] && [ -f "$REPO/.devcontainer/importfacil/informar-estado.sh" ]; then
-  for pid in $(processos_com "importfacil/[i]nformar-estado.sh"); do kill "$pid" 2>/dev/null || true; done
-  setsid nohup bash "$REPO/.devcontainer/importfacil/informar-estado.sh" > /tmp/informar-estado.log 2>&1 < /dev/null &
+if [ -n "$REPO" ] && [ -f "$REPO/.devcontainer/exportfacil/informar-estado.sh" ]; then
+  for pid in $(processos_com "exportfacil/[i]nformar-estado.sh"); do kill "$pid" 2>/dev/null || true; done
+  setsid nohup bash "$REPO/.devcontainer/exportfacil/informar-estado.sh" > /tmp/informar-estado.log 2>&1 < /dev/null &
 fi
 while true; do
   sleep "${INTERVALO_ATUALIZACAO:-300}"

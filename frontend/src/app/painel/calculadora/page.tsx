@@ -9,7 +9,7 @@ import {
 import { data } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
-const CHAVE = 'importfacil:calculadora';
+const CHAVE = 'exportfacil:calculadora';
 const BRL = (v: number) => (Number.isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const USD = (v: number, casas = 2) => (Number.isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'USD', maximumFractionDigits: casas });
 const PCT = (v: number | null) => (v == null || !Number.isFinite(v) ? '—' : `${(v * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`);

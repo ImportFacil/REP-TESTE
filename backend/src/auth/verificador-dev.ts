@@ -6,7 +6,7 @@ import type { Identidade, VerificadorToken } from './identidade';
  * Login de desenvolvimento: tokens assinados com um segredo local.
  * Só existe nos ambientes local, teste e dev (a configuração recusa em homologação e produção).
  */
-const EMISSOR = 'importfacil-dev';
+const EMISSOR = 'exportfacil-dev';
 
 export class VerificadorDev implements VerificadorToken {
   private readonly chave: Uint8Array;

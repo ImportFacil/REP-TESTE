@@ -18,9 +18,9 @@ describe('lerConfig', () => {
 
   it('monta a URL do banco a partir das partes (senha vinda do Secrets Manager)', () => {
     const c = lerConfig({
-      AMBIENTE: 'dev', AUTH_MODO: 'dev', DB_HOST: 'banco.interno', DB_NOME: 'importfacil', DB_USUARIO: 'api', DB_SENHA: 'a@b:c/d',
+      AMBIENTE: 'dev', AUTH_MODO: 'dev', DB_HOST: 'banco.interno', DB_NOME: 'exportfacil', DB_USUARIO: 'api', DB_SENHA: 'a@b:c/d',
     });
-    expect(c.banco.url).toBe('postgres://api:a%40b%3Ac%2Fd@banco.interno:5432/importfacil');
+    expect(c.banco.url).toBe('postgres://api:a%40b%3Ac%2Fd@banco.interno:5432/exportfacil');
     expect(c.banco.ssl).toBe(true);
   });
 

@@ -1,8 +1,8 @@
 {
-  "name": "importfacil-api",
+  "name": "exportfacil-api",
   "version": "0.1.0",
   "private": true,
-  "description": "API da plataforma ImportFácil (fase 1: contas, catálogo e preços)",
+  "description": "API da plataforma Export Fácil (fase 1: contas, catálogo e preços)",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=22"

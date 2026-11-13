@@ -2,7 +2,7 @@ import { gerarTokenDev } from '../auth/verificador-dev';
 
 /**
  * Gera um token de login de desenvolvimento (só funciona com AUTH_MODO=dev).
- * Uso: node dist/scripts/token-dev.js admin@importfacil.dev equipe
+ * Uso: node dist/scripts/token-dev.js admin@exportfacil.dev equipe
  *      node dist/scripts/token-dev.js compras@coop-demo.com.br cliente
  */
 const [email, origem] = process.argv.slice(2);

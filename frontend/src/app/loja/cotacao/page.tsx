@@ -14,7 +14,7 @@ interface Cotacao {
   id: number; situacao: string; mensagem: string | null; resposta: string | null; validade: string | null; criado_em: string; respondida_em: string | null; pedido_id: number | null;
   solicitante: string; respondida_por_nome: string | null; itens: Item[]; tabela_centavos: number; proposto_centavos: number | null; economia_centavos: number | null;
 }
-const NOMES: Record<string, string> = { solicitada: 'Esperando a ImportFácil', respondida: 'Respondida', aceita: 'Aceita', recusada: 'Recusada', expirada: 'Expirada', cancelada: 'Cancelada' };
+const NOMES: Record<string, string> = { solicitada: 'Esperando a Export Fácil', respondida: 'Respondida', aceita: 'Aceita', recusada: 'Recusada', expirada: 'Expirada', cancelada: 'Cancelada' };
 const COR: Record<string, string> = { solicitada: 'pendente', respondida: 'em_aberto', aceita: 'aprovado', recusada: 'recusado', expirada: 'expirada', cancelada: 'cancelada' };
 
 /** Uma cotação de preço: itens com o preço da tabela e o negociado; o aprovador aceita e o pedido sai com o preço combinado. */
@@ -45,7 +45,7 @@ export default function CotacaoDePreco() {
       </div>
       <Aviso tipo="erro">{acao.erro}</Aviso>
       {c.pedido_id && <Aviso tipo="ok">Aceita. <Link href={`/loja/pedido/?id=${c.pedido_id}`}>Ver o pedido {c.pedido_id}</Link></Aviso>}
-      {c.situacao === 'expirada' && <Aviso tipo="atencao">A validade venceu. Fale com a ImportFácil para receber uma nova resposta.</Aviso>}
+      {c.situacao === 'expirada' && <Aviso tipo="atencao">A validade venceu. Fale com a Export Fácil para receber uma nova resposta.</Aviso>}
       <div className="grade grade-lado">
         <div className="cartao tabela-rolagem">
           <table>
@@ -80,7 +80,7 @@ export default function CotacaoDePreco() {
           ) : c.situacao === 'respondida' ? <p className="muted">A proposta está pronta. Só o aprovador da empresa aceita cotações.</p>
             : c.situacao === 'solicitada' ? (
               <>
-                <p className="muted">A ImportFácil vai responder com o preço de cada item e a validade da proposta.</p>
+                <p className="muted">A Export Fácil vai responder com o preço de cada item e a validade da proposta.</p>
                 <button className="botao leve" disabled={acao.enviando} onClick={() => void mudar('cancelar')}>Cancelar a cotação</button>
               </>
             ) : <p className="muted">{NOMES[c.situacao]}.</p>}

@@ -20,7 +20,7 @@ terraform {
 }
 
 locals {
-  tags = { Projeto = "importfacil", Ambiente = "homolog", GerenciadoPor = "terraform" }
+  tags = { Projeto = "exportfacil", Ambiente = "homolog", GerenciadoPor = "terraform" }
 }
 
 provider "aws" {

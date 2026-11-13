@@ -226,7 +226,7 @@ resource "aws_lb_listener_rule" "cloudfront" {
   priority     = 10
   condition {
     http_header {
-      http_header_name = "X-Origem-ImportFacil"
+      http_header_name = "X-Origem-ExportFacil"
       values           = [random_password.origem.result]
     }
   }

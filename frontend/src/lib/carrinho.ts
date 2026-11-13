@@ -12,8 +12,8 @@ export interface ItemCarrinho {
   preco_cliente_centavos: number;
 }
 
-const CHAVE = 'importfacil:carrinho';
-const EVENTO = 'importfacil:carrinho';
+const CHAVE = 'exportfacil:carrinho';
+const EVENTO = 'exportfacil:carrinho';
 
 export function lerCarrinho(): ItemCarrinho[] {
   try {

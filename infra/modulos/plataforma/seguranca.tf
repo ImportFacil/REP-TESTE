@@ -26,7 +26,7 @@ resource "aws_secretsmanager_secret" "banco" {
 resource "aws_secretsmanager_secret_version" "banco" {
   secret_id = aws_secretsmanager_secret.banco.id
   secret_string = jsonencode({
-    usuario = "importfacil"
+    usuario = "exportfacil"
     senha   = random_password.banco.result
   })
 }

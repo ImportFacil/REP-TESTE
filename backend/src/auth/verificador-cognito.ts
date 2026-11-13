@@ -4,7 +4,7 @@ import type { Identidade, VerificadorToken } from './identidade';
 
 /**
  * Confere tokens de acesso dos dois grupos de usuários do Cognito:
- * clientes e equipe ImportFácil. O emissor (iss) do token diz de qual grupo ele veio,
+ * clientes e equipe Export Fácil. O emissor (iss) do token diz de qual grupo ele veio,
  * e por isso uma conta de cliente nunca chega ao Painel da equipe.
  */
 export class VerificadorCognito implements VerificadorToken {

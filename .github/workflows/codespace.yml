@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ['.devcontainer/importfacil/devcontainer.json', '.devcontainer/devcontainer.json']
+        config: ['.devcontainer/exportfacil/devcontainer.json', '.devcontainer/devcontainer.json']
     steps:
       - uses: actions/checkout@v4
 
@@ -47,4 +47,4 @@ jobs:
         run: |
           id=$(docker ps -q --filter "label=devcontainer.config_file=$PWD/${{ matrix.config }}" | head -1)
           [ -z "$id" ] && id=$(docker ps -q | head -1)
-          docker exec "$id" bash -c 'tail -n 80 /tmp/importfacil.log' 2>&1 | grep -viE "password|senha|secret|token|app_key|key=" || true
+          docker exec "$id" bash -c 'tail -n 80 /tmp/exportfacil.log' 2>&1 | grep -viE "password|senha|secret|token|app_key|key=" || true

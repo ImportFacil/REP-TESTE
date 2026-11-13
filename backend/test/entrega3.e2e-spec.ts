@@ -14,11 +14,11 @@ import { lerConfig } from '../src/config';
 
 /** Painel no formato do Bagisto, entrega 3: promoções e cupons, newsletter, modelos de e-mail, avaliações, usuários e páginas. */
 
-const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/importfacil_teste';
+const URL = process.env.TESTE_DATABASE_URL ?? 'postgres://postgres@127.0.0.1:55432/exportfacil_teste';
 const SEGREDO = 'segredo-dos-testes';
 const config = lerConfig({
   AMBIENTE: 'teste', DATABASE_URL: URL, AUTH_SEGREDO_DEV: SEGREDO, LIMITE_REQ_MINUTO: '10000',
-  PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'importfacil-arquivos-')),
+  PASTA_ARQUIVOS: mkdtempSync(join(tmpdir(), 'exportfacil-arquivos-')),
 });
 
 let app: INestApplication;
@@ -26,9 +26,9 @@ let db: Banco;
 let api: () => ReturnType<typeof request>;
 const COOP = 'compras@coop-demo.com.br';
 const HOSP = 'compras@hospital-demo.com.br';
-const ADMIN = 'admin@importfacil.dev';
-const FIN = 'financeiro@importfacil.dev';
-const COM = 'comercial@importfacil.dev';
+const ADMIN = 'admin@exportfacil.dev';
+const FIN = 'financeiro@exportfacil.dev';
+const COM = 'comercial@exportfacil.dev';
 const como = async (email: string, origem: 'cliente' | 'equipe') => `Bearer ${await gerarTokenDev(SEGREDO, `dev-${email}`, origem)}`;
 const produto = (codigo: string) => db.selectFrom('produtos').select(['id', 'estoque', 'multiplo_venda']).where('codigo', '=', codigo).executeTakeFirstOrThrow();
 
@@ -192,7 +192,7 @@ describe('usuários dos clientes', () => {
   it('lista os usuários de todas as empresas, com pedidos e newsletter', async () => {
     await api().get('/equipe/clientes/usuarios').set('Authorization', await como(COOP, 'cliente')).expect(403);
     const r = await api().get('/equipe/clientes/usuarios').set('Authorization', await como(FIN, 'equipe')).expect(200);
-    expect(r.body.every((u: { email: string }) => !u.email.endsWith('@importfacil.dev'))).toBe(true);
+    expect(r.body.every((u: { email: string }) => !u.email.endsWith('@exportfacil.dev'))).toBe(true);
     expect(r.body.find((u: { email: string }) => u.email === COOP)).toMatchObject({ razao_social: 'Cooperativa Agro Sorriso', pedidos: 1, newsletter: false });
   });
 });

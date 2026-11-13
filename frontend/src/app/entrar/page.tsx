@@ -12,7 +12,7 @@ const DEMO = [
   { email: 'compras@revenda-demo.com.br', nome: 'Revenda Ferramentas', origem: 'cliente' },
   { email: 'compras@construtora-demo.com.br', nome: 'Construtora Horizonte', origem: 'cliente' },
   { email: 'compras@hospital-demo.com.br', nome: 'Hospital Santa Clara', origem: 'cliente' },
-  { email: 'admin@importfacil.dev', nome: 'Equipe ImportFácil: Laís De Martin (administradora)', origem: 'equipe' },
+  { email: 'admin@exportfacil.dev', nome: 'Equipe Export Fácil: Laís De Martin (administradora)', origem: 'equipe' },
 ] as const;
 
 export default function Entrar() {
@@ -42,7 +42,7 @@ export default function Entrar() {
         <div className="marca" style={{ padding: 0 }}>
           <div className="marca-icone">IF</div>
           <div>
-            <b>ImportFácil</b>
+            <b>Export Fácil</b>
             <span>Loja B2B e importação</span>
           </div>
         </div>
@@ -50,8 +50,8 @@ export default function Entrar() {
         {config?.auth === 'cognito' && (
           <>
             <button className="botao largo" onClick={() => void entrarCognito('cliente')}>Entrar como cliente</button>
-            <button className="botao secundario largo" onClick={() => void entrarCognito('equipe')}>Sou da equipe ImportFácil</button>
-            <p className="pequeno muted">O acesso é criado pela equipe ImportFácil, que envia o convite por e-mail. No primeiro acesso, troque a senha temporária.</p>
+            <button className="botao secundario largo" onClick={() => void entrarCognito('equipe')}>Sou da equipe Export Fácil</button>
+            <p className="pequeno muted">O acesso é criado pela equipe Export Fácil, que envia o convite por e-mail. No primeiro acesso, troque a senha temporária.</p>
           </>
         )}
         {config?.auth === 'dev' && (
@@ -72,7 +72,7 @@ export default function Entrar() {
             </form>
           </>
         )}
-        <p className="pequeno muted" style={{ margin: 0 }}><Link href="/pagina/">Sobre a ImportFácil, entrega, pagamentos e privacidade</Link></p>
+        <p className="pequeno muted" style={{ margin: 0 }}><Link href="/pagina/">Sobre a Export Fácil, entrega, pagamentos e privacidade</Link></p>
       </div>
     </div>
   );

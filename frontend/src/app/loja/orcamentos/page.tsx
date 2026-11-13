@@ -50,7 +50,7 @@ export default function Orcamentos() {
           <h2>Novo orçamento</h2>
           <Campo rotulo="Modalidade" dica={eu.empresa?.conta_e_ordem_liberada ? undefined : 'A conta e ordem é liberada para clientes com pedidos mensais a partir de R$ 400.000,00.'}>
             <select value={modalidade} onChange={(e) => setModalidade(e.target.value as 'encomenda')}>
-              <option value="encomenda">Encomenda (a ImportFácil importa e revende)</option>
+              <option value="encomenda">Encomenda (a Export Fácil importa e revende)</option>
               <option value="conta_e_ordem" disabled={!eu.empresa?.conta_e_ordem_liberada}>Conta e ordem (em nome da sua empresa)</option>
             </select>
           </Campo>

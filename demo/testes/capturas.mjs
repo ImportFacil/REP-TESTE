@@ -1,4 +1,4 @@
-// Navega pela demonstração ImportFácil (loja como empresa, Painel como equipe), confere cada página
+// Navega pela demonstração Export Fácil (loja como empresa, Painel como equipe), confere cada página
 // e tira capturas de tela. Uso: node capturas.mjs <endereço> <pasta de saída>
 import fs from 'node:fs';
 import { chromium, devices } from 'playwright';
@@ -60,8 +60,8 @@ const mj = await man.json().catch(() => ({}));
 checar('app-manifesto', man.ok() && mj.display === 'standalone' && (mj.icons || []).length >= 2, `/manifest.webmanifest → ${man.status()}`);
 const sw = await page.request.get(base + '/sw.js');
 checar('app-service-worker', sw.ok(), `/sw.js → ${sw.status()}`);
-await visitar(page, '01-celular-baixar-app', '/app/', { espera: 'App ImportFácil no celular' });
-await visitar(page, '02-celular-entrar', '/entrar/', { espera: 'ImportFácil' });
+await visitar(page, '01-celular-baixar-app', '/app/', { espera: 'App Export Fácil no celular' });
+await visitar(page, '02-celular-entrar', '/entrar/', { espera: 'Export Fácil' });
 await ctx.close();
 
 // 2) Loja como empresa (Cooperativa)
@@ -82,7 +82,7 @@ for (const [nome, caminho, espera] of [
 // Entrega 3 na loja: avaliações no produto, cupom no carrinho e rodapé com páginas e newsletter
 try {
   const textoCatalogo = await visitar(page, '19-loja-catalogo-produtos', '/loja/catalogo/');
-  checar('loja-rodape', /Novidades por e-mail/.test(textoCatalogo) && /Sobre a ImportFácil/.test(textoCatalogo), 'rodapé com páginas e newsletter');
+  checar('loja-rodape', /Novidades por e-mail/.test(textoCatalogo) && /Sobre a Export Fácil/.test(textoCatalogo), 'rodapé com páginas e newsletter');
   await page.locator('a[href*="/loja/produto/?id="]').first().click();
   await page.getByRole('heading', { name: 'Avaliações' }).waitFor({ timeout: 15000 });
   await page.screenshot({ path: `${saida}/20-loja-produto-avaliacoes.png`, fullPage: true });
@@ -301,7 +301,7 @@ try {
 // Importação → Calculadora de importação: mesmos números do protótipo, recalcula ao digitar, busca de NCM
 try {
   await visitar(page, '64-calculadora', '/painel/calculadora/', { espera: 'Resumo do embarque' });
-  await page.evaluate(() => localStorage.removeItem('importfacil:calculadora'));
+  await page.evaluate(() => localStorage.removeItem('exportfacil:calculadora'));
   await page.reload(); await page.getByText('Resumo do embarque').waitFor();
   const linha = (t) => page.locator('.calc-linha', { hasText: t }).first().locator('span').last().innerText();
   // ao abrir, os três câmbios vêm com o dólar do dia; com o câmbio da planilha (5,45) os números são os do protótipo

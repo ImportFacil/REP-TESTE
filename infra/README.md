@@ -61,7 +61,7 @@ O site (Next.js) fica na raiz e o protótipo antigo em `/prototipo/`. As rotinas
 
 - Uma conta AWS com cartão cadastrado e um usuário com permissão de administrador para rodar o Terraform.
 - [Terraform 1.10 ou mais novo](https://developer.hashicorp.com/terraform/install) e a [AWS CLI](https://aws.amazon.com/cli/) no computador de quem vai rodar.
-- Opcional: um domínio no Route 53 (ex.: `importfacil.com.br`). Recomendado para produção.
+- Opcional: um domínio no Route 53 (ex.: `exportfacil.com.br`). Recomendado para produção.
 
 ## Passo a passo da primeira vez
 
@@ -114,11 +114,11 @@ Depois crie o primeiro administrador da equipe pelo workflow **Criar administrad
 
 ```bash
 AMB=homolog
-P=/importfacil/$AMB
+P=/exportfacil/$AMB
 ler() { aws ssm get-parameter --name "$P/$1" --query Parameter.Value --output text; }
 aws ecs run-task --cluster "$(ler ecs/cluster)" --task-definition "$(ler ecs/familia)" --launch-type FARGATE \
   --network-configuration "awsvpcConfiguration={subnets=[$(ler ecs/subredes)],securityGroups=[$(ler ecs/grupo-seguranca)],assignPublicIp=$(ler ecs/ip-publico)}" \
-  --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/scripts/criar-admin.js","--email","voce@importfacil.com.br","--nome","Seu Nome"]}]}'
+  --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/scripts/criar-admin.js","--email","voce@exportfacil.com.br","--nome","Seu Nome"]}]}'
 ```
 
 A pessoa recebe por e-mail a senha temporária. No primeiro login, troca a senha e configura a verificação em 2 etapas. A partir daí, novos usuários são convidados pelo Painel da equipe.
@@ -128,10 +128,10 @@ A pessoa recebe por e-mail a senha temporária. No primeiro login, troca a senha
 - **Código:** todo commit no `main` passa pelos testes, vai para homologação e espera aprovação para ir à produção, com a mesma imagem.
 - **Infraestrutura:** mudanças nos arquivos `.tf` passam pelo CI (formato e validação). O `terraform apply` é feito por uma pessoa, primeiro em homologação.
 - **Banco:** mudanças só por migrações versionadas (`backend/src/banco/migracoes`), aplicadas automaticamente no deploy.
-- **Segredos:** a senha do banco é gerada pelo Terraform e fica no Secrets Manager. As chaves das integrações (fase 2) vão no segredo `/importfacil/<ambiente>/integracoes`, gravadas pelo console da AWS, nunca no código.
+- **Segredos:** a senha do banco é gerada pelo Terraform e fica no Secrets Manager. As chaves das integrações (fase 2) vão no segredo `/exportfacil/<ambiente>/integracoes`, gravadas pelo console da AWS, nunca no código.
 
 ## Pontos de atenção
 
-- **E-mails do Cognito:** por padrão, o Cognito envia no máximo 50 e-mails por dia (convites e recuperação de senha). Antes de abrir para clientes, configure o Amazon SES com o domínio da ImportFácil.
+- **E-mails do Cognito:** por padrão, o Cognito envia no máximo 50 e-mails por dia (convites e recuperação de senha). Antes de abrir para clientes, configure o Amazon SES com o domínio da Export Fácil.
 - **Custos:** os maiores são o NAT, o balanceador e o banco. Dev e homologação não têm NAT e usam a menor configuração possível. O `dev` pode ser destruído quando não estiver em uso (`terraform destroy`), e criado de novo depois.
 - **Contas separadas:** hoje os três ambientes ficam na mesma conta AWS, separados por rede, chaves e permissões. Quando a operação crescer, vale mover produção para uma conta própria (AWS Organizations).

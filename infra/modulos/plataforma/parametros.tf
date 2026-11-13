@@ -1,4 +1,4 @@
-# Parâmetros que o GitHub Actions lê no deploy (o papel de deploy só lê /importfacil/<ambiente>/*).
+# Parâmetros que o GitHub Actions lê no deploy (o papel de deploy só lê /exportfacil/<ambiente>/*).
 
 locals {
   parametros = {

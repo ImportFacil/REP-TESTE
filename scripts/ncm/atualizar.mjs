@@ -11,7 +11,7 @@ async function baixar() {
   let ultimoErro;
   for (let tentativa = 1; tentativa <= 4; tentativa++) {
     try {
-      const r = await fetch(URL_NCM, { headers: { 'User-Agent': 'ImportFacil-tabela-ncm/1.0', Accept: 'application/json' } });
+      const r = await fetch(URL_NCM, { headers: { 'User-Agent': 'ExportFacil-tabela-ncm/1.0', Accept: 'application/json' } });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       // a Receita às vezes entrega em latin1; tenta utf-8 e corrige se aparecer caractere inválido
       const buf = Buffer.from(await r.arrayBuffer());

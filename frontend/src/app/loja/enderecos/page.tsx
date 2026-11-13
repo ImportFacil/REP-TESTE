@@ -52,7 +52,7 @@ export default function Enderecos() {
           <div className="linha"><button className="botao" disabled={acao.enviando}>Salvar</button><button type="button" className="botao leve" onClick={() => setF(null)}>Cancelar</button></div>
         </form>
       )}
-      {!dados ? <Carregando /> : !dados.length ? <Vazio>Nenhum endereço cadastrado. Sem endereço, a ImportFácil combina a entrega com a empresa.</Vazio> : (
+      {!dados ? <Carregando /> : !dados.length ? <Vazio>Nenhum endereço cadastrado. Sem endereço, a Export Fácil combina a entrega com a empresa.</Vazio> : (
         <div className="grade grade-2">
           {dados.map((d) => (
             <div key={d.id} className="cartao pilha" style={{ gap: 8 }}>

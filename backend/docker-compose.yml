@@ -4,9 +4,9 @@ services:
   banco:
     image: postgres:16
     environment:
-      POSTGRES_USER: importfacil
-      POSTGRES_PASSWORD: importfacil
-      POSTGRES_DB: importfacil
+      POSTGRES_USER: exportfacil
+      POSTGRES_PASSWORD: exportfacil
+      POSTGRES_DB: exportfacil
     ports: ["5432:5432"]
     volumes: [banco:/var/lib/postgresql/data]
   cache:

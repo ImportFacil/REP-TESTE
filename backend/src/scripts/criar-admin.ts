@@ -5,7 +5,7 @@ import { ProvedorCognito, ProvedorDev } from '../auth/provedor-cognito';
 
 /**
  * Cria o primeiro administrador da equipe (depois disso, novos usuários são convidados pela API).
- * Uso: node dist/scripts/criar-admin.js --email pessoa@importfacil.com.br --nome "Nome Sobrenome"
+ * Uso: node dist/scripts/criar-admin.js --email pessoa@exportfacil.com.br --nome "Nome Sobrenome"
  */
 async function principal(): Promise<void> {
   const args = process.argv.slice(2);

@@ -22,7 +22,7 @@ interface Avisos { geral: { parcelas_vencidas: number }; contagens?: Record<stri
 /** Sem botão de tema no Painel: segue o aparelho. Apaga a escolha antiga de claro/escuro de quem já tinha usado o botão. */
 function useTemaDoAparelho() {
   useEffect(() => {
-    try { localStorage.removeItem('importfacil:tema'); } catch { /* sem armazenamento */ }
+    try { localStorage.removeItem('exportfacil:tema'); } catch { /* sem armazenamento */ }
     delete document.documentElement.dataset.tema;
   }, []);
 }
@@ -50,11 +50,11 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
     return () => window.removeEventListener('keydown', tecla);
   }, []);
   useEffect(() => {
-    try { setRecolhido(localStorage.getItem('importfacil:menu-recolhido') === '1'); } catch { /* sem armazenamento */ }
+    try { setRecolhido(localStorage.getItem('exportfacil:menu-recolhido') === '1'); } catch { /* sem armazenamento */ }
   }, []);
   const recolher = () => {
     setRecolhido(!recolhido);
-    try { localStorage.setItem('importfacil:menu-recolhido', recolhido ? '0' : '1'); } catch { /* sem armazenamento */ }
+    try { localStorage.setItem('exportfacil:menu-recolhido', recolhido ? '0' : '1'); } catch { /* sem armazenamento */ }
   };
 
   const pode = (papeis?: string[]) => !papeis || papeis.includes(usuario.papel);
@@ -91,10 +91,10 @@ export function PainelLayout({ itens, usuario, ambiente, children }: {
         <button className="pn-icone-botao pn-so-celular" onClick={() => setAberto(!aberto)} aria-label={aberto ? 'Fechar menu' : 'Abrir menu'} aria-expanded={aberto} aria-controls="pn-menu">
           <Icone nome={aberto ? 'fechar' : 'menu'} />
         </button>
-        <Link href="/painel/" className="pn-logo" aria-label="ImportFácil, Painel de controle">
+        <Link href="/painel/" className="pn-logo" aria-label="Export Fácil, Painel de controle">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/globo-192.png" alt="" width={32} height={32} />
-          <span>ImportFácil</span>
+          <span>Export Fácil</span>
         </Link>
         <Busca itens={visiveis} />
         <div className="pn-topo-acoes">

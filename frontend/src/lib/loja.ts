@@ -4,8 +4,8 @@ import { api } from './api';
 
 // ---------- comparação (até 4 produtos, guardada neste navegador) ----------
 
-const CHAVE_COMPARAR = 'importfacil:comparar';
-const EVENTO_COMPARAR = 'importfacil:comparar';
+const CHAVE_COMPARAR = 'exportfacil:comparar';
+const EVENTO_COMPARAR = 'exportfacil:comparar';
 export const MAX_COMPARAR = 4;
 
 export function lerComparar(): number[] {
@@ -47,7 +47,7 @@ export function useComparar() {
 
 // ---------- favoritos (no servidor, de cada pessoa) ----------
 
-const EVENTO_FAVORITOS = 'importfacil:favoritos';
+const EVENTO_FAVORITOS = 'exportfacil:favoritos';
 let cache: Promise<number[]> | null = null;
 
 export function useFavoritos() {

@@ -317,7 +317,7 @@ const SINONIMOS: Record<string, string[]> = {
   semente: ['sementes'], fertilizante: ['adubos', 'fertilizantes'], adubo: ['adubos'], herbicida: ['herbicidas'], inseticida: ['inseticidas'], fungicida: ['fungicidas'],
   irrigacao: ['irrigacao', 'aspersores'], gotejador: ['irrigacao'], 'pivo central': ['irrigacao'],
 };
-/** Atalhos para produtos frequentes da ImportFácil: aparecem primeiro, com a regra de classificação. */
+/** Atalhos para produtos frequentes da Export Fácil: aparecem primeiro, com a regra de classificação. */
 export const DICAS_NCM = [
   { termos: ['drone', 'drones', 'vant', 'rpa', 'agras', 'dji', 'mavic', 'aereos nao tripulados'], prefixos: ['88069', '88062'],
     nota: 'Drones: 8806.9 quando fazem voo programado sem intervenção do piloto (caso dos drones agrícolas, SC Cosit 98.027/2025); 8806.2 quando só voam pilotados remotamente. O código final depende do peso máximo de decolagem.' },

@@ -26,7 +26,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: importfacil_teste
+          POSTGRES_DB: exportfacil_teste
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres"
@@ -46,7 +46,7 @@ jobs:
       - name: Testes da API contra PostgreSQL
         run: npm run test:api
         env:
-          TESTE_DATABASE_URL: postgres://postgres:postgres@localhost:5432/importfacil_teste
+          TESTE_DATABASE_URL: postgres://postgres:postgres@localhost:5432/exportfacil_teste
 
   site:
     name: Site (tipos e build)

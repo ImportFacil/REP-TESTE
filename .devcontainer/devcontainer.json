@@ -1,8 +1,8 @@
 {
-  "name": "Loja ImportFácil (demonstração, padrão)",
+  "name": "Loja Export Fácil (demonstração, padrão)",
   "dockerComposeFile": [
     "../demo/docker-compose.yml",
-    "importfacil/docker-compose.codespaces.yml"
+    "exportfacil/docker-compose.codespaces.yml"
   ],
   "service": "app",
   "runServices": [
@@ -15,13 +15,13 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postStartCommand": "setsid nohup bash /opt/importfacil/demo/iniciar.sh > /tmp/importfacil.log 2>&1 < /dev/null & setsid nohup bash \"${containerWorkspaceFolder}/.devcontainer/importfacil/informar-estado.sh\" > /tmp/informar-estado.log 2>&1 < /dev/null & sleep 2",
+  "postStartCommand": "setsid nohup bash /opt/exportfacil/demo/iniciar.sh > /tmp/exportfacil.log 2>&1 < /dev/null & setsid nohup bash \"${containerWorkspaceFolder}/.devcontainer/exportfacil/informar-estado.sh\" > /tmp/informar-estado.log 2>&1 < /dev/null & sleep 2",
   "forwardPorts": [
     8000
   ],
   "portsAttributes": {
     "8000": {
-      "label": "Loja ImportFácil",
+      "label": "Loja Export Fácil",
       "onAutoForward": "notify"
     }
   },

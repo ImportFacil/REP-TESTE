@@ -80,7 +80,7 @@ export async function semearDemonstracao(db: Banco): Promise<void> {
   }
   await db
     .insertInto('usuarios')
-    .values({ origem: 'equipe', empresa_id: null, nome: 'Laís De Martin', email: 'admin@importfacil.dev', papel: 'administrador', cognito_sub: 'dev-admin@importfacil.dev' })
+    .values({ origem: 'equipe', empresa_id: null, nome: 'Laís De Martin', email: 'admin@exportfacil.dev', papel: 'administrador', cognito_sub: 'dev-admin@exportfacil.dev' })
     .onConflict((oc) => oc.columns(['origem', 'email']).doUpdateSet({ nome: 'Laís De Martin' })) // atualiza o nome em bancos de demonstração já semeados
     .execute();
   // ordens de demonstração abertas antes de a ordem ter rota: Xangai → Santos, embarque 10 dias depois da abertura

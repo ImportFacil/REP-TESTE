@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Baixar o app ImportFácil</title>
-<meta name="description" content="Instale o app ImportFácil no celular: leia o QR code ou abra este endereço no Chrome (Android) ou no Safari (iPhone).">
+<title>Baixar o app Export Fácil</title>
+<meta name="description" content="Instale o app Export Fácil no celular: leia o QR code ou abra este endereço no Chrome (Android) ou no Safari (iPhone).">
 <meta name="theme-color" content="#1D4ED8">
-<link rel="icon" href="../prototipo-globo-192.png">
-<link rel="apple-touch-icon" href="../prototipo-globo-apple.png">
+<link rel="icon" href="globo-192.png">
+<link rel="apple-touch-icon" href="globo-192.png">
 <style>
   :root{--fundo:#F6F5F2;--cartao:#fff;--tinta:#18181B;--tinta2:#52525B;--borda:#E4E2DC;--azul:#1D4ED8;--azul-claro:#E8EEFC;--ok:#15803D;--ok-fundo:#DCFCE7;--pend:#92400E;--pend-fundo:#FEF3C7}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fundo:#141414;--cartao:#1F1F1E;--tinta:#F2F1EE;--tinta2:#B8B6B0;--borda:#34332F;--azul:#7AA2F7;--azul-claro:#1E2A44;--ok:#86EFAC;--ok-fundo:#14301F;--pend:#FCD34D;--pend-fundo:#3A2E10}}
@@ -40,18 +40,18 @@
 <body>
 <div class="wrap">
   <header>
-    <img src="../prototipo-globo-192.png" alt="">
+    <img src="globo-192.png" alt="">
     <div>
-      <h1>App ImportFácil no celular</h1>
+      <h1>App Export Fácil no celular</h1>
       <p class="sub">A loja inteira, com o ícone do globo na tela inicial. Instala pelo navegador, sem loja de aplicativos.</p>
     </div>
   </header>
 
   <div class="grade">
     <div class="cartao qr">
-      <img src="qr-app.png" alt="QR code do endereço importfacil.github.io/REP-TESTE/app" width="300" height="300">
+      <img src="qr-app.png" alt="QR code do endereço importfacil.github.io/Export-F-cil-PROTOTIPE/app" width="300" height="300">
       <p><b>Aponte a câmera do celular para o QR code</b></p>
-      <p><code>importfacil.github.io/REP-TESTE/app</code></p>
+      <p><code>importfacil.github.io/Export-F-cil-PROTOTIPE/app</code></p>
     </div>
 
     <div class="cartao estado" id="estado" aria-live="polite">
@@ -69,13 +69,13 @@
     <ol><li>Leia o QR code com a câmera e abra no Safari.</li><li>Toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>.</li></ol>
   </div>
 
-  <footer>Loja e Painel da ImportFácil, em teste. Enquanto não há homologação na AWS, a loja roda no GitHub Codespaces e este endereço leva até ela.</footer>
+  <footer>Loja e Painel da Export Fácil, em teste. Enquanto não há homologação na AWS, a loja roda no GitHub Codespaces e este endereço leva até ela.</footer>
 </div>
 
 <script>
 (function () {
-  var ENDERECO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/endereco.json';
-  var CODESPACES = 'https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fimportfacil%2Fdevcontainer.json';
+  var ENDERECO = 'https://raw.githubusercontent.com/ImportFacil/Export-F-cil-PROTOTIPE/app-endereco/endereco.json';
+  var CODESPACES = 'https://codespaces.new/ImportFacil/Export-F-cil-PROTOTIPE?devcontainer_path=.devcontainer%2Fexportfacil%2Fdevcontainer.json';
   var PROTOTIPO = '../';
   var caixa = document.getElementById('estado');
   var celular = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900;

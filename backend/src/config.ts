@@ -120,7 +120,7 @@ export function lerConfig(env: NodeJS.ProcessEnv = process.env): Config {
     filaEventosUrl: env.FILA_EVENTOS_URL || undefined,
     arquivos: env.BUCKET_ARQUIVOS
       ? { modo: 's3', bucket: env.BUCKET_ARQUIVOS, pasta: '' }
-      : { modo: 'local', pasta: env.PASTA_ARQUIVOS ?? '/tmp/importfacil-arquivos' },
+      : { modo: 'local', pasta: env.PASTA_ARQUIVOS ?? '/tmp/exportfacil-arquivos' },
     sentryDsn: env.SENTRY_DSN || undefined,
     workerNaApi: env.WORKER_NA_API === 'true',
   };

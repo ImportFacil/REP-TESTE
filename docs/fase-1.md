@@ -1,6 +1,6 @@
 # Fase 1: situação
 
-Comparação entre o documento **Arquitetura ImportFácil** e o que está neste repositório.
+Comparação entre o documento **Arquitetura Export Fácil** e o que está neste repositório.
 
 ## Feito
 

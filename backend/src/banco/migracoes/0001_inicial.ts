@@ -67,7 +67,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
       ativo             boolean NOT NULL DEFAULT true,
       criado_em         timestamptz NOT NULL DEFAULT now(),
       ultimo_acesso_em  timestamptz,
-      -- Clientes pertencem a uma empresa; a equipe ImportFácil não.
+      -- Clientes pertencem a uma empresa; a equipe Export Fácil não.
       CONSTRAINT usuarios_papel_por_origem CHECK (
         (origem = 'cliente' AND empresa_id IS NOT NULL AND papel IN ('comprador', 'aprovador'))
         OR (origem = 'equipe' AND empresa_id IS NULL AND papel IN ('comercial', 'financeiro', 'administrador'))

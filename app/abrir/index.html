@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ImportFácil — abrir o protótipo</title>
+<title>Export Fácil — abrir o protótipo</title>
 <style>
   body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f6f5f1; color: #1c2430; }
   main { max-width: 460px; padding: 28px 24px; text-align: center; }
   h1 { font-size: 1.3rem; margin: 0 0 10px; }
   p { line-height: 1.5; color: #4a5565; }
-  a.botao { display: inline-block; margin-top: 14px; padding: 12px 20px; border-radius: 8px; background: #2a78d6; color: #fff; text-decoration: none; font-weight: 600; }
+  a.botao { display: inline-block; margin-top: 14px; padding: 12px 20px; border-radius: 8px; background: #8a6a3f; color: #fff; text-decoration: none; font-weight: 600; }
   small { display: block; margin-top: 18px; color: #6b7482; }
   @media (prefers-color-scheme: dark) { body { background: #12171f; color: #e8ecf2; } p { color: #aab3c0; } }
 </style>
@@ -25,7 +25,7 @@
 /* Endereço fixo do protótipo: lê o estado publicado pelo Codespace (ramo app-endereco) e leva ao link que está no ar.
    O link do túnel muda cada vez que o Codespace liga; este endereço não muda. */
 (function () {
-  var ESTADO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/estado.json';
+  var ESTADO = 'https://raw.githubusercontent.com/ImportFacil/Export-F-cil-PROTOTIPE/app-endereco/estado.json';
   var el = function (id) { return document.getElementById(id); };
   function mostrar(titulo, texto) { el('titulo').textContent = titulo; el('texto').textContent = texto; }
   function ver() {

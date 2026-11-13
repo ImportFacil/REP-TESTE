@@ -39,7 +39,7 @@ export default function BaixarApp() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/globo-192.png" alt="" width={60} height={60} style={{ borderRadius: 14, border: '1px solid var(--borda)' }} />
           <div>
-            <h1 style={{ margin: 0 }}>App ImportFácil no celular</h1>
+            <h1 style={{ margin: 0 }}>App Export Fácil no celular</h1>
             <p className="sub" style={{ margin: '4px 0 0' }}>A loja, o Financeiro, a importação e o Painel da equipe, com o ícone do globo na tela inicial.</p>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function BaixarApp() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/qr-app.png" alt="QR code para baixar o app" width={240} height={240} style={{ maxWidth: '100%', height: 'auto', background: '#fff', borderRadius: 10, padding: 6 }} />
             <b>Aponte a câmera do celular para o QR code</b>
-            <span className="pequeno muted">importfacil.github.io/REP-TESTE/app</span>
+            <span className="pequeno muted">importfacil.github.io/Export-F-cil-PROTOTIPE/app</span>
             {instalado ? (
               <span className="etiqueta verde">App instalado neste aparelho</span>
             ) : pedido ? (

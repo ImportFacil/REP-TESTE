@@ -37,7 +37,7 @@ export function variaveisDesconhecidas(texto: string, permitidas: string[]): str
 export const EXEMPLO: Record<string, string> = {
   empresa: 'Cooperativa Agro Sorriso', nome: 'Marina Souza', pedido: '10042', parcela: '2', valor: 'R$ 12.480,00',
   vencimento: '15/12/2026', dias: '3', transportadora: 'Jadlog', rastreio: 'JD000123456BR', volumes: '4',
-  link_sair: 'https://loja.importfacil.com.br/newsletter/sair/?t=…',
+  link_sair: 'https://loja.exportfacil.com.br/newsletter/sair/?t=…',
 };
 
 function reais(c: number): string {

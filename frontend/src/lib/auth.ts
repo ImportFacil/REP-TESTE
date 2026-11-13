@@ -13,8 +13,8 @@ interface Sessao {
   refresh?: string;
 }
 
-const CHAVE = 'importfacil:sessao';
-const CHAVE_PKCE = 'importfacil:pkce';
+const CHAVE = 'exportfacil:sessao';
+const CHAVE_PKCE = 'exportfacil:pkce';
 
 export function sessaoAtual(): Sessao | null {
   try {

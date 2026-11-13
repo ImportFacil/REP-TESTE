@@ -25,7 +25,7 @@ export async function criarAplicacao(config: Config): Promise<INestApplication> 
 
   if (config.documentacaoApi) {
     const doc = new DocumentBuilder()
-      .setTitle('API ImportFácil')
+      .setTitle('API Export Fácil')
       .setDescription('Fase 1: contas e acesso, catálogo e preços por tipo de cliente.')
       .setVersion(process.env.VERSAO_APP ?? 'local')
       .addBearerAuth()

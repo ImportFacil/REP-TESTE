@@ -24,13 +24,13 @@ variable "regiao" {
 
 variable "projeto" {
   type    = string
-  default = "importfacil"
+  default = "exportfacil"
 }
 
 variable "repositorio_github" {
   description = "Repositório que pode publicar imagens e fazer deploy, no formato dono/nome."
   type        = string
-  default     = "ImportFacil/REP-TESTE"
+  default     = "ImportFacil/Export-F-cil-PROTOTIPE"
 }
 
 variable "ambientes_github" {

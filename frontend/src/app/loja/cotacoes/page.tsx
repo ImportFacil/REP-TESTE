@@ -5,10 +5,10 @@ import { data, dataHora, reais } from '@/lib/formato';
 import { useDados } from '@/lib/hooks';
 
 interface Cotacao { id: number; situacao: string; validade: string | null; criado_em: string; pedido_id: number | null; solicitante: string; qtd_itens: number; tabela_centavos: number; proposto_centavos: number | null }
-const NOMES: Record<string, string> = { solicitada: 'Esperando a ImportFácil', respondida: 'Respondida', aceita: 'Aceita', recusada: 'Recusada', expirada: 'Expirada', cancelada: 'Cancelada' };
+const NOMES: Record<string, string> = { solicitada: 'Esperando a Export Fácil', respondida: 'Respondida', aceita: 'Aceita', recusada: 'Recusada', expirada: 'Expirada', cancelada: 'Cancelada' };
 const COR: Record<string, string> = { solicitada: 'pendente', respondida: 'em_aberto', aceita: 'aprovado', recusada: 'recusado', expirada: 'expirada', cancelada: 'cancelada' };
 
-/** Cotações de preço (B2B): a empresa pede preço negociado para volumes do catálogo; a ImportFácil responde com preço e validade. */
+/** Cotações de preço (B2B): a empresa pede preço negociado para volumes do catálogo; a Export Fácil responde com preço e validade. */
 export default function Cotacoes() {
   const { dados, erro } = useDados<Cotacao[]>('/empresa/cotacoes');
   return (

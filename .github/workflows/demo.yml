@@ -10,7 +10,7 @@ on:
       - 'backend/**'
       - 'frontend/**'
       - 'demo/**'
-      - '.devcontainer/importfacil/**'
+      - '.devcontainer/exportfacil/**'
       - '.github/workflows/demo.yml'
 
 permissions:

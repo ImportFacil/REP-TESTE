@@ -58,7 +58,7 @@ export function Fechamento({ subtotal, inicial, aoMudar }: { subtotal: number; i
         </Campo>
         <Campo rotulo="Nº da ordem de compra" dica="O número do pedido no sistema da sua empresa"><input value={oc} onChange={(e) => setOc(e.target.value)} maxLength={60} /></Campo>
       </div>
-      <textarea placeholder="Observação para a ImportFácil (opcional)" value={obs} onChange={(e) => setObs(e.target.value)} maxLength={1000} aria-label="Observação" />
+      <textarea placeholder="Observação para a Export Fácil (opcional)" value={obs} onChange={(e) => setObs(e.target.value)} maxLength={1000} aria-label="Observação" />
       <div className="linha entre"><span>Total estimado</span><b className="numero">{reais(total ?? subtotal)}</b></div>
     </div>
   );

@@ -27,8 +27,8 @@ resource "aws_db_instance" "principal" {
   engine_version = var.banco_versao
   instance_class = var.banco_classe
 
-  db_name  = "importfacil"
-  username = "importfacil"
+  db_name  = "exportfacil"
+  username = "exportfacil"
   password = random_password.banco.result
   port     = 5432
 

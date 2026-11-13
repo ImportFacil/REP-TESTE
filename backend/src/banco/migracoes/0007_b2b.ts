@@ -71,15 +71,15 @@ export async function up(db: Kysely<unknown>): Promise<void> {
   for (const [codigo, nome, descricao, assunto, corpo, variaveis] of [
     ['requisicao_pendente', 'Compra esperando aprovação', 'Para os aprovadores da empresa, quando um comprador passa do limite.',
       'Compra de {{valor}} esperando a sua aprovação',
-      'Olá.\n\n{{solicitante}} montou uma compra de {{valor}} na {{empresa}}, acima do limite dele. A requisição nº {{requisicao}} espera a sua aprovação na loja, em Aprovações.\n\nEquipe ImportFácil',
+      'Olá.\n\n{{solicitante}} montou uma compra de {{valor}} na {{empresa}}, acima do limite dele. A requisição nº {{requisicao}} espera a sua aprovação na loja, em Aprovações.\n\nEquipe Export Fácil',
       ['solicitante', 'empresa', 'valor', 'requisicao']],
     ['requisicao_decidida', 'Resposta da aprovação', 'Para quem pediu, quando o aprovador decide.',
       'Sua requisição nº {{requisicao}} foi {{decisao}}',
-      'Olá, {{nome}}.\n\nA requisição nº {{requisicao}} foi {{decisao}} por {{aprovador}}. {{detalhe}}\n\nEquipe ImportFácil',
+      'Olá, {{nome}}.\n\nA requisição nº {{requisicao}} foi {{decisao}} por {{aprovador}}. {{detalhe}}\n\nEquipe Export Fácil',
       ['nome', 'requisicao', 'decisao', 'aprovador', 'detalhe']],
     ['cotacao_respondida', 'Cotação respondida', 'Para quem pediu a cotação, quando a equipe responde com os preços.',
       'Cotação nº {{cotacao}} respondida: {{valor}}',
-      'Olá, {{nome}}.\n\nA ImportFácil respondeu a cotação nº {{cotacao}}: {{valor}} para os itens pedidos, válida até {{validade}}.\n\n{{resposta}}\n\nO aprovador da empresa aceita a cotação na loja e o pedido sai com estes preços.\n\nEquipe ImportFácil',
+      'Olá, {{nome}}.\n\nA Export Fácil respondeu a cotação nº {{cotacao}}: {{valor}} para os itens pedidos, válida até {{validade}}.\n\n{{resposta}}\n\nO aprovador da empresa aceita a cotação na loja e o pedido sai com estes preços.\n\nEquipe Export Fácil',
       ['nome', 'cotacao', 'valor', 'validade', 'resposta']],
   ] as const) {
     await sql`INSERT INTO modelos_email (codigo, nome, descricao, assunto, corpo, variaveis)

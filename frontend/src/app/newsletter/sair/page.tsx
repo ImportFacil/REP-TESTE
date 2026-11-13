@@ -21,7 +21,7 @@ export default function SairDaNewsletter() {
         {estado === 'esperando' && <Carregando texto="Cancelando a inscrição…" />}
         {estado === 'ok' && <p>Pronto: você saiu da lista e não recebe mais as novidades por e-mail. Os avisos dos seus pedidos continuam chegando normalmente.</p>}
         {estado === 'erro' && <div className="aviso erro">{msg || 'Link inválido.'}</div>}
-        <Link href="/pagina/">Informações da ImportFácil</Link>
+        <Link href="/pagina/">Informações da Export Fácil</Link>
       </div>
     </div>
   );

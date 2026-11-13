@@ -133,31 +133,31 @@ const COBRANCA = ['empresa', 'pedido', 'parcela', 'valor', 'vencimento', 'dias']
 const MODELOS: Array<[string, string, string, string, string, string[]]> = [
   ['lembrete_vencimento', 'Lembrete de vencimento', 'Régua de cobrança: até 3 dias antes do vencimento do boleto.',
     'Seu boleto do pedido {{pedido}} vence em {{vencimento}}',
-    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, no valor de {{valor}}, vence em {{vencimento}}.\n\nSe já pagou, desconsidere esta mensagem.\n\nEquipe ImportFácil', COBRANCA],
+    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, no valor de {{valor}}, vence em {{vencimento}}.\n\nSe já pagou, desconsidere esta mensagem.\n\nEquipe Export Fácil', COBRANCA],
   ['vence_hoje', 'Vence hoje', 'Régua de cobrança: no dia do vencimento.',
     'Hoje vence a parcela {{parcela}} do pedido {{pedido}}',
-    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, vence hoje ({{vencimento}}).\n\nO boleto e a linha digitável estão em Financeiro, na sua área da loja.\n\nEquipe ImportFácil', COBRANCA],
+    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, vence hoje ({{vencimento}}).\n\nO boleto e a linha digitável estão em Financeiro, na sua área da loja.\n\nEquipe Export Fácil', COBRANCA],
   ['parcela_em_atraso', 'Parcela em atraso', 'Régua de cobrança: a partir de 1 dia de atraso. Novos pedidos no boleto ficam bloqueados.',
     'Parcela em atraso: pedido {{pedido}}',
-    'Olá, {{empresa}}.\n\nNão identificamos o pagamento da parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, vencida em {{vencimento}} ({{dias}} dia(s) de atraso).\n\nEnquanto houver parcela em atraso, novos pedidos no boleto ficam bloqueados. Pix e cartão continuam disponíveis.\n\nEquipe ImportFácil', COBRANCA],
+    'Olá, {{empresa}}.\n\nNão identificamos o pagamento da parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, vencida em {{vencimento}} ({{dias}} dia(s) de atraso).\n\nEnquanto houver parcela em atraso, novos pedidos no boleto ficam bloqueados. Pix e cartão continuam disponíveis.\n\nEquipe Export Fácil', COBRANCA],
   ['aviso_negativacao', 'Aviso de negativação', 'Régua de cobrança: a partir de 30 dias de atraso.',
     'Aviso de negativação: pedido {{pedido}}',
-    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, está com {{dias}} dias de atraso.\n\nSem o pagamento, o débito poderá ser registrado nos órgãos de proteção ao crédito, conforme o contrato.\n\nEquipe ImportFácil', COBRANCA],
+    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, está com {{dias}} dias de atraso.\n\nSem o pagamento, o débito poderá ser registrado nos órgãos de proteção ao crédito, conforme o contrato.\n\nEquipe Export Fácil', COBRANCA],
   ['aviso_protesto', 'Aviso de protesto', 'Régua de cobrança: a partir de 45 dias de atraso.',
     'Aviso de protesto: pedido {{pedido}}',
-    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, está com {{dias}} dias de atraso e poderá ser levada a protesto em cartório.\n\nFale com o financeiro da ImportFácil para negociar.\n\nEquipe ImportFácil', COBRANCA],
+    'Olá, {{empresa}}.\n\nA parcela {{parcela}} do pedido {{pedido}}, de {{valor}}, está com {{dias}} dias de atraso e poderá ser levada a protesto em cartório.\n\nFale com o financeiro da Export Fácil para negociar.\n\nEquipe Export Fácil', COBRANCA],
   ['pedido_enviado', 'Pedido enviado', 'Quando a equipe registra o envio do pedido, para quem comprou.',
     'Pedido {{pedido}} enviado por {{transportadora}}',
-    'Olá, {{nome}}.\n\nO pedido {{pedido}} da {{empresa}} saiu para entrega com a {{transportadora}}.\n\nCódigo de rastreio: {{rastreio}}\nVolumes: {{volumes}}\n\nEquipe ImportFácil', ['nome', 'empresa', 'pedido', 'transportadora', 'rastreio', 'volumes']],
+    'Olá, {{nome}}.\n\nO pedido {{pedido}} da {{empresa}} saiu para entrega com a {{transportadora}}.\n\nCódigo de rastreio: {{rastreio}}\nVolumes: {{volumes}}\n\nEquipe Export Fácil', ['nome', 'empresa', 'pedido', 'transportadora', 'rastreio', 'volumes']],
   ['newsletter_boas_vindas', 'Boas-vindas da newsletter', 'Quando alguém se inscreve na newsletter.',
-    'Você agora recebe as novidades da ImportFácil',
-    'Olá!\n\nObrigado por se inscrever. Você vai receber lançamentos, promoções e chegadas de importação.\n\nPara sair da lista: {{link_sair}}\n\nEquipe ImportFácil', ['link_sair']],
+    'Você agora recebe as novidades da Export Fácil',
+    'Olá!\n\nObrigado por se inscrever. Você vai receber lançamentos, promoções e chegadas de importação.\n\nPara sair da lista: {{link_sair}}\n\nEquipe Export Fácil', ['link_sair']],
 ];
 
 /** [slug, título, resumo, conteúdo]. O conteúdo usa um Markdown simples: ## título, parágrafos, listas com "-", **negrito** e [link](endereço). */
 const PAGINAS: Array<[string, string, string, string]> = [
-  ['sobre', 'Sobre a ImportFácil', 'Quem somos e como trabalhamos com empresas.',
-    `A ImportFácil vende para empresas: cooperativas, distribuidoras, revendas, construtoras e hospitais. Cada tipo de cliente tem o seu catálogo, a sua tabela de preços e o seu pedido mínimo.
+  ['sobre', 'Sobre a Export Fácil', 'Quem somos e como trabalhamos com empresas.',
+    `A Export Fácil vende para empresas: cooperativas, distribuidoras, revendas, construtoras e hospitais. Cada tipo de cliente tem o seu catálogo, a sua tabela de preços e o seu pedido mínimo.
 
 ## O que fazemos
 - Venda em atacado de produtos a pronta entrega, com preço da tabela do seu tipo de cliente.
@@ -177,7 +177,7 @@ Trabalhamos com Jadlog, TNT, Braspress, Patrus e Correios. A transportadora é e
 Quando o pedido sai, você recebe um e-mail com o código de rastreio. O código também aparece no pedido, na sua área da loja.`],
   ['trocas-e-devolucoes', 'Trocas e devoluções', 'Avarias, divergências e devolução de valores.',
     `## Avaria ou divergência
-Confira a carga no recebimento. Se houver avaria ou item faltando, anote no comprovante da transportadora e avise a ImportFácil em até 7 dias.
+Confira a carga no recebimento. Se houver avaria ou item faltando, anote no comprovante da transportadora e avise a Export Fácil em até 7 dias.
 
 ## Como devolvemos o valor
 - Pix: devolução por Pix para a conta da empresa.
@@ -194,7 +194,7 @@ Itens devolvidos voltam ao estoque depois da conferência.`],
 ## Crédito
 O limite é analisado a partir do cadastro da empresa e dos documentos enviados. Com parcela em atraso, novos pedidos no boleto ficam bloqueados até a regularização.`],
   ['politica-de-privacidade', 'Política de privacidade', 'Como tratamos os dados pessoais (LGPD).',
-    `Esta política explica como a ImportFácil trata dados pessoais, conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018).
+    `Esta política explica como a Export Fácil trata dados pessoais, conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018).
 
 ## Quais dados tratamos
 Nome, e-mail e telefone dos usuários das empresas clientes, dados da empresa (CNPJ, endereço) e os documentos enviados para a análise de crédito.

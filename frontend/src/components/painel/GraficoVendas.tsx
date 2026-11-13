@@ -37,7 +37,7 @@ export function GraficoVendas({ pontos, titulo, resumo, altura = 240 }: { pontos
       const cor = (v: string, padrao: string) => css.getPropertyValue(v).trim() || padrao;
       // a biblioteca só entende cores simples: resolve a cor do tema para rgb e monta a versão translúcida
       const sonda = document.createElement('span');
-      sonda.style.color = cor('--azul', '#2962FF');
+      sonda.style.color = cor('--azul', '#8a6a3f');
       el.appendChild(sonda);
       const rgb = (getComputedStyle(sonda).color.match(/[\d.]+/g) ?? ['41', '98', '255']).slice(0, 3).join(', ');
       sonda.remove();

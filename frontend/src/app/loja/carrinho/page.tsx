@@ -241,7 +241,7 @@ export default function Carrinho() {
                     ))}
                   </select>
                   <Aviso tipo="info">
-                    Os dados do cartão são digitados no formulário seguro do gateway de pagamento; a ImportFácil nunca vê o número do cartão.
+                    Os dados do cartão são digitados no formulário seguro do gateway de pagamento; a Export Fácil nunca vê o número do cartão.
                     Neste ambiente de testes o pagamento é simulado.
                   </Aviso>
                   <label className="linha pequeno"><input type="checkbox" checked={recusar} onChange={(e) => setRecusar(e.target.checked)} style={{ width: 'auto' }} /> Simular cartão recusado</label>
@@ -252,12 +252,12 @@ export default function Carrinho() {
                   <select value={enderecoId ?? enderecos.dados.find((x) => x.padrao)?.id ?? ''} onChange={(e) => setEnderecoId(Number(e.target.value))} aria-label="Endereço de entrega">
                     {enderecos.dados.map((x) => <option key={x.id} value={x.id}>{x.apelido}{x.padrao ? ' (padrão)' : ''}: {enderecoEmLinha(x.endereco)}</option>)}
                   </select>
-                ) : <span className="pequeno muted" style={{ fontWeight: 400 }}>Sem endereço cadastrado: a ImportFácil combina a entrega. <Link href="/loja/enderecos/">Cadastrar endereços</Link></span>}
+                ) : <span className="pequeno muted" style={{ fontWeight: 400 }}>Sem endereço cadastrado: a Export Fácil combina a entrega. <Link href="/loja/enderecos/">Cadastrar endereços</Link></span>}
               </label>
               <label className="campo">Nº da ordem de compra (opcional)
                 <input value={ordemCompra} onChange={(e) => setOrdemCompra(e.target.value)} maxLength={60} placeholder="O número do pedido no sistema da sua empresa" />
               </label>
-              <textarea placeholder="Observação para a ImportFácil (opcional)" value={observacao} onChange={(e) => setObservacao(e.target.value)} maxLength={1000} />
+              <textarea placeholder="Observação para a Export Fácil (opcional)" value={observacao} onChange={(e) => setObservacao(e.target.value)} maxLength={1000} />
               <div className="linha entre"><span>Total</span><b style={{ fontSize: '1.2rem' }} className="numero">{reais(totalEscolhido)}</b></div>
               <Aviso tipo="erro">{fechar.erro ?? outro.erro}</Aviso>
               {precisaAprovacao && (

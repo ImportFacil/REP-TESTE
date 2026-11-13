@@ -20,13 +20,13 @@ export default function InicioLoja() {
     <>
       <div className="banner">
         <span className="selo">{NOMES_TIPO[eu.empresa!.tipo_cliente] ?? eu.empresa!.tipo_cliente}</span>
-        <h2>{desconto ? `Seu preço já está com ${desconto}% de desconto` : 'Bem-vindo à ImportFácil'}</h2>
+        <h2>{desconto ? `Seu preço já está com ${desconto}% de desconto` : 'Bem-vindo à Export Fácil'}</h2>
         <p>
           {destaques.dados ? `Pedido mínimo ${reais(destaques.dados.pedido_minimo_centavos)} · ` : ''}
           Pix com desconto, boleto em até 4× para empresas aprovadas e cartão em até 12×.
         </p>
       </div>
-      {eu.empresa!.situacao !== 'ativa' && <Aviso tipo="atencao">A empresa está bloqueada para novos pedidos. Fale com a ImportFácil.</Aviso>}
+      {eu.empresa!.situacao !== 'ativa' && <Aviso tipo="atencao">A empresa está bloqueada para novos pedidos. Fale com a Export Fácil.</Aviso>}
       <div className="linha entre" style={{ margin: '8px 0 12px' }}>
         <h2 style={{ margin: 0 }}>Categorias</h2>
         <Link href="/loja/catalogo/">Ver tudo ›</Link>

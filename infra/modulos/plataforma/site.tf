@@ -121,7 +121,7 @@ resource "aws_cloudfront_distribution" "site" {
       origin_read_timeout    = 60
     }
     custom_header {
-      name  = "X-Origem-ImportFacil"
+      name  = "X-Origem-ExportFacil"
       value = random_password.origem.result
     }
   }

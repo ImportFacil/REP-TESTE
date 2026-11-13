@@ -1,6 +1,6 @@
 variable "projeto" {
   type    = string
-  default = "importfacil"
+  default = "exportfacil"
 }
 
 variable "ambiente" {
@@ -171,13 +171,13 @@ variable "worker_memoria" {
 # ---------- domínio (opcional) ----------
 
 variable "dominio_site" {
-  description = "Endereço do site neste ambiente, ex.: app.importfacil.com.br. Vazio = usa o endereço *.cloudfront.net."
+  description = "Endereço do site neste ambiente, ex.: app.exportfacil.com.br. Vazio = usa o endereço *.cloudfront.net."
   type        = string
   default     = ""
 }
 
 variable "dominio_origem_api" {
-  description = "Nome interno do balanceador, ex.: origem-api.prod.importfacil.com.br. Obrigatório quando dominio_site é informado."
+  description = "Nome interno do balanceador, ex.: origem-api.prod.exportfacil.com.br. Obrigatório quando dominio_site é informado."
   type        = string
   default     = ""
 }

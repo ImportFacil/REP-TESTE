@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Cria a homologação da ImportFácil numa conta AWS nova, direto do AWS CloudShell (região São Paulo).
+# Cria a homologação da Export Fácil numa conta AWS nova, direto do AWS CloudShell (região São Paulo).
 #
 # No console da AWS: escolha a região "América do Sul (São Paulo)", abra o CloudShell (ícone >_ no topo) e cole:
 #
-#   curl -fsSL https://raw.githubusercontent.com/ImportFacil/REP-TESTE/main/infra/cloudshell/criar-homologacao.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/ImportFacil/Export-F-cil-PROTOTIPE/main/infra/cloudshell/criar-homologacao.sh | bash
 #
 # O que faz (de 15 a 25 minutos):
 #   1. instala o Terraform no CloudShell;
@@ -17,8 +17,8 @@
 set -euo pipefail
 
 VERSAO_TERRAFORM="1.10.5"
-REPO="https://github.com/ImportFacil/REP-TESTE.git"
-PASTA="$HOME/REP-TESTE"
+REPO="https://github.com/ImportFacil/Export-F-cil-PROTOTIPE.git"
+PASTA="$HOME/Export-F-cil-PROTOTIPE"
 REGIAO="sa-east-1"
 export AWS_REGION="$REGIAO" AWS_DEFAULT_REGION="$REGIAO"
 
@@ -41,7 +41,7 @@ if [ "${CONFIRMAR:-}" != "sim" ]; then
 fi
 
 EMAIL="${EMAIL_ALERTAS:-}"
-while [ -z "$EMAIL" ]; do EMAIL=$(perguntar 'E-mail para os alertas (ex.: ti@importfacil.com.br): '); done
+while [ -z "$EMAIL" ]; do EMAIL=$(perguntar 'E-mail para os alertas (ex.: ti@exportfacil.com.br): '); done
 
 titulo "1/5 Terraform $VERSAO_TERRAFORM"
 mkdir -p "$HOME/bin"
@@ -68,7 +68,7 @@ git -C "$PASTA" log -1 --format='Versão: %h %s'
 
 titulo "3/5 Base da conta (bootstrap)"
 cd "$PASTA/infra/bootstrap"
-BUCKET="importfacil-terraform-estado-$CONTA"
+BUCKET="exportfacil-terraform-estado-$CONTA"
 COPIA="s3://$BUCKET/bootstrap/terraform.tfstate"
 # O estado do bootstrap fica no CloudShell e uma cópia no bucket; se o CloudShell perdeu o arquivo, recupera a cópia.
 if [ ! -f terraform.tfstate ] && aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null; then
@@ -100,12 +100,12 @@ if quando=$(aws s3api head-object --bucket "$BUCKET" --key "$TRAVA" --query Last
 fi
 terraform init -input=false -reconfigure -backend-config=../backend.hcl >/dev/null
 terraform apply -input=false -auto-approve -lock-timeout=2m -var-file=homolog.tfvars
-URL_SITE=$(aws ssm get-parameter --name /importfacil/homolog/site/url --query Parameter.Value --output text)
+URL_SITE=$(aws ssm get-parameter --name /exportfacil/homolog/site/url --query Parameter.Value --output text)
 
 titulo "5/5 Pronto. Agora, no GitHub"
 cat <<FIM
 
-Repositório ImportFacil/REP-TESTE > Settings > Secrets and variables > Actions > aba Variables:
+Repositório ImportFacil/Export-F-cil-PROTOTIPE > Settings > Secrets and variables > Actions > aba Variables:
 
   Variáveis do repositório (New repository variable):
     AWS_PAPEL_BUILD = $PAPEL_BUILD

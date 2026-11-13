@@ -9,6 +9,6 @@ locals {
   com_dominio = var.dominio_site != ""
   url_site    = local.com_dominio ? "https://${var.dominio_site}" : "https://${aws_cloudfront_distribution.site.domain_name}"
 
-  # Parâmetros lidos pelo GitHub Actions no deploy (caminho /importfacil/<ambiente>/...).
+  # Parâmetros lidos pelo GitHub Actions no deploy (caminho /exportfacil/<ambiente>/...).
   prefixo_ssm = "/${var.projeto}/${var.ambiente}"
 }

@@ -12,7 +12,7 @@
 # Atenção: a AWS liga sozinha um banco parado depois de 7 dias. O agendamento do GitHub
 # (workflow "Homologação: ligar e desligar") roda "pausar" toda noite, o que o desliga de novo.
 #
-# Usa os parâmetros /importfacil/<ambiente>/* gravados pelo Terraform. Produção não pode ser pausada.
+# Usa os parâmetros /exportfacil/<ambiente>/* gravados pelo Terraform. Produção não pode ser pausada.
 set -euo pipefail
 
 acao="${1:-situacao}"
@@ -22,7 +22,7 @@ if [ "$amb" = "prod" ]; then
   exit 1
 fi
 
-P="/importfacil/$amb"
+P="/exportfacil/$amb"
 ler() { aws ssm get-parameter --name "$P/$1" --query Parameter.Value --output text; }
 
 cluster=$(ler ecs/cluster)

@@ -4,7 +4,7 @@ import { IsBoolean, IsIn, IsInt, IsObject, IsOptional, IsString, Length, Max, Ma
 
 export class SalvarCadastroDto {
   @ApiPropertyOptional({ description: 'Faturamento mensal médio, em centavos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(0) faturamento_mensal_centavos?: number;
-  @ApiPropertyOptional({ description: 'Compras mensais previstas na ImportFácil, em centavos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(0) compras_mensais_previstas_centavos?: number;
+  @ApiPropertyOptional({ description: 'Compras mensais previstas na Export Fácil, em centavos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(0) compras_mensais_previstas_centavos?: number;
   @ApiPropertyOptional({ description: 'Limite de crédito desejado, em centavos' }) @IsOptional() @Type(() => Number) @IsInt() @Min(0) limite_solicitado_centavos?: number;
   @ApiPropertyOptional() @IsOptional() @Type(() => Number) @IsInt() @Min(0) @Max(200) anos_cnpj?: number;
   @ApiPropertyOptional({ description: 'Campos próprios do tipo de cliente (nº de cooperados, CNES, etc.)' }) @IsOptional() @IsObject() dados?: Record<string, unknown>;

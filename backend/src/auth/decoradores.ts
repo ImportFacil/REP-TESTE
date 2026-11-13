@@ -2,8 +2,8 @@ import { SetMetadata, createParamDecorator, type ExecutionContext } from '@nestj
 import type { OrigemUsuario, PapelCliente, PapelEquipe } from '../banco/tipos';
 import type { UsuarioAutenticado } from './identidade';
 
-export const META_PUBLICO = 'importfacil:publico';
-export const META_ACESSO = 'importfacil:acesso';
+export const META_PUBLICO = 'exportfacil:publico';
+export const META_ACESSO = 'exportfacil:acesso';
 
 export interface RegraAcesso {
   origem: OrigemUsuario;
@@ -13,7 +13,7 @@ export interface RegraAcesso {
 /** Rota aberta, sem login (ex.: verificação de saúde). */
 export const Publico = () => SetMetadata(META_PUBLICO, true);
 
-/** Só usuários da equipe ImportFácil; se papéis forem informados, só esses papéis. */
+/** Só usuários da equipe Export Fácil; se papéis forem informados, só esses papéis. */
 export const SoEquipe = (...papeis: PapelEquipe[]) => SetMetadata(META_ACESSO, { origem: 'equipe', papeis } satisfies RegraAcesso);
 
 /** Só usuários de empresas clientes; se papéis forem informados, só esses papéis. */
