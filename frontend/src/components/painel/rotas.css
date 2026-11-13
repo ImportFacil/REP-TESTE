@@ -34,44 +34,50 @@
   .rota-trocar { justify-self: start; }
 }
 
-/* pino de localização dos portos: branco e pequeno. A Globe.gl centraliza o elemento no porto;
+/* pino de localização dos portos: dourado e pequeno. A Globe.gl centraliza o elemento no porto;
    o pino sobe metade da própria altura para a ponta tocar o porto. */
-.rota-pino { display: flex; flex-direction: column; align-items: center; transform: translateY(-50%); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); }
+.rota-pino { display: flex; flex-direction: column; align-items: center; transform: translateY(-50%); pointer-events: none; transition: opacity .2s; filter: drop-shadow(0 0 4px rgba(255, 200, 61, .75)) drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); }
 .rota-pino-rotulo { margin-bottom: 2px; padding: 1px 7px; border-radius: 6px; background: rgba(0, 0, 17, .7); color: #fff; font-size: 0.72rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
 
-/* ---------- página Rotas marítimas: o globo é o fundo de toda a área da página ---------- */
+/* ---------- página Rotas marítimas: o globo ocupa a área da página e os dois quadros ficam por cima ---------- */
 .rota-fundo, .rota-cena { position: fixed; top: var(--pn-topo); right: 0; bottom: 0; left: var(--pn-menu); }
 .pn-recolhido .rota-fundo, .pn-recolhido .rota-cena { left: var(--pn-menu-recolhido); }
 .rota-fundo { z-index: 1; background: #000011; }
+/* espaço livre do globo: entre o quadro da esquerda e o da direita (medidos pela página) */
+.rota-livre { position: absolute; inset: 0 var(--livre-direita, 0px) var(--livre-base, 0px) var(--livre-esquerda, 0px); }
 .rota-globo-fundo { height: 100%; background: #000011; }
 .rota-cena {
-  z-index: 2; overflow-y: auto; padding: 20px 24px 16px; display: flex; flex-direction: column; gap: 14px;
-  pointer-events: none; /* o arrasto passa para o globo; só os painéis recebem o clique */
+  z-index: 2; padding: 18px 22px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; overflow-y: auto;
+  pointer-events: none; /* o arrasto passa para o globo; só os quadros recebem o clique */
   color: #fff;
   --texto: #ffffff; --texto-2: #b9c6da; --borda: rgba(255, 255, 255, .22); --superficie: rgba(255, 255, 255, .08); --superficie-2: rgba(255, 255, 255, .08);
 }
-.rota-cena > * > *, .rota-rodape { pointer-events: auto; }
-.rota-topo { display: flex; flex-direction: column; gap: 12px; }
-.rota-titulo h1 { margin: 0; font-size: 1.5rem; text-shadow: 0 1px 6px rgba(0, 0, 0, .8); }
-.rota-titulo p { margin: 4px 0 0; color: #c9d4e6; font-size: 0.95rem; text-shadow: 0 1px 6px rgba(0, 0, 0, .9); }
-.rota-vidro { background: rgba(6, 10, 26, .66); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 16px 18px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.rota-cena input { color: #fff; color-scheme: dark; }
+.rota-vidro { background: rgba(6, 10, 26, .72); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 15px 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.rota-quadro { pointer-events: auto; width: 300px; max-height: 100%; overflow-y: auto; }
+.rota-consulta h1 { margin: 0; font-size: 1.25rem; }
+.rota-sub { margin: 3px 0 14px; font-size: 0.84rem; color: #c9d4e6; }
+.rota-form { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.rota-campo { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; }
+.rota-cena input { color: #fff; color-scheme: dark; font-size: 0.88rem; padding: 8px 10px; }
 .rota-cena input::placeholder { color: #8f9db3; }
-.rota-cena .rota-trocar { height: 42px; width: 44px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .08); color: #fff; font-size: 1.2rem; cursor: pointer; }
-.rota-cena .rota-trocar:hover { background: rgba(255, 255, 255, .18); }
-.rota-cena .rota-evitar input { accent-color: #ffc83d; }
-.rota-erro { border-color: rgba(255, 120, 120, .6); color: #ffd4d4; }
-.rota-meio { flex: 1; display: flex; justify-content: flex-end; align-items: flex-start; min-height: 0; }
-.rota-resultado { width: min(340px, 100%); }
-.rota-resultado h2 { margin: 0 0 12px; font-size: 1.1rem; }
-.rota-resultado h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .04em; color: #ffd66b; margin: 14px 0 6px; }
-.rota-resultado .rota-numeros b { color: #fff; }
-.rota-fraco, .rota-portos { margin: 0; font-size: 0.88rem; color: #c9d4e6; }
+.rota-trocar { align-self: center; height: 32px; width: 38px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .08); color: #fff; font-size: 1rem; cursor: pointer; }
+.rota-trocar:hover { background: rgba(255, 255, 255, .18); }
+.rota-evitar { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; font-size: 0.82rem; }
+.rota-evitar label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.rota-evitar input { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; accent-color: #ffc83d; }
+.rota-erro { margin: 12px 0 0; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255, 120, 120, .6); color: #ffd4d4; font-size: 0.84rem; }
+.rota-nota { margin: 14px 0 0; padding: 12px 0 0; border-radius: 0; background: none; border-top: 1px solid rgba(255, 255, 255, .12); font-size: 0.72rem; line-height: 1.45; color: #a9b6cb; }
+.rota-resultado h2 { margin: 0 0 12px; font-size: 1.05rem; }
+.rota-resultado h3 { font-size: 0.74rem; text-transform: uppercase; letter-spacing: .04em; color: #ffd66b; margin: 14px 0 6px; }
+.rota-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rota-numeros div { padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, .08); }
+.rota-numeros b { display: block; font-size: 1rem; color: #fff; font-variant-numeric: tabular-nums; }
+.rota-numeros span { font-size: 0.72rem; color: #b9c6da; }
+.rota-passagens { margin: 0; padding-left: 18px; font-size: 0.85rem; }
+.rota-fraco, .rota-portos { margin: 0; font-size: 0.84rem; color: #c9d4e6; }
 .rota-portos b { color: #fff; }
-.rota-rodape { margin: 0; max-width: 760px; font-size: 0.76rem; line-height: 1.45; color: #a9b6cb; text-shadow: 0 1px 4px rgba(0, 0, 0, .9); }
-@media (max-width: 900px) {
+@media (max-width: 999px) {
   .rota-fundo, .rota-cena, .pn-recolhido .rota-fundo, .pn-recolhido .rota-cena { left: 0; }
-  .rota-cena { padding: 14px; }
-  .rota-meio { justify-content: stretch; align-items: flex-end; min-height: 46vh; }
-  .rota-resultado { width: 100%; }
+  .rota-cena { flex-direction: column; align-items: stretch; padding: 12px; }
+  .rota-quadro { width: auto; max-height: none; }
 }

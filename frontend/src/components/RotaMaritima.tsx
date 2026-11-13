@@ -54,14 +54,14 @@ const CAMADAS_NEON: Camada[] = [
   { cor: '#fff1b8', traco: 3.2 },
 ];
 
-/** Pino de localização branco e pequeno, com o nome do porto (a ponta fica exatamente sobre o porto). */
+/** Pino de localização dourado e pequeno, com o nome do porto (a ponta fica exatamente sobre o porto). */
 function pino(p: Porto & { papel: string }): HTMLElement {
   const el = document.createElement('div');
   el.innerHTML = `<div class="rota-pino">
     <span class="rota-pino-rotulo"></span>
     <svg viewBox="0 0 24 32" width="18" height="24" aria-hidden="true">
-      <path d="M12 31C12 31 2 19.5 2 11.5a10 10 0 1 1 20 0C22 19.5 12 31 12 31z" fill="#ffffff" stroke="rgba(0,0,17,.55)" stroke-width="1.2"/>
-      <circle cx="12" cy="11.5" r="3.6" fill="#000011"/>
+      <path d="M12 31C12 31 2 19.5 2 11.5a10 10 0 1 1 20 0C22 19.5 12 31 12 31z" fill="#ffc83d" stroke="#fff3c4" stroke-width="1.4"/>
+      <circle cx="12" cy="11.5" r="3.6" fill="#3a2600"/>
     </svg></div>`;
   (el.querySelector('.rota-pino-rotulo') as HTMLElement).textContent = p.nome;
   (el.firstElementChild as HTMLElement).title = `${p.papel}: ${p.nome}`;
@@ -135,7 +135,7 @@ export function GloboRota({ rota, altura, fundo }: { rota: Rota | null; altura?:
     g.pathsData(CAMADAS_NEON.map((c, k) => ({ ...c, pontos: rota.linha.map(([lon, lat]) => [lon, lat, ALTURA_ROTA + k * 0.0015]) })))
       .htmlElementsData([{ ...rota.origem, papel: 'Saída' }, { ...rota.destino, papel: 'Chegada' }]);
     const meio = rota.linha[Math.floor(rota.linha.length / 2)];
-    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: fundo ? 3.7 : 1.9 }, 900);
+    g.pointOfView({ lat: meio[1], lng: meio[0], altitude: fundo ? 2.6 : 1.9 }, 900);
   }, [rota, pronto, fundo]);
 
   return (
