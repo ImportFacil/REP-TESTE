@@ -34,7 +34,7 @@ export default function Rotas() {
 
   // O globo fica centralizado no espaço entre os dois quadros, sem ficar coberto por nenhum deles.
   const fundo = useRef<HTMLDivElement>(null);
-  const consulta = useRef<HTMLElement>(null);
+  const consulta = useRef<HTMLDivElement>(null);
   const resultado = useRef<HTMLElement>(null);
   useEffect(() => {
     const medir = () => {
@@ -60,7 +60,8 @@ export default function Rotas() {
       {/* O globo ocupa a área da página; os dois quadros ficam por cima, um de cada lado */}
       <div className="rota-fundo" ref={fundo}><div className="rota-livre"><GloboRota rota={rota} fundo /></div></div>
       <div className="rota rota-cena">
-        <section className="rota-vidro rota-quadro rota-consulta" ref={consulta}>
+        <div className="rota-coluna" ref={consulta}>
+        <section className="rota-vidro rota-quadro rota-consulta">
           <h1>Rotas marítimas</h1>
           <p className="rota-sub">Caminho pelo mar entre o porto de embarque e o de chegada.</p>
           <div className="rota-form">
@@ -72,6 +73,8 @@ export default function Rotas() {
               <input id="rotaVel" type="number" min={5} max={30} step={1} value={velocidade} onChange={(e) => { const v = Number(e.target.value); if (v >= 5 && v <= 30) setVelocidade(v); }} />
             </label>
           </div>
+        </section>
+        <section className="rota-vidro rota-quadro rota-opcoes">
           <div className="rota-evitar">
             <label><input type="checkbox" checked={evitar.includes('suez')} onChange={() => alternar('suez')} /> Evitar o Canal de Suez e o Mar Vermelho</label>
             <label><input type="checkbox" checked={evitar.includes('panama')} onChange={() => alternar('panama')} /> Evitar o Canal do Panamá</label>
@@ -79,6 +82,7 @@ export default function Rotas() {
           {erro && <p className="rota-erro" role="alert">{erro}</p>}
           <p className="rota-nota">Arraste o globo para girar e role para aproximar. Estimativa da searoute sobre a malha marítima do Eurostat (2025): é o caminho comercial mais curto pelo mar, não o trajeto real de um navio, e o tempo supõe navegação contínua, sem escalas nem espera em porto. Confirme o prazo com o armador.</p>
         </section>
+        </div>
 
         <aside className="rota-vidro rota-quadro rota-resultado" ref={resultado} aria-live="polite" aria-busy={calculando}>
           <h2>{rota ? `${rota.origem.nome} → ${rota.destino.nome}` : 'Calculando a rota…'}</h2>

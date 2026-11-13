@@ -54,6 +54,9 @@
 }
 .rota-vidro { background: rgba(6, 10, 26, .72); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 15px 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .rota-quadro { pointer-events: auto; width: 300px; max-height: 100%; overflow-y: auto; }
+/* coluna da esquerda: a consulta no alto e as opções no fim da página, com o espaço livre entre os dois */
+.rota-coluna { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; min-height: 100%; }
+.rota-opcoes .rota-evitar { margin-top: 0; }
 .rota-consulta h1 { margin: 0; font-size: 1.25rem; }
 .rota-sub { margin: 3px 0 14px; font-size: 0.84rem; color: #c9d4e6; }
 .rota-form { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
@@ -80,4 +83,5 @@
   .rota-fundo, .rota-cena, .pn-recolhido .rota-fundo, .pn-recolhido .rota-cena { left: 0; }
   .rota-cena { flex-direction: column; align-items: stretch; padding: 12px; }
   .rota-quadro { width: auto; max-height: none; }
+  .rota-coluna { min-height: 0; }
 }
