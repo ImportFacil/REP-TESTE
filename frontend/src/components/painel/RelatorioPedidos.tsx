@@ -74,7 +74,8 @@ function Numeros({ itens }: { itens: Array<[string, string, string?]> }) {
 export function RelatorioPedidos() {
   const router = useRouter();
   const { janela, mudar, consulta, pronto } = useJanela('24h');
-  const empresas = useDados<{ itens: Empresa[] }>('/equipe/empresas?por_pagina=1000');
+  // só id, nome e tipo de cada empresa (lista leve para o seletor de cliente)
+  const empresas = useDados<Empresa[]>('/equipe/empresas/opcoes');
   const empresa = typeof window === 'undefined' ? '' : new URLSearchParams(location.search).get('cliente') ?? '';
   const { dados: r, erro } = useDados<Relatorio>(pronto ? `/equipe/relatorios/pedidos?${consulta}${empresa ? `&empresa_id=${empresa}` : ''}` : null);
   const escolherCliente = (id: string) => {
@@ -83,7 +84,7 @@ export function RelatorioPedidos() {
     history.replaceState(null, '', `?${q}`);
     mudar({});
   };
-  const nomeCliente = empresas.dados?.itens.find((e) => e.id === empresa)?.razao_social;
+  const nomeCliente = empresas.dados?.find((e) => e.id === empresa)?.razao_social;
   const titulo = `Pedidos · ${r?.janela.rotulo ?? ''}${nomeCliente ? ` · ${nomeCliente}` : janela.tipo ? ` · ${NOMES_TIPO[janela.tipo]}` : ' · todos os clientes'}`;
   const arquivo = `pedidos-${(r?.janela.rotulo ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-')}${nomeCliente ? `-${nomeCliente.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : ''}`;
   return (
@@ -91,7 +92,7 @@ export function RelatorioPedidos() {
       <FiltroJanela janela={janela} mudar={mudar} extra={
         <select value={empresa} onChange={(e) => escolherCliente(e.target.value)} style={{ width: 'auto', maxWidth: 320 }} aria-label="Cliente">
           <option value="">Todos os clientes</option>
-          {(empresas.dados?.itens ?? []).filter((e) => !janela.tipo || e.tipo_cliente === janela.tipo).map((e) => <option key={e.id} value={e.id}>{e.razao_social}</option>)}
+          {(empresas.dados ?? []).filter((e) => !janela.tipo || e.tipo_cliente === janela.tipo).map((e) => <option key={e.id} value={e.id}>{e.razao_social}</option>)}
         </select>
       } />
       <Aviso tipo="erro">{erro}</Aviso>

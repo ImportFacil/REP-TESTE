@@ -80,6 +80,11 @@ export class EquipeEmpresasController {
     return this.empresas.criar(dto, u, ip);
   }
 
+  @Get('opcoes')
+  opcoes() {
+    return this.empresas.opcoes();
+  }
+
   @Get(':id')
   obter(@Param('id', ParseUUIDPipe) id: string) {
     return this.empresas.obter(id);

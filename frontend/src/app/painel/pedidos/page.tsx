@@ -6,13 +6,13 @@ import { Grade, type Coluna } from '@/components/painel/Grade';
 import { Situacao } from '@/components/ui';
 import { api } from '@/lib/api';
 import { FORMA, NOMES_TIPO, SITUACAO_PAGAMENTO, SITUACAO_PEDIDO, dataHora, reais } from '@/lib/formato';
-import { useDados } from '@/lib/hooks';
+import { useListaServidor } from '@/lib/hooks';
 
 interface Linha { id: number; razao_social: string; tipo_cliente: string; criado_em: string; forma_pagamento: string; parcelas: number; total_centavos: number; situacao: string; situacao_pagamento: string; ordem_compra: string | null; cotacao_id: number | null }
 
 const COLUNAS: Coluna<Linha>[] = [
   { chave: 'id', titulo: 'Nº', ordenavel: true, render: (p) => <b>{p.id}</b> },
-  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'opcoes',
+  { chave: 'razao_social', titulo: 'Empresa', ordenavel: true, filtro: 'texto',
     render: (p) => <>{p.razao_social}{(p.ordem_compra || p.cotacao_id) && <div className="pequeno muted">{p.ordem_compra ? `OC ${p.ordem_compra}` : ''}{p.ordem_compra && p.cotacao_id ? ' · ' : ''}{p.cotacao_id ? `cotação ${p.cotacao_id}` : ''}</div>}</> },
   { chave: 'ordem_compra', titulo: 'Ordem de compra', filtro: 'texto', oculta: true },
   { chave: 'tipo_cliente', titulo: 'Perfil', filtro: 'opcoes', opcoes: NOMES_TIPO, render: (p) => NOMES_TIPO[p.tipo_cliente] ?? p.tipo_cliente, valorCsv: (p) => NOMES_TIPO[p.tipo_cliente] ?? p.tipo_cliente },
@@ -23,7 +23,7 @@ const COLUNAS: Coluna<Linha>[] = [
     render: (p) => <Situacao valor={p.situacao_pagamento} nomes={SITUACAO_PAGAMENTO} />, valorCsv: (p) => SITUACAO_PAGAMENTO[p.situacao_pagamento] },
   { chave: 'situacao', titulo: 'Situação do pedido', filtro: 'opcoes', opcoes: SITUACAO_PEDIDO,
     render: (p) => <Situacao valor={p.situacao} nomes={SITUACAO_PEDIDO} />, valorCsv: (p) => SITUACAO_PEDIDO[p.situacao] },
-  { chave: 'total_centavos', titulo: 'Total', ordenavel: true, direita: true, filtro: 'numero', valor: (p) => p.total_centavos,
+  { chave: 'total_centavos', titulo: 'Total (R$)', parametro: 'total', ordenavel: true, direita: true, filtro: 'numero', valor: (p) => p.total_centavos,
     render: (p) => reais(p.total_centavos), valorCsv: (p) => (p.total_centavos / 100).toFixed(2).replace('.', ',') },
 ];
 
@@ -31,7 +31,9 @@ export default function PedidosPainel() {
   const router = useRouter();
   const { eu } = useEu();
   const { janela, mudar, consulta, pronto } = useJanela('todos', true);
-  const { dados, carregando, recarregar } = useDados<{ itens: Linha[]; total: number; janela: { rotulo: string } | null }>(pronto ? `/equipe/pedidos?por_pagina=1000&${consulta}` : null);
+  // só a página que aparece vem da API; busca, filtros e ordem também são feitos lá
+  const { dados, carregando, recarregar, servidor } = useListaServidor<Linha>(pronto ? `/equipe/pedidos?${consulta}` : null);
+  const rotulo = (dados?.janela as { rotulo: string } | null | undefined)?.rotulo;
   const fin = ['financeiro', 'administrador'].includes(eu.usuario.papel);
   const emLote = async (linhas: Linha[], caminho: (p: Linha) => string) => {
     const erros: string[] = [];
@@ -42,10 +44,11 @@ export default function PedidosPainel() {
   return (
     <Grade
       titulo="Pedidos"
-      sub={dados ? `${dados.total} pedido(s)${dados.janela ? ` · ${dados.janela.rotulo}` : ''}${janela.tipo ? ` · ${NOMES_TIPO[janela.tipo]}` : ''}, dos mais recentes para os mais antigos${dados.total > 1000 ? ' (os 1.000 mais recentes aparecem aqui; use o período para ver os outros)' : ''}` : ' '}
+      sub={dados ? `${dados.total} pedido(s)${rotulo ? ` · ${rotulo}` : ''}${janela.tipo ? ` · ${NOMES_TIPO[janela.tipo]}` : ''}` : ' '}
       topo={<FiltroJanela janela={janela} mudar={mudar} comTodos />}
       linhas={dados?.itens}
       carregando={carregando}
+      servidor={servidor}
       colunas={COLUNAS}
       chave={(p) => p.id}
       aoClicar={(p) => router.push(`/painel/pedido/?id=${p.id}`)}

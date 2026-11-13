@@ -29,7 +29,11 @@ export default function PedidoRapido() {
   const conferir = () => acao.executar(async () => {
     const lidas = lerTexto(texto).slice(0, 200);
     const codigos = [...new Set(lidas.map((l) => l.codigo))].filter((c) => /^[A-Z0-9._-]+$/.test(c));
-    const r = codigos.length ? await api<{ itens: ProdutoApi[] }>(`/catalogo/produtos?por_pagina=500&codigos=${encodeURIComponent(codigos.join(','))}`) : { itens: [] };
+    // a API entrega no máximo 200 por vez: códigos em blocos de 200
+    const blocos: string[][] = [];
+    for (let i = 0; i < codigos.length; i += 200) blocos.push(codigos.slice(i, i + 200));
+    const partes = await Promise.all(blocos.map((b) => api<{ itens: ProdutoApi[] }>(`/catalogo/produtos?por_pagina=200&codigos=${encodeURIComponent(b.join(','))}`)));
+    const r = { itens: partes.flatMap((x) => x.itens) };
     const porCodigo = new Map(r.itens.map((p) => [p.codigo, p]));
     setEnviado(0);
     setLinhas(lidas.map((l) => {

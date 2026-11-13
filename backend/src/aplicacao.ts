@@ -15,7 +15,8 @@ export async function criarAplicacao(config: Config): Promise<INestApplication> 
   // Atrás do CloudFront e do balanceador, o IP real de quem acessa vem em X-Forwarded-For.
   app.set('trust proxy', config.saltosProxy);
   app.disable('x-powered-by');
-  app.enableCors({ origin: config.corsOrigens, credentials: false });
+  // credentials: o site manda o cookie httpOnly da sessão (só para /sessao) quando está em outro endereço
+  app.enableCors({ origin: config.corsOrigens, credentials: true });
   if (config.prefixoApi) app.setGlobalPrefix(config.prefixoApi);
   // Demonstração: o mesmo endereço serve o site (páginas estáticas do Next) e a API (em /api).
   if (config.pastaSite) app.useStaticAssets(config.pastaSite, { extensions: ['html'], index: 'index.html' });

@@ -11,6 +11,7 @@ import { CONFIG, type Config } from './config';
 import { ContasModule } from './contas/contas.module';
 import { CreditoModule } from './credito/credito.module';
 import { DevTokenController } from './auth/dev-token.controller';
+import { SessaoController } from './auth/sessao.controller';
 import { ImportacaoModule } from './importacao/importacao.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
 import { PainelModule } from './painel/painel.module';
@@ -68,7 +69,7 @@ export class AppModule {
         LojaModule,
         B2bModule,
       ],
-      controllers: [SaudeController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
+      controllers: [SaudeController, SessaoController, ...(config.auth.modo === 'dev' ? [DevTokenController] : [])],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };
   }

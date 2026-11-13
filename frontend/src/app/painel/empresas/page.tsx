@@ -6,7 +6,7 @@ import { Grade, type Coluna } from '@/components/painel/Grade';
 import { Aviso, Campo, Situacao } from '@/components/ui';
 import { api } from '@/lib/api';
 import { NOMES_TIPO, cnpj } from '@/lib/formato';
-import { useAcao, useDados } from '@/lib/hooks';
+import { useAcao, useDados, useListaServidor } from '@/lib/hooks';
 
 interface Empresa { id: string; cnpj: string; razao_social: string; nome_fantasia: string | null; tipo_cliente: string; situacao: string; conta_e_ordem_liberada: boolean }
 
@@ -14,7 +14,7 @@ export default function Empresas() {
   const router = useRouter();
   const { eu } = useEu();
   const pode = ['comercial', 'administrador'].includes(eu.usuario.papel);
-  const lista = useDados<{ itens: Empresa[]; total: number }>('/equipe/empresas?por_pagina=1000');
+  const lista = useListaServidor<Empresa>('/equipe/empresas');
   const tipos = useDados<Array<{ tipo_cliente: string; nome: string }>>('/equipe/tabelas-preco');
   const [novo, setNovo] = useState(false);
   const [form, setForm] = useState({ cnpj: '', razao_social: '', nome_fantasia: '', tipo_cliente: 'cooperativa' });
@@ -57,6 +57,7 @@ export default function Empresas() {
         </>}
         linhas={lista.dados?.itens}
         carregando={lista.carregando}
+        servidor={lista.servidor}
         colunas={colunas}
         chave={(e) => e.id}
         aoClicar={(e) => router.push(`/painel/empresa/?id=${e.id}`)}

@@ -1,11 +1,11 @@
-// Baixa a tabela oficial da NCM (Siscomex / Receita Federal) e gera prototipo-ncm.json,
+// Baixa a tabela oficial da NCM (Siscomex / Receita Federal) e gera frontend/public/ncm.json,
 // usado pela busca de NCM da calculadora de importação (Painel da equipe).
 // Formato gerado: { atualizadoEm, ato, fonte, total, n: [[codigoSóDígitos, descrição], ...] }
 // com todos os níveis (capítulo, posição, subposições e itens), para montar a descrição completa no navegador.
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 
 const URL_NCM = 'https://portalunico.siscomex.gov.br/classif/api/publico/nomenclatura/download/json?perfil=PUBLICO';
-const SAIDA = process.argv[2] || 'prototipo-ncm.json';
+const SAIDA = process.argv[2] || 'frontend/public/ncm.json';
 
 async function baixar() {
   let ultimoErro;

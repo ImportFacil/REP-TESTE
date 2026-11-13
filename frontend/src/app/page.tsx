@@ -7,8 +7,7 @@ import { sessaoAtual } from '@/lib/auth';
 export default function Inicio() {
   const router = useRouter();
   useEffect(() => {
-    const s = sessaoAtual();
-    router.replace(!s ? '/entrar/' : s.origem === 'equipe' ? '/painel/' : '/loja/');
+    void sessaoAtual().then((s) => router.replace(!s ? '/entrar/' : s.origem === 'equipe' ? '/painel/' : '/loja/'));
   }, [router]);
   return <Carregando />;
 }

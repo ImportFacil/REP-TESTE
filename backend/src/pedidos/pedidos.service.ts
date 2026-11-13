@@ -7,7 +7,7 @@ import type { Endereco, FormaPagamento, SituacaoPedido } from '../banco/tipos';
 import { CatalogoService } from '../catalogo/catalogo.service';
 import { LojaService } from '../loja/loja.service';
 import { MarketingService } from '../marketing/marketing.service';
-import { limites } from '../comum/paginacao';
+import { limites, lista, termoBusca } from '../comum/paginacao';
 import { lerJanela } from '../comum/periodo';
 import { PagamentosService } from '../pagamentos/pagamentos.service';
 import { PoliticaService } from '../pagamentos/politica.service';
@@ -208,25 +208,38 @@ export class PedidosService {
   async listar(f: {
     empresaId?: string; situacao?: string; situacao_pagamento?: string; pagina?: number; por_pagina?: number;
     horas?: number; de?: string; ate?: string; tipo_cliente?: string; busca?: string; ordem?: 'recentes' | 'antigos' | 'maior_valor' | 'menor_valor';
+    forma_pagamento?: string; razao_social?: string; ordem_compra?: string; criado_em_de?: string; criado_em_ate?: string;
+    total_min?: number; total_max?: number; ordenar?: 'id' | 'razao_social' | 'criado_em' | 'total_centavos'; dir?: 'asc' | 'desc';
   }) {
     const { limite, deslocamento, pagina } = limites(f, 20);
     const janela = lerJanela(f);
     let q = this.db.selectFrom('pedidos as p').innerJoin('empresas as e', 'e.id', 'p.empresa_id');
     if (f.empresaId) q = q.where('p.empresa_id', '=', f.empresaId);
-    if (f.situacao) q = q.where('p.situacao', '=', f.situacao as never);
-    if (f.situacao_pagamento) q = q.where('p.situacao_pagamento', '=', f.situacao_pagamento as never);
-    if (f.tipo_cliente) q = q.where('p.tipo_cliente', '=', f.tipo_cliente);
+    // filtros de várias opções chegam separados por vírgula (situacao=novo,enviado)
+    const situacoes = lista(f.situacao), pagamentos = lista(f.situacao_pagamento), tipos = lista(f.tipo_cliente), formas = lista(f.forma_pagamento);
+    if (situacoes.length) q = q.where('p.situacao', 'in', situacoes as never[]);
+    if (pagamentos.length) q = q.where('p.situacao_pagamento', 'in', pagamentos as never[]);
+    if (tipos.length) q = q.where('p.tipo_cliente', 'in', tipos);
+    if (formas.length) q = q.where('p.forma_pagamento', 'in', formas as never[]);
+    if (f.razao_social?.trim()) q = q.where('e.razao_social', 'ilike', termoBusca(f.razao_social));
+    if (f.ordem_compra?.trim()) q = q.where('p.ordem_compra', 'ilike', termoBusca(f.ordem_compra));
+    // datas do filtro da coluna, no fuso de Brasília
+    if (f.criado_em_de) q = q.where(sql<boolean>`p.criado_em >= (${f.criado_em_de}::date::timestamp AT TIME ZONE 'America/Sao_Paulo')`);
+    if (f.criado_em_ate) q = q.where(sql<boolean>`p.criado_em < ((${f.criado_em_ate}::date + 1)::timestamp AT TIME ZONE 'America/Sao_Paulo')`);
+    if (f.total_min !== undefined) q = q.where('p.total_centavos', '>=', Math.round(f.total_min * 100));
+    if (f.total_max !== undefined) q = q.where('p.total_centavos', '<=', Math.round(f.total_max * 100));
     if (janela) q = q.where(sql<boolean>`p.criado_em BETWEEN ${janela.inicio}::timestamptz AND ${janela.fim}::timestamptz`);
     if (f.busca?.trim()) {
       const t = f.busca.trim();
-      const termo = `%${t.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+      const termo = termoBusca(t);
       q = q.where((eb) => eb.or([
         ...(/^\d{1,12}$/.test(t) ? [eb('p.id', '=', Number(t))] : []),
         eb('e.razao_social', 'ilike', termo), eb('p.ordem_compra', 'ilike', termo), eb('e.cnpj', 'like', `%${t.replace(/\D/g, '') || '§'}%`),
       ]));
     }
     const ordem = { recentes: ['p.criado_em', 'desc'], antigos: ['p.criado_em', 'asc'], maior_valor: ['p.total_centavos', 'desc'], menor_valor: ['p.total_centavos', 'asc'] } as const;
-    const [col, dir] = ordem[f.ordem ?? 'recentes'];
+    const colunas = { id: 'p.id', razao_social: 'e.razao_social', criado_em: 'p.criado_em', total_centavos: 'p.total_centavos' } as const;
+    const [col, dir] = f.ordenar ? [colunas[f.ordenar], f.dir ?? 'asc'] as const : ordem[f.ordem ?? 'recentes'];
     const [itens, total] = await Promise.all([
       q.selectAll('p').select(['e.razao_social', sql<number>`(select count(*)::int from pedido_itens i where i.pedido_id = p.id)`.as('qtd_itens')])
         .orderBy(col, dir).orderBy('p.id', 'desc').limit(limite).offset(deslocamento).execute(),

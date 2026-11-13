@@ -5,7 +5,7 @@ import {
   registerDecorator, type ValidationOptions,
 } from 'class-validator';
 import { cnpjValido, normalizarCnpj } from '../comum/cnpj';
-import { Paginacao } from '../comum/paginacao';
+import { Ordenacao, Paginacao } from '../comum/paginacao';
 import { PAPEIS_CLIENTE, PAPEIS_EQUIPE, type PapelCliente, type PapelEquipe, type SituacaoEmpresa } from '../banco/tipos';
 
 const aparar = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
@@ -48,10 +48,13 @@ export class AlterarEmpresaDto {
   @ApiPropertyOptional({ type: EnderecoDto }) @IsOptional() @ValidateNested() @Type(() => EnderecoDto) endereco?: EnderecoDto;
 }
 
-export class FiltroEmpresas extends Paginacao {
+export class FiltroEmpresas extends Ordenacao {
   @ApiPropertyOptional({ description: 'Parte da razão social, do nome fantasia ou do CNPJ' }) @IsOptional() @IsString() @MaxLength(100) busca?: string;
-  @ApiPropertyOptional({ enum: SITUACOES }) @IsOptional() @IsIn(SITUACOES) situacao?: SituacaoEmpresa;
-  @ApiPropertyOptional() @IsOptional() @IsString() tipo_cliente?: string;
+  @ApiPropertyOptional({ description: `Uma ou mais, separadas por vírgula: ${SITUACOES.join(', ')}` })
+  @IsOptional() @Matches(new RegExp(`^(${SITUACOES.join('|')})(,(${SITUACOES.join('|')}))*$`)) situacao?: string;
+  @ApiPropertyOptional({ description: 'Um ou mais tipos de cliente, separados por vírgula' }) @IsOptional() @IsString() @MaxLength(200) tipo_cliente?: string;
+  @ApiPropertyOptional({ description: 'true, false ou true,false' }) @IsOptional() @Matches(/^(true|false)(,(true|false))?$/) conta_e_ordem_liberada?: string;
+  @ApiPropertyOptional({ enum: ['razao_social', 'tipo_cliente', 'criado_em'] }) @IsOptional() @IsIn(['razao_social', 'tipo_cliente', 'criado_em']) ordenar?: 'razao_social' | 'tipo_cliente' | 'criado_em';
 }
 
 export class NovoUsuarioClienteDto {

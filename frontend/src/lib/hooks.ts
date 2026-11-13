@@ -59,3 +59,39 @@ export function useAcao() {
   }, []);
   return { enviando, erro, ok, executar, setErro, setOk };
 }
+
+/**
+ * Lista grande do Painel paginada na API: a grade informa a consulta (página, busca, filtros, ordem)
+ * e este gancho busca só aquela página. `base` é o caminho com os filtros fixos da página (ex.: período).
+ * Para exportar, `todas` percorre as páginas de 100 em 100, só quando a pessoa pede.
+ */
+export function useListaServidor<T>(base: string | null) {
+  const [consulta, setConsulta] = useState<string | null>(null);
+  const juntar = useCallback((c: string) => {
+    if (!base) return null;
+    const [caminho, fixos = ''] = base.split('?');
+    const q = new URLSearchParams(fixos);
+    new URLSearchParams(c).forEach((v, k) => q.set(k, v)); // o filtro da coluna vale mais que o fixo
+    return `${caminho}?${q}`;
+  }, [base]);
+  const caminho = consulta === null ? null : juntar(consulta);
+  const r = useDados<{ itens: T[]; total: number } & Record<string, unknown>>(caminho);
+  const todas = useCallback(async (c: string) => {
+    const linhas: T[] = [];
+    for (let pagina = 1; pagina <= 500; pagina++) {
+      const q = new URLSearchParams(c);
+      q.set('pagina', String(pagina));
+      q.set('por_pagina', '100');
+      const p = await api<{ itens: T[]; total: number }>(juntar(q.toString())!);
+      linhas.push(...p.itens);
+      if (!p.itens.length || linhas.length >= p.total) break;
+    }
+    return linhas;
+  }, [juntar]);
+  return {
+    ...r,
+    // sem consulta ainda (a grade monta a primeira) conta como carregando
+    carregando: r.carregando || caminho === null,
+    servidor: { total: r.dados?.total ?? 0, aoMudar: setConsulta, todas },
+  };
+}

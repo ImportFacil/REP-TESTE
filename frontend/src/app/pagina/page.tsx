@@ -21,8 +21,9 @@ export default function PaginaDeConteudo() {
   const [voltar, setVoltar] = useState<{ href: string; rotulo: string }>({ href: '/entrar/', rotulo: 'Entrar' });
 
   useEffect(() => {
-    const s = sessaoAtual();
-    if (s) setVoltar(s.origem === 'equipe' ? { href: '/painel/', rotulo: 'Voltar ao Painel' } : { href: '/loja/', rotulo: 'Voltar à loja' });
+    void sessaoAtual().then((s) => {
+      if (s) setVoltar(s.origem === 'equipe' ? { href: '/painel/', rotulo: 'Voltar ao Painel' } : { href: '/loja/', rotulo: 'Voltar à loja' });
+    });
     apiPublica<Resumo[]>('/conteudo/paginas').then(setTodas).catch(() => setTodas([]));
   }, []);
   useEffect(() => {

@@ -3,7 +3,7 @@
 Plataforma B2B da ImportFácil: loja para clientes empresariais, crédito, pedidos, pagamentos, importação,
 Painel da equipe e app para celular.
 
-**▶ Protótipo navegável (24 telas, simulação): https://importfacil.github.io/REP-TESTE/**
+**▶ Protótipo no ar (endereço fixo, leva ao link atual do Codespace): https://importfacil.github.io/REP-TESTE/app/abrir/**
 **▶ App da loja no celular (QR code): https://importfacil.github.io/REP-TESTE/app/**
 
 ## O que tem neste repositório
@@ -15,7 +15,7 @@ Painel da equipe e app para celular.
 | `demo/` | Demonstração num endereço só: banco + API servindo o site, com login de demonstração sem senha |
 | `.devcontainer/importfacil/` | Abre a demonstração no GitHub Codespaces |
 | `infra/` | Terraform da AWS (homologação e produção) |
-| `index.html` | Protótipo de todas as telas |
+| `app/` | Páginas fixas no GitHub Pages: o QR code do app (`app/`) e o endereço fixo do protótipo (`app/abrir/`) |
 | `.github/workflows/` | `entrega.yml` (testes e deploy na AWS), `demo.yml` (demonstração com capturas), `ncm.yml` (tabela NCM semanal) |
 
 A loja feita no Bagisto ficou guardada no ramo [`bagisto`](https://github.com/ImportFacil/REP-TESTE/tree/bagisto).

@@ -59,5 +59,8 @@
     "criar-admin": "node dist/scripts/criar-admin.js",
     "token-dev": "node dist/scripts/token-dev.js",
     "worker": "node dist/worker.js"
+  },
+  "overrides": {
+    "multer": "2.5.0"
   }
 }

@@ -1,4 +1,4 @@
-# Atualiza a tabela NCM usada pela calculadora de importação (prototipo-ncm.json, usada pelo protótipo e pela API).
+# Atualiza a tabela NCM usada pela calculadora de importação (frontend/public/ncm.json).
 # Roda toda segunda-feira, quando este arquivo ou o script mudam, e à mão em Actions.
 name: Tabela NCM
 
@@ -30,16 +30,15 @@ jobs:
           node-version: 22
       - name: Baixar a NCM vigente do Siscomex
         run: |
-          node scripts/ncm/atualizar.mjs prototipo-ncm.json
-          cp prototipo-ncm.json frontend/public/ncm.json   # a mesma tabela para a calculadora do Painel
+          node scripts/ncm/atualizar.mjs frontend/public/ncm.json
       - name: Gravar no repositório, se mudou
         run: |
-          if git diff --quiet -- prototipo-ncm.json frontend/public/ncm.json && git ls-files --error-unmatch frontend/public/ncm.json >/dev/null 2>&1 && git ls-files --error-unmatch prototipo-ncm.json >/dev/null 2>&1; then
+          if git diff --quiet -- frontend/public/ncm.json && git ls-files --error-unmatch frontend/public/ncm.json >/dev/null 2>&1 && git ls-files --error-unmatch prototipo-ncm.json >/dev/null 2>&1; then
             echo "Tabela NCM sem mudanças."; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add prototipo-ncm.json frontend/public/ncm.json
+          git add frontend/public/ncm.json
           git commit -m "Tabela NCM atualizada pelo Siscomex"
           git pull --rebase origin main
           git push origin HEAD:main

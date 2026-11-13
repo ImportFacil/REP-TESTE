@@ -6,7 +6,7 @@ import { BANCO, type Banco } from '../banco/banco.module';
 import type { Empresa } from '../banco/tipos';
 import { normalizarCnpj } from '../comum/cnpj';
 import { PG_VIOLACAO_UNICA, codigoPg } from '../comum/erros';
-import { limites } from '../comum/paginacao';
+import { limites, lista, termoBusca } from '../comum/paginacao';
 import type { AlterarEmpresaDto, CriarEmpresaDto, FiltroEmpresas } from './dto';
 
 @Injectable()
@@ -48,10 +48,12 @@ export class EmpresasService {
   async listar(f: FiltroEmpresas) {
     const { limite, deslocamento, pagina } = limites(f);
     let q = this.db.selectFrom('empresas');
-    if (f.situacao) q = q.where('situacao', '=', f.situacao);
-    if (f.tipo_cliente) q = q.where('tipo_cliente', '=', f.tipo_cliente);
+    const situacoes = lista(f.situacao), tipos = lista(f.tipo_cliente), contaOrdem = lista(f.conta_e_ordem_liberada);
+    if (situacoes.length) q = q.where('situacao', 'in', situacoes as never[]);
+    if (tipos.length) q = q.where('tipo_cliente', 'in', tipos);
+    if (contaOrdem.length === 1) q = q.where('conta_e_ordem_liberada', '=', contaOrdem[0] === 'true');
     if (f.busca?.trim()) {
-      const termo = `%${f.busca.trim().replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+      const termo = termoBusca(f.busca);
       const cnpj = normalizarCnpj(f.busca);
       q = q.where((eb) =>
         eb.or([
@@ -62,10 +64,15 @@ export class EmpresasService {
       );
     }
     const [itens, total] = await Promise.all([
-      q.selectAll().orderBy('razao_social').limit(limite).offset(deslocamento).execute(),
+      q.selectAll().orderBy(f.ordenar ?? 'razao_social', f.dir ?? 'asc').orderBy('id').limit(limite).offset(deslocamento).execute(),
       q.select(sql<number>`count(*)::int`.as('n')).executeTakeFirstOrThrow(),
     ]);
     return { itens, total: total.n, pagina, por_pagina: limite };
+  }
+
+  /** Só id, nome e tipo de todas as empresas, para listas de seleção (sem os cadastros completos). */
+  opcoes() {
+    return this.db.selectFrom('empresas').select(['id', 'razao_social', 'tipo_cliente']).orderBy('razao_social').execute();
   }
 
   async obter(id: string): Promise<Empresa> {

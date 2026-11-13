@@ -42,10 +42,11 @@ export function Shell({ origem, secoes = [], painel, children }: { origem: Orige
   const carrinho = useCarrinho();
 
   useEffect(() => {
-    const s = sessaoAtual();
-    if (!s) router.replace('/entrar/');
-    else if (s.origem !== origem) router.replace(s.origem === 'equipe' ? '/painel/' : '/loja/');
-    else setPronto(true);
+    void sessaoAtual().then((s) => {
+      if (!s) router.replace('/entrar/');
+      else if (s.origem !== origem) router.replace(s.origem === 'equipe' ? '/painel/' : '/loja/');
+      else setPronto(true);
+    });
     carregarConfig().then((c) => setAmbiente(c.ambiente === 'prod' ? '' : c.ambiente)).catch(() => undefined);
   }, [origem, router]);
 

@@ -19,6 +19,20 @@ export interface Coluna<T> {
   oculta?: boolean;
   /** valor no CSV, quando diferente do `valor` (ex.: nome legível da situação) */
   valorCsv?: (l: T) => string | number | null | undefined;
+  /** na grade paginada no servidor: nome do parâmetro do filtro na API (padrão: a `chave`) */
+  parametro?: string;
+}
+
+/**
+ * Paginação no servidor: a grade não recebe a lista inteira, só a página atual e o `total`.
+ * A cada mudança de página, busca, filtro ou ordem ela chama `aoMudar` com a consulta pronta
+ * (pagina, por_pagina, busca, ordenar, dir e os filtros das colunas) para a página buscar na API.
+ */
+export interface GradeServidor<T> {
+  total: number;
+  aoMudar: (consulta: string) => void;
+  /** busca todas as linhas com os filtros atuais, só quando a pessoa pede para exportar */
+  todas?: (consulta: string) => Promise<T[]>;
 }
 
 export interface AcaoLote<T> {
@@ -30,11 +44,31 @@ export interface AcaoLote<T> {
 
 type Filtro = { tipo: 'texto'; v: string } | { tipo: 'opcoes'; v: string[] } | { tipo: 'faixa'; de: string; ate: string };
 
+/** Monta a consulta da API a partir do estado da grade. */
+function montarConsulta<T>(colunas: Coluna<T>[], e: { pagina: number; porPagina: number; busca: string; ordem: { chave: string; dir: 'asc' | 'desc' } | null; filtros: Record<string, Filtro> }) {
+  const q = new URLSearchParams({ pagina: String(e.pagina), por_pagina: String(e.porPagina) });
+  if (e.busca.trim()) q.set('busca', e.busca.trim());
+  if (e.ordem) { q.set('ordenar', e.ordem.chave); q.set('dir', e.ordem.dir); }
+  for (const [k, f] of Object.entries(e.filtros)) {
+    const c = colunas.find((x) => x.chave === k);
+    if (!c) continue;
+    const nome = c.parametro ?? k;
+    if (f.tipo === 'texto' && f.v.trim()) q.set(nome, f.v.trim());
+    if (f.tipo === 'opcoes' && f.v.length) q.set(nome, f.v.join(','));
+    if (f.tipo === 'faixa') {
+      const [a, b] = c.filtro === 'data' ? ['_de', '_ate'] : ['_min', '_max'];
+      if (f.de !== '') q.set(nome + a, f.de);
+      if (f.ate !== '') q.set(nome + b, f.ate);
+    }
+  }
+  return q.toString();
+}
+
 const tira = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /** Grade de dados no formato do Bagisto: busca, filtros por coluna, ordenação, paginação, exportação e ações em lote. */
 export function Grade<T>({
-  titulo, sub, acoes, topo, linhas, colunas, chave, aoClicar, acoesLote, carregando, vazio = 'Nenhum registro.', nomeArquivo, porPaginaInicial = 10, ordemInicial,
+  titulo, sub, acoes, topo, linhas, colunas, chave, aoClicar, acoesLote, carregando, vazio = 'Nenhum registro.', nomeArquivo, porPaginaInicial = 10, ordemInicial, servidor,
 }: {
   titulo?: string;
   sub?: ReactNode;
@@ -51,6 +85,8 @@ export function Grade<T>({
   nomeArquivo?: string;
   porPaginaInicial?: number;
   ordemInicial?: { chave: string; dir: 'asc' | 'desc' };
+  /** paginação, busca, filtros e ordem feitos na API (listas grandes) */
+  servidor?: GradeServidor<T>;
 }) {
   const [busca, setBusca] = useState('');
   const [filtros, setFiltros] = useState<Record<string, Filtro>>({});
@@ -58,7 +94,10 @@ export function Grade<T>({
   const [ordem, setOrdem] = useState(ordemInicial ?? null);
   const [porPagina, setPorPagina] = useState(porPaginaInicial);
   const [pagina, setPagina] = useState(1);
-  const [marcadas, setMarcadas] = useState<Set<string | number>>(new Set());
+  // as marcadas guardam a linha inteira: na paginação no servidor a seleção sobrevive à troca de página
+  const [marcadas, setMarcadas] = useState<Map<string | number, T>>(new Map());
+  const [iniciada, setIniciada] = useState(false);
+  const [buscaEnviada, setBuscaEnviada] = useState('');
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
@@ -73,15 +112,28 @@ export function Grade<T>({
       else if (c.filtro === 'texto') f[c.chave] = { tipo: 'texto', v };
     }
     if (Object.keys(f).length) setFiltros(f);
-    if (q.get('busca')) setBusca(q.get('busca')!);
+    if (q.get('busca')) { setBusca(q.get('busca')!); setBuscaEnviada(q.get('busca')!); }
+    setIniciada(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => setPagina(1), [busca, filtros, porPagina]);
+  useEffect(() => setPagina(1), [busca, filtros, porPagina, ordem]);
+  // no servidor a busca espera a pessoa parar de digitar
+  useEffect(() => {
+    if (!servidor) return;
+    const t = setTimeout(() => setBuscaEnviada(busca), 350);
+    return () => clearTimeout(t);
+  }, [busca, servidor]);
+  const consulta = montarConsulta(colunas, { pagina, porPagina, busca: buscaEnviada, ordem, filtros });
+  const aoMudar = servidor?.aoMudar;
+  useEffect(() => {
+    if (iniciada && aoMudar) aoMudar(consulta);
+  }, [iniciada, aoMudar, consulta]);
 
   const val = (c: Coluna<T>, l: T) => (c.valor ? c.valor(l) : (l as Record<string, unknown>)[c.chave] as string | number | null | undefined);
 
   const filtradas = useMemo(() => {
     if (!linhas) return [];
+    if (servidor) return linhas;
     const q = tira(busca.trim());
     let r = linhas.filter((l) => {
       if (q && !colunas.some((c) => c.exportar !== false && tira(String(c.valorCsv?.(l) ?? val(c, l) ?? '')).includes(q))) return false;
@@ -117,14 +169,21 @@ export function Grade<T>({
     }
     return r;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linhas, busca, filtros, ordem, colunas]);
+  }, [linhas, busca, filtros, ordem, colunas, !!servidor]);
 
-  const paginas = Math.max(1, Math.ceil(filtradas.length / porPagina));
+  const total = servidor ? servidor.total : filtradas.length;
+  const paginas = Math.max(1, Math.ceil(total / porPagina));
   const atual = Math.min(pagina, paginas);
-  const visiveis = filtradas.slice((atual - 1) * porPagina, atual * porPagina);
+  const visiveis = servidor ? filtradas : filtradas.slice((atual - 1) * porPagina, atual * porPagina);
   const chavesVisiveis = visiveis.map(chave);
   const todasMarcadas = chavesVisiveis.length > 0 && chavesVisiveis.every((k) => marcadas.has(k));
-  const selecionadas = (linhas ?? []).filter((l) => marcadas.has(chave(l)));
+  const selecionadas = [...marcadas.values()];
+  const marcar = (ls: T[], sim: boolean) => {
+    const n = new Map(marcadas);
+    for (const l of ls) { if (sim) n.set(chave(l), l); else n.delete(chave(l)); }
+    setMarcadas(n);
+  };
+  const [exportando, setExportando] = useState(false);
   const nFiltros = Object.values(filtros).filter((f) => (f.tipo === 'opcoes' ? f.v.length : f.tipo === 'texto' ? f.v : f.de || f.ate)).length;
 
   const alternarOrdem = (c: Coluna<T>) => {
@@ -132,10 +191,17 @@ export function Grade<T>({
     setOrdem(ordem?.chave === c.chave ? (ordem.dir === 'asc' ? { chave: c.chave, dir: 'desc' } : null) : { chave: c.chave, dir: 'asc' });
   };
 
-  const exportar = () => {
+  const exportar = async () => {
+    let fonte = filtradas;
+    if (servidor?.todas) {
+      setExportando(true);
+      try { fonte = await servidor.todas(montarConsulta(colunas, { pagina: 1, porPagina: 100, busca: buscaEnviada, ordem, filtros })); }
+      catch (e) { setAviso((e as Error).message); return; }
+      finally { setExportando(false); }
+    }
     const cols = colunas.filter((c) => c.exportar !== false);
     const esc = (v: unknown) => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-    const csv = [cols.map((c) => esc(c.titulo)).join(';'), ...filtradas.map((l) => cols.map((c) => esc(c.valorCsv?.(l) ?? val(c, l))).join(';'))].join('\r\n');
+    const csv = [cols.map((c) => esc(c.titulo)).join(';'), ...fonte.map((l) => cols.map((c) => esc(c.valorCsv?.(l) ?? val(c, l))).join(';'))].join('\r\n');
     const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a');
     a.href = url;
@@ -150,7 +216,7 @@ export function Grade<T>({
     try {
       await a.executar(selecionadas);
       setAviso(`${a.rotulo}: ${selecionadas.length} registro(s).`);
-      setMarcadas(new Set());
+      setMarcadas(new Map());
     } catch (e) {
       setAviso((e as Error).message);
     } finally {
@@ -170,7 +236,7 @@ export function Grade<T>({
             {sub && <p className="sub muted">{sub}</p>}
           </div>
           <div className="pn-cabecalho-acoes">
-            <button className="pn-botao-leve" onClick={exportar} disabled={!filtradas.length}><Icone nome="exportar" tamanho={18} /> Exportar</button>
+            <button className="pn-botao-leve" onClick={() => void exportar()} disabled={!filtradas.length || exportando}><Icone nome="exportar" tamanho={18} /> {exportando ? 'Exportando…' : 'Exportar'}</button>
             {acoes}
           </div>
         </div>
@@ -182,7 +248,7 @@ export function Grade<T>({
           <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Para pesquisar" aria-label="Pesquisar na lista" />
           <Icone nome="busca" tamanho={18} />
         </div>
-        <span className="pn-resultados">{linhas ? `${filtradas.length} resultado${filtradas.length === 1 ? '' : 's'}` : ''}</span>
+        <span className="pn-resultados">{linhas ? `${total} resultado${total === 1 ? '' : 's'}` : ''}</span>
         <div className="pn-paginacao">
           {filtraveis.length > 0 && (
             <button className="pn-botao-borda" aria-pressed={verFiltros} onClick={() => setVerFiltros(!verFiltros)}>
@@ -211,7 +277,7 @@ export function Grade<T>({
             );
             if (c.filtro === 'opcoes') {
               const marcados = f?.tipo === 'opcoes' ? f.v : [];
-              const opcoes = c.opcoes ?? Object.fromEntries([...new Set((linhas ?? []).map((l) => String(val(c, l) ?? '')))].filter(Boolean).sort().map((v) => [v, v]));
+              const opcoes = c.opcoes ?? (servidor ? {} : null) ?? Object.fromEntries([...new Set((linhas ?? []).map((l) => String(val(c, l) ?? '')))].filter(Boolean).sort().map((v) => [v, v]));
               return (
                 <fieldset key={c.chave}><legend>{c.titulo}</legend>
                   {Object.entries(opcoes).map(([k, rot]) => (
@@ -254,14 +320,14 @@ export function Grade<T>({
         <div className="pn-lote" role="region" aria-label="Ações em lote">
           <b>{selecionadas.length} selecionado(s)</b>
           {acoesLote.map((a) => <button key={a.rotulo} className="pn-botao-borda" disabled={ocupado} onClick={() => void executarLote(a)}>{a.rotulo}</button>)}
-          <button className="pn-botao-leve" onClick={() => setMarcadas(new Set())}>Desmarcar</button>
+          <button className="pn-botao-leve" onClick={() => setMarcadas(new Map())}>Desmarcar</button>
         </div>
       )}
       {aviso && <div className="aviso info" style={{ marginBottom: 12 }} role="status">{aviso}</div>}
 
       <div className="pn-caixa" style={{ overflow: 'hidden' }}>
         {carregando && !linhas ? <div className="pn-vazio">Carregando…</div> : !filtradas.length ? (
-          <div className="pn-vazio"><Icone nome="caixa" tamanho={40} />{linhas?.length ? 'Nada encontrado com essa busca ou filtro.' : vazio}</div>
+          <div className="pn-vazio"><Icone nome="caixa" tamanho={40} />{(servidor ? buscaEnviada || nFiltros : linhas?.length) ? 'Nada encontrado com essa busca ou filtro.' : vazio}</div>
         ) : (
           <table className="pn-tabela">
             <thead>
@@ -269,7 +335,7 @@ export function Grade<T>({
                 {acoesLote && (
                   <th className="pn-caixinha">
                     <input type="checkbox" aria-label="Selecionar todos desta página" checked={todasMarcadas}
-                      onChange={(e) => { const n = new Set(marcadas); chavesVisiveis.forEach((k) => (e.target.checked ? n.add(k) : n.delete(k))); setMarcadas(n); }} />
+                      onChange={(e) => marcar(visiveis, e.target.checked)} />
                   </th>
                 )}
                 {colunas.filter((c) => !c.oculta).map((c) => (
@@ -291,7 +357,7 @@ export function Grade<T>({
                     {acoesLote && (
                       <td className="pn-caixinha" onClick={(e) => e.stopPropagation()}>
                         <input type="checkbox" aria-label="Selecionar" checked={marcadas.has(k)}
-                          onChange={(e) => { const n = new Set(marcadas); if (e.target.checked) n.add(k); else n.delete(k); setMarcadas(n); }} />
+                          onChange={(e) => marcar([l], e.target.checked)} />
                       </td>
                     )}
                     {colunas.filter((c) => !c.oculta).map((c) => (

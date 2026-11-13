@@ -255,7 +255,7 @@ try {
 } catch (e) { checar('painel-cotacao', false, e.message.split('\n')[0]); }
 try {
   const contar = async () => { await page.waitForLoadState('networkidle'); await page.waitForTimeout(500); return Number((await page.locator('.pn-cabecalho .sub').first().innerText()).match(/^(\d+)/)?.[1] ?? -1); };
-  await visitar(page, '100-pedidos-todos', '/painel/pedidos/', { espera: 'dos mais recentes' });
+  await visitar(page, '100-pedidos-todos', '/painel/pedidos/', { espera: "Pedidos" });
   const todos = await contar();
   const contagens = [];
   for (const [rotulo, nome] of [['24 horas', '101-pedidos-24h'], ['48 horas', '102-pedidos-48h'], ['72 horas', '103-pedidos-72h'], ['Semana', '104-pedidos-semana']]) {

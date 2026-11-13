@@ -118,13 +118,11 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Montar o site (Next.js) e o protótipo em /prototipo
+      - name: Montar o site (Next.js)
         working-directory: frontend
         run: |
           npm ci --no-audit --no-fund
           npm run build
-          mkdir -p out/prototipo
-          cp ../index.html ../prototipo-*.webmanifest ../prototipo-sw.js ../prototipo-globo-*.png ../prototipo-ncm.json out/prototipo/
           # Configuração lida pelo site ao abrir (login pelo Cognito deste ambiente).
           jq -n --arg amb "${{ inputs.ambiente }}" --arg r "$AWS_REGION" --arg sentry "${{ vars.SENTRY_DSN_SITE }}" \
             --arg cp "$COG_CLI_POOL" --arg cc "$COG_CLI_CLIENT" --arg cd "$COG_CLI_DOMINIO" \

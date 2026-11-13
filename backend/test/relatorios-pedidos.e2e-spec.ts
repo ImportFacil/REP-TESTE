@@ -157,3 +157,81 @@ describe('Relatório financeiro de todos os clientes', () => {
     expect(p.body.janela.de).toBe(hoje);
   });
 });
+
+describe('Painel → listas paginadas no servidor', () => {
+  const get = async (q: string) => api().get(`/equipe/pedidos?${q}`).set('Authorization', await como(COM, 'equipe'));
+
+  it('não entrega mais de 200 por vez', async () => {
+    expect((await get('por_pagina=1000')).status).toBe(400);
+    await api().get('/equipe/empresas?por_pagina=201').set('Authorization', await como(COM, 'equipe')).expect(400);
+  });
+
+  it('página, total e ordem por coluna', async () => {
+    const p1 = (await get('por_pagina=2&pagina=1&ordenar=criado_em&dir=asc')).body;
+    const p2 = (await get('por_pagina=2&pagina=2&ordenar=criado_em&dir=asc')).body;
+    expect(p1.total).toBe(5);
+    expect(p1.itens).toHaveLength(2);
+    expect(ids({ body: p1 })).toEqual([P.d5, P.h60]);
+    expect(ids({ body: p2 })[0]).toBe(P.h30);
+    expect(ids(await get('ordenar=id&dir=desc&por_pagina=1'))).toEqual([Math.max(...Object.values(P))]);
+  });
+
+  it('filtros das colunas: várias situações, forma, empresa, OC, valor e data', async () => {
+    expect(ids(await get('situacao=cancelado'))).toEqual([P.h30]);
+    expect((await get('situacao=cancelado,novo,pago,em_separacao')).body.total).toBeGreaterThanOrEqual(2);
+    expect((await get('forma_pagamento=boleto')).body.total).toBe(0);
+    expect((await get('forma_pagamento=pix,cartao')).body.total).toBe(5);
+    const coop = await get('razao_social=coop');
+    expect(coop.body.total).toBe(4);
+    expect(ids(await get('ordem_compra=555'))).toEqual([P.agora]);
+    const caro = (await get('ordenar=total_centavos&dir=desc&por_pagina=1')).body.itens[0].total_centavos as number;
+    expect((await get(`total_min=${caro / 100}`)).body.itens.every((p: { total_centavos: number }) => p.total_centavos >= caro)).toBe(true);
+    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+    expect(ids(await get(`criado_em_de=${hoje}&razao_social=coop`))).toEqual([P.agora]);
+    expect((await get('forma_pagamento=dinheiro')).status).toBe(400);
+  });
+
+  it('empresas: filtros de várias opções, ordem e lista leve de opções', async () => {
+    const auth = await como(COM, 'equipe');
+    const todas = (await api().get('/equipe/empresas?por_pagina=100').set('Authorization', auth).expect(200)).body;
+    const hosp = (await api().get('/equipe/empresas?tipo_cliente=hospital,cooperativa&ordenar=razao_social&dir=desc').set('Authorization', auth).expect(200)).body;
+    expect(hosp.itens.every((e: { tipo_cliente: string }) => ['hospital', 'cooperativa'].includes(e.tipo_cliente))).toBe(true);
+    const nomes = hosp.itens.map((e: { razao_social: string }) => e.razao_social);
+    expect(nomes).toEqual([...nomes].sort((a: string, b: string) => b.localeCompare(a, 'pt-BR')));
+    await api().get('/equipe/empresas?situacao=ativa,qualquer').set('Authorization', auth).expect(400);
+    const opcoes = (await api().get('/equipe/empresas/opcoes').set('Authorization', auth).expect(200)).body;
+    expect(opcoes).toHaveLength(todas.total);
+    expect(Object.keys(opcoes[0]).sort()).toEqual(['id', 'razao_social', 'tipo_cliente']);
+  });
+});
+
+describe('Sessão no cookie httpOnly (o token não fica guardado no navegador)', () => {
+  const cookieDe = (r: { headers: Record<string, unknown> }) => ([] as string[]).concat((r.headers['set-cookie'] as string[] | undefined) ?? []);
+
+  it('login de desenvolvimento grava o cookie protegido; renovar devolve um token que funciona', async () => {
+    const login = await api().post('/dev/token').send({ email: COM, origem: 'equipe' }).expect(201);
+    const [cookie] = cookieDe(login);
+    expect(cookie).toMatch(/^if_sessao=/);
+    expect(cookie).toMatch(/HttpOnly/i);
+    expect(cookie).toMatch(/SameSite=Strict/i);
+    expect(cookie).toMatch(/Path=\/sessao/);
+    const r = await api().post('/sessao/renovar').set('Cookie', cookie.split(';')[0]).expect(200);
+    expect(r.body.origem).toBe('equipe');
+    expect(r.body.expira_em_segundos).toBeGreaterThan(3600);
+    await api().get('/equipe/pedidos?por_pagina=1').set('Authorization', `Bearer ${r.body.token}`).expect(200);
+  });
+
+  it('sem cookie, com cookie adulterado ou depois de sair: 401 e o cookie é apagado', async () => {
+    await api().post('/sessao/renovar').expect(401);
+    const falso = Buffer.from(JSON.stringify({ o: 'equipe', t: 'token-inventado' })).toString('base64url');
+    const r = await api().post('/sessao/renovar').set('Cookie', `if_sessao=${falso}`).expect(401);
+    expect(cookieDe(r)[0]).toMatch(/if_sessao=;/);
+    const sair = await api().post('/sessao/sair').expect(200);
+    expect(cookieDe(sair)[0]).toMatch(/if_sessao=;/);
+  });
+
+  it('POST /sessao (troca do refresh token do Cognito) não existe no modo de desenvolvimento', async () => {
+    const r = await api().post('/sessao').send({ origem: 'equipe', refresh_token: 'x'.repeat(40) });
+    expect(r.status).toBe(403);
+  });
+});

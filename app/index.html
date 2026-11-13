@@ -6,8 +6,8 @@
 <title>Baixar o app ImportFácil</title>
 <meta name="description" content="Instale o app ImportFácil no celular: leia o QR code ou abra este endereço no Chrome (Android) ou no Safari (iPhone).">
 <meta name="theme-color" content="#1D4ED8">
-<link rel="icon" href="../prototipo-globo-192.png">
-<link rel="apple-touch-icon" href="../prototipo-globo-apple.png">
+<link rel="icon" href="globo-192.png">
+<link rel="apple-touch-icon" href="globo-apple.png">
 <style>
   :root{--fundo:#F6F5F2;--cartao:#fff;--tinta:#18181B;--tinta2:#52525B;--borda:#E4E2DC;--azul:#1D4ED8;--azul-claro:#E8EEFC;--ok:#15803D;--ok-fundo:#DCFCE7;--pend:#92400E;--pend-fundo:#FEF3C7}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fundo:#141414;--cartao:#1F1F1E;--tinta:#F2F1EE;--tinta2:#B8B6B0;--borda:#34332F;--azul:#7AA2F7;--azul-claro:#1E2A44;--ok:#86EFAC;--ok-fundo:#14301F;--pend:#FCD34D;--pend-fundo:#3A2E10}}
@@ -40,7 +40,7 @@
 <body>
 <div class="wrap">
   <header>
-    <img src="../prototipo-globo-192.png" alt="">
+    <img src="globo-192.png" alt="">
     <div>
       <h1>App ImportFácil no celular</h1>
       <p class="sub">A loja inteira, com o ícone do globo na tela inicial. Instala pelo navegador, sem loja de aplicativos.</p>
@@ -76,7 +76,6 @@
 (function () {
   var ENDERECO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/endereco.json';
   var CODESPACES = 'https://codespaces.new/ImportFacil/REP-TESTE?devcontainer_path=.devcontainer%2Fimportfacil%2Fdevcontainer.json';
-  var PROTOTIPO = '../';
   var caixa = document.getElementById('estado');
   var celular = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 900;
   var semRedirecionar = /[?&]ficar\b/.test(location.search);
@@ -96,9 +95,7 @@
       + '<p>Se você acabou de ligar o Codespace, espere: a primeira vez leva de 10 a 20 minutos. Depois, a porta 8000 precisa estar <b>pública</b> (no Codespace: aba PORTAS → 8000 → botão direito → Visibilidade da porta → Pública).</p>'
       + '<p>Para ligar: abra o Codespace da loja no computador. Quando ela estiver no ar, leia o QR de novo.</p>'
       + '<a class="botao" href="' + CODESPACES + '">Ligar a loja no Codespaces</a>'
-      + '<a class="botao sec" href="https://github.com/codespaces">Meus Codespaces</a>'
-      + '<h3>Enquanto isso</h3><p>O app do protótipo funciona sempre e também instala no celular.</p>'
-      + '<a class="botao sec" href="' + PROTOTIPO + '">Abrir o app do protótipo</a>');
+      + '<a class="botao sec" href="https://github.com/codespaces">Meus Codespaces</a>');
   }
 
   function ligada(url) {
@@ -133,10 +130,15 @@
   }
   var PORTA = '<p>A porta 8000 precisa estar <b>pública</b>: no Codespace, aba PORTAS → 8000 → botão direito → Visibilidade da porta → Pública.</p>';
 
+  // O link do túnel (trycloudflare) não passa pelo encaminhamento de portas do GitHub, que às vezes responde 404.
+  function melhorLink(e) {
+    return /^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/i.test(e.link_alternativo || '') ? e.link_alternativo : e.url;
+  }
+
   function porEstado(e) {
     var idade = minutos(e.atualizado);
     var antigo = idade === null || idade > (e.fase === 'no_ar' ? 20 : 6);
-    if (antigo) { testar(e.url, 'O último sinal do Codespace foi há ' + (idade === null ? '?' : idade) + ' min: ele provavelmente foi desligado.'); return; }
+    if (antigo) { testar(melhorLink(e), 'O último sinal do Codespace foi há ' + (idade === null ? '?' : idade) + ' min: ele provavelmente foi desligado.'); return; }
     if (e.fase === 'instalando') {
       mostrar('<span class="selo">Instalando</span><h2>A loja está sendo instalada</h2>'
         + '<p>Na primeira vez leva de 10 a 20 minutos. Esta página se atualiza sozinha. Último sinal há ' + idade + ' min.</p>' + linhas(e.log, 4));
@@ -148,7 +150,8 @@
         + '<p style="margin-top:10px">Envie esta tela para a equipe técnica. Para tentar de novo, reinicie o Codespace.</p>');
       return;
     }
-    testar(e.url, e.porta && e.porta !== 'public' ? 'A loja está no ar, mas a porta 8000 está privada.' + PORTA : null);
+    var link = melhorLink(e);
+    testar(link, link === e.url && e.porta && e.porta !== 'public' ? 'A loja está no ar, mas a porta 8000 está privada.' + PORTA : null);
   }
 
   function verificar() {
