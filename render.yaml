@@ -1,0 +1,20 @@
+# Protótipo da ImportFácil no Render (plano grátis), com o banco no Neon (plano grátis).
+# Passo a passo: demo/render/LEIA-ME.md
+services:
+  - type: web
+    name: importfacil-prototipo
+    runtime: node
+    plan: free
+    region: virginia            # mesma região do banco no Neon (AWS US East 1)
+    branch: main
+    autoDeploy: true            # cada mudança no main publica sozinha
+    buildCommand: bash demo/render/montar.sh
+    startCommand: bash demo/render/iniciar.sh
+    healthCheckPath: /api/saude
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL       # endereço do banco no Neon: colado no painel do Render, nunca no repositório
+        sync: false
+      - key: AUTH_SEGREDO_DEV   # o Render gera um valor aleatório
+        generateValue: true

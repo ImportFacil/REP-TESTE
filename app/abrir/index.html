@@ -25,6 +25,9 @@
 /* Endereço fixo do protótipo: lê o estado publicado pelo Codespace (ramo app-endereco) e leva ao link que está no ar.
    O link do túnel muda cada vez que o Codespace liga; este endereço não muda. */
 (function () {
+  // Link fixo no Render (plano grátis): sempre no ar, sem depender do Codespace. Vazio = só o Codespace.
+  // ?codespace no endereço desta página força o caminho antigo (Codespace).
+  var LINK_FIXO = '';
   var ESTADO = 'https://raw.githubusercontent.com/ImportFacil/REP-TESTE/app-endereco/estado.json';
   var el = function (id) { return document.getElementById(id); };
   function mostrar(titulo, texto) { el('titulo').textContent = titulo; el('texto').textContent = texto; }
@@ -44,6 +47,14 @@
         mostrar('O protótipo está desligado', 'Ligue o Codespace em github.com/codespaces e volte aqui em 3 minutos.'); setTimeout(ver, 30000);
       }
     }).catch(function () { mostrar('Não consegui consultar o endereço', 'Confira a conexão e recarregue a página.'); });
+  }
+  if (LINK_FIXO && !/[?&]codespace\b/.test(location.search)) {
+    var fixo = LINK_FIXO.replace(/\/+$/, '') + '/entrar/';
+    el('botao').href = fixo; el('botao').hidden = false;
+    mostrar('Abrindo o protótipo…', 'Se ele estava parado, leva cerca de 1 minuto para acordar.');
+    el('pe').textContent = 'Endereço: ' + LINK_FIXO;
+    location.replace(fixo);
+    return;
   }
   ver();
 })();
