@@ -52,7 +52,7 @@
   color: #fff;
   --texto: #ffffff; --texto-2: #b9c6da; --borda: rgba(255, 255, 255, .22); --superficie: rgba(255, 255, 255, .08); --superficie-2: rgba(255, 255, 255, .08);
 }
-.rota-vidro { background: rgba(6, 10, 26, .72); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 15px 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.rota-vidro { background: rgba(20, 28, 52, .88); border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; padding: 15px 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .rota-quadro { pointer-events: auto; width: 300px; max-height: 100%; overflow-y: auto; }
 /* coluna da esquerda: a consulta no alto e as opções no fim da página, com o espaço livre entre os dois */
 .rota-coluna { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; min-height: 100%; }
